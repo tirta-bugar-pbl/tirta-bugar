@@ -1,0 +1,81 @@
+/* variabel warna */
+:root{
+    --primary-color: #1F1F1F;
+    --secondary-color: #FFFFFF;
+    --acent-color: #DFA100;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    flex-direction: column;
+}
+
+.title-daftar {
+    font-size: 2.5rem;
+    padding-bottom: 50px;
+    font-weight: bold;
+    font-family: "Montserrat", system-ui;
+    text-align: center;
+}
+
+label {
+    font-family: "Roboto", system-ui;
+    font-size: 1.1rem;
+}
+
+.input-daftar {
+    padding: 10px;
+    margin-bottom: 20px;
+    font-size: 16px;
+    font-family: "Roboto", system-ui;
+    border-radius: 10px;
+    border: 1px solid var(--secondary-color);
+    color: var(--secondary-color);
+    padding: 0.8rem;
+}
+
+.form-group {
+    width: 100%;
+}
+
+.form-group.container {
+    flex-direction: column;
+    gap: 10px;
+}
+
+.form-container {
+    width: 100%;
+    max-width: 600px;
+    padding: 2rem;
+}
+
+.daftar.container {
+    flex-direction: column;
+    gap: 12px;
+}
+
+select {
+    appearance: none;
+    background-image: url("../assets/arrow.svg");
+    background-repeat: no-repeat;
+    background-position: right 0.7rem center;
+    background-size: 1rem;
+}
+
+option {
+    background-color: var(--primary-color);
+}
+
+.btn-daftar {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    background-color: var(--acent-color);
+    color: var(--secondary-color);
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 1rem;
+}

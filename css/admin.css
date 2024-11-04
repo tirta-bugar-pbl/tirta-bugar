@@ -1,0 +1,272 @@
+/* css reset */
+*, *::after, *::before {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* variabel warna */
+:root{
+    --primary-color: #1F1F1F;
+    --secondary-color: #FFFFFF;
+    --acent-color: #DFA100;
+    --acent2-color: #B31E1E;
+}
+
+body {
+    font-family: "Montserrat", system-ui;
+    width: 100%;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+ul {
+    list-style-type: none;
+}
+
+button {
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+}
+
+img {
+    width: 100%;
+}
+
+input, select {
+    background-color: transparent;
+    outline: none;
+    border: none;
+}
+
+.container {
+    display: flex;
+    width: 100%;
+}
+
+.content {
+    flex-grow: 1;
+    width: 100%;
+}
+
+/* sidebar */
+.sidebar {
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+    width: 350px;
+}
+
+.sidebar.container {
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100vh;
+}
+
+.sidebar .logo-sidebar {
+    background-color: var(--acent-color);
+    text-align: center;
+    padding: 10px 20px;
+}
+
+.sidebar .logo-sidebar h1 {
+    font-size: 3rem;
+    font-weight: bold;
+    font-family: "Playfair Display", system-ui;
+}
+
+.sidebar nav {
+    padding: 40px 20px;
+}
+
+.sidebar nav ul li {
+    padding-bottom: 25px;
+    font-weight: 600;
+}
+
+.sidebar .log-out {
+    background-color: var(--acent2-color);
+    padding: 15px 20px;
+}
+
+.sidebar .log-out img {
+    width: 10%;
+}
+
+.sidebar .log-out.container {
+    align-items: center;
+    gap: 12px;
+}
+
+.sidebar .menu.container {
+    align-items: center;
+    gap: 12px;
+}
+
+.sidebar .menu-item.container{
+    display: flex;
+    margin-left: auto;
+}
+
+.sidebar .menu-item .menu img, .sidebar .menu-item img  {
+    width: 24px;
+    height: 24px
+}
+
+/* header */
+header {
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+}
+
+header .container {
+    justify-content: space-between;
+    align-items: center;
+    padding: 26px 40px;
+}
+
+header .account {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 16px;
+}
+
+header .account-profile {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+}
+
+header .account img {
+    width: 20px;
+    height: 20px
+}
+
+/* main */
+main {
+    padding: 40px 20px;
+}
+
+/* card member amount */
+.amount-member .container {
+    justify-content: space-evenly;
+    gap: 12px;
+}
+
+.card-member-amount {
+    border: 1px solid var(--primary-color);
+    width: 30%;
+}
+
+.card-member-amount.container {
+    gap: 12px;
+    justify-content: flex-start;
+}
+
+.card-member-amount .image-amount {
+    background-color: var(--primary-color);
+    padding: 20px 10px;
+    width: 150px;
+}
+
+.card-member-amount .image-amount img {
+    width: 100px;
+}
+
+.card-member-amount .image-amount.container {
+    justify-content: center;
+    align-items: center;
+}
+
+.card-member-amount .title-amount-group {
+    padding: 8px 0;
+}
+
+.card-member-amount .title-amount-group h3, .card-member-amount .title-amount-group h4 {
+    font-weight: 400;
+}
+
+/* filtering */
+.filtering-member {
+    padding: 20px;
+}
+
+.filtering-member .container {
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.filtering-member .filter-member, .filtering-member .search-member {
+    padding: 8px;
+    border: 1px solid #CECECE;
+    border-radius: 8px;
+} 
+
+.filtering-member .search-member {
+    width: 20%;
+}
+
+.filtering-member .search-member .container {
+    align-items: center;
+}
+
+.filtering-member .search-member img {
+    width: 18px;
+    height: 18px;
+}
+
+select {
+    width: 150px;
+    appearance: none;
+    background-image: url("../assets/filter.svg");
+    background-repeat: no-repeat;
+    background-position: right 0.7rem center;
+    background-size: 1rem;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0 20px 0;
+}
+
+.heading-tampil-data {
+    text-align: center;
+    padding-bottom: 50px;
+}
+
+td {
+    border: 1px solid black;
+    padding: 12px;
+}
+
+thead td {
+    background-color: black;
+    color: white;
+    font-weight: 600;
+}
+
+.action.container {
+    justify-content: center;
+    gap: 12px;
+}
+
+.action a {
+    padding: 6px 12px;
+    border-radius: 8px;
+}
+
+.detail {
+    background-color: var(--acent-color);
+    color: white;
+}
+
+.hapus {
+    background-color: var(--acent2-color);
+    color: white;
+}

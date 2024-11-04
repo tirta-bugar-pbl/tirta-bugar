@@ -1,0 +1,92 @@
+/* variabel warna */
+:root{
+    --primary-color: #1F1F1F;
+    --secondary-color: #FFFFFF;
+    --acent-color: #DFA100;
+}
+
+body {
+    padding: 3em;
+}
+
+.title-payment {
+    font-weight: bold;
+    font-size: 2em;
+    margin-bottom: 1.5em;
+    font-family: "Montserrat", system-ui;
+}
+
+.payment-box {
+    border: 1px solid var(--secondary-color);
+    border-radius: 12px;
+    padding: 2em;
+}
+
+.title-detail-payment, .title-invoice {
+    font-family: "Roboto", system-ui;
+    text-align: center;
+    font-weight: 500;
+}
+
+.title-detail-payment {
+    font-size: 1.5em;
+}
+
+.title-invoice {
+    font-size: 1em;
+    margin-bottom: 3em;
+}
+
+.detail-payment-group.container {
+    justify-content: space-between;
+}
+
+.detail-payment-group p, .label-detail-payment p {
+    font-family: "Roboto", system-ui;
+    font-size: 1em;
+
+}
+
+.detail-payment-group.container > div {
+    margin-bottom: 1em;
+}
+
+.label-detail-payment.container {
+    justify-content: space-between;
+    width: 80%;
+}
+
+.total.container {
+    align-items: center;
+    height: 10vh;
+}
+
+.label-total-amount {
+    font-size: 1.3em;
+    font-weight: bold;
+    color: var(--acent-color);
+}
+
+.label-total-amount, .total-amount {
+    font-family: "Roboto", system-ui;
+}
+
+.total-amount {
+    font-size: 1.8em;
+    font-weight: bold;
+}
+
+.btn-payment {
+    background-color: var(--acent-color);
+    color: var(--secondary-color);
+    font-size: 1.2em;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 20px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 80%;
+}

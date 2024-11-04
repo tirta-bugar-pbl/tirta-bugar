@@ -1,0 +1,44 @@
+.detail-member .container {
+    flex-direction: column;
+    gap: 20px;
+}
+
+.detail-member .detail-member-group.container {
+    flex-direction: row;
+    justify-content: flex-start;
+    width: 100%;
+}
+
+.detail-member .detail-member-group .detail-label.container{
+    flex-direction: row;
+}
+
+.detail-member .detail-member-group .label-nama, .detail-member .detail-member-group .label-phone, .detail-member .detail-member-group .label-email, .detail-member .detail-member-group .label-paket, .detail-member .detail-member-group .label-durasi, .detail-member .detail-member-group .label-date-start, .detail-member .detail-member-group .label-date-end, .detail-member .detail-member-group .label-keterangan, .detail-member .detail-member-group .label-status, .detail-member .detail-member-group .label-kwitansi {
+    width: 40%;
+}
+
+.detail-member .btn-group.container {
+    flex-direction: row;
+    gap: 10px;
+    width: 100%;
+    margin-top: 50px;
+}
+.btn-edit {
+    width: 100%;
+    text-align: center;
+    padding: 10px 20px;
+    border-radius: 5px;
+    background-color: var(--acent-color);
+    color: white;
+    cursor: pointer;
+}
+
+.btn-delete {
+    width: 100%;
+    text-align: center;
+    padding: 10px 20px;
+    border-radius: 5px;
+    background-color: var(--acent2-color);
+    color: white;
+    cursor: pointer;
+}

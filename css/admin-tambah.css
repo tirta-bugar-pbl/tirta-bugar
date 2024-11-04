@@ -1,0 +1,46 @@
+.tambah-member label {
+    width: 30%;
+}
+
+.tambah-member .input-tambah {
+    border: 1px solid #CECECE;
+    border-radius: 5px;
+    padding: 10px;
+    width: 100%;
+}
+
+.form-tambah.container {
+    flex-direction: column;
+    row-gap: 20px;
+}
+
+.btn-group.container {
+    gap: 10px;
+    margin-top: 50px;
+}
+
+.btn-group .btn-tambah {
+    background-color: var(--acent-color);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+}
+
+.tambah-member select {
+    background-image: url("../assets/arrow-form-admin.svg");
+}
+
+.btn-group .btn-cancell {
+    background-color: var(--acent2-color);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+}
