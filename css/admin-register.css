@@ -68,8 +68,18 @@ input[type="password"], input[type="text"] {
     cursor: pointer;
 }
 
-.pw-group {
+.pw-group, .button-group {
     width: 100%;
+}
+
+.text-login {
+    text-align: center;
+    margin-top: 6px;
+    font-size: 12px;
+}
+
+.text-login a {
+    color: var(--acent-color);
 }
 
 .btn-register {

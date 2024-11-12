@@ -51,13 +51,19 @@ input, select {
 .content {
     flex-grow: 1;
     width: 100%;
+    margin-left: 300px;
 }
 
 /* sidebar */
 .sidebar {
+    position: fixed;
     background-color: var(--primary-color);
     color: var(--secondary-color);
-    width: 350px;
+    width: 300px;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1;
 }
 
 .sidebar.container {
@@ -198,7 +204,6 @@ main {
 
 .filtering-member .container {
     justify-content: space-between;
-    gap: 12px;
 }
 
 .filtering-member .filter-member, .filtering-member .search-member {
@@ -207,11 +212,7 @@ main {
     border-radius: 8px;
 } 
 
-.filtering-member .search-member {
-    width: 20%;
-}
-
-.filtering-member .search-member .container {
+.filtering-member .search-member.container {
     align-items: center;
 }
 

@@ -1,3 +1,36 @@
+<?php 
+    session_start();
+    include 'koneksi.php';
+
+    if(!isset($_SESSION['email'])){
+        header('Location: admin-login.php');
+        exit();
+    }
+
+    // mengambil data profile di php // mengambil data profile di php
+    $adminId = $_SESSION['id_admin'];
+    $queryProfileName = "SELECT id_admin, username, email FROM admin WHERE id_admin = $adminId";
+    $resultProfileName = $conn->query($queryProfileName);
+    $rowProfileName = $resultProfileName->fetch(PDO::FETCH_ASSOC);
+
+    // update profile
+    if(isset($_POST['submit'])){
+        $username = $_POST['username'];
+        $email = $_POST['email'];
+
+        if(empty($username) || empty($email)){
+            echo "<script>alert('Wajib isi Form !');</script>";
+        } else {
+            $queryUpdateProfile = "UPDATE admin SET username = '$username', email = '$email' WHERE id_admin = $adminId";
+            $resultUpdateProfile = $conn->query($queryUpdateProfile);
+            if($resultUpdateProfile){
+                header('Location: admin-akun.php');
+                exit();
+            }
+        }
+    }
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,8 +38,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin</title>
     <!-- link css -->
-    <link rel="stylesheet" href="css/admin.css">
-    <link rel="stylesheet" href="css/admin-tambah.css">
+    <link rel="stylesheet" href="css/admin.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="css/admin-tambah.css?v=<?php echo time(); ?>">
     <!-- link google font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -26,16 +59,15 @@
                 <nav>
                     <ul>
                         <li>
-                            <a href="admin.html" class="menu-item container">
+                            <a href="admin.php" class="menu-item">
                                 <div class="menu container">
                                     <img src="assets/home.svg" alt="dashboard-nav">
                                     Beranda
                                 </div>
-                                <img src="assets/active-menu.svg" alt="active-icon">
                             </a>
                         </li>
                         <li>
-                            <a href="admin-tambah.html" class="menu-item">
+                            <a href="admin-tambah.php" class="menu-item">
                                 <div class="menu container">
                                     <img src="assets/plus.svg" alt="tambah-nav">
                                     Tambah Member
@@ -43,7 +75,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="admin-paket.html" class="menu-item">
+                            <a href="admin-paket.php" class="menu-item">
                                 <div class="menu container">
                                     <img src="assets/note.svg" alt="paket-nav">
                                     Daftar Paket
@@ -51,7 +83,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="admin-transaksi.html" class="menu-item">
+                            <a href="admin-transaksi.php" class="menu-item">
                                 <div class="menu container">
                                     <img src="assets/transaction.svg" alt="transaction-nav">
                                     Transaksi
@@ -59,15 +91,16 @@
                             </a>
                         </li>
                         <li>
-                            <a href="admin-akun.html" class="menu-item">
+                            <a href="admin-akun.php" class="menu-item container">
                                 <div class="menu container">
                                     <img src="assets/setting.svg" alt="setting-nav">
                                     Pengaturan Akun
                                 </div>
+                                <img src="assets/active-menu.svg" alt="active-icon">
                             </a>
                         </li>
                         <li>
-                            <a href="admin-absen.html" class="menu-item">
+                            <a href="admin-absen.php" class="menu-item">
                                 <div class="menu container">
                                     <img src="assets/calendar.svg" alt="calendar-nav">
                                     Absensi Harian
@@ -78,10 +111,10 @@
                 </nav>
             </div>
             <!-- sidebar log out -->
-            <div class="log-out container">
+            <a href="logout.php" class="log-out container">
                 <img src="assets/log-out.svg" alt="log-out">
                 <h3>Log Out</h3>
-            </div>
+            </a>
         </div>
         <div class="content">
             <header>
@@ -95,7 +128,7 @@
                         <div class="account-profile">
                             <!-- icon account -->
                             <img src="assets/profile.svg" alt="profile">
-                            <h3>Admin</h3>
+                            <h3><?= $rowProfileName['username']?></h3>
                         </div>
                     </div>
                 </div>
@@ -103,41 +136,17 @@
             <main>
                 <!-- form tambah member -->
                 <section class="tambah-member">
-                    <form class="form-tambah container">
+                    <form class="form-tambah container" method="POST">
                         <div class="form-group container">
-                            <label for="nama">Nama (Sesuai KTP)</label>
-                            <input type="text" name="nama" id="nama" class="input-tambah">
+                            <label for="username">Username</label>
+                            <input type="text" name="username" id="username" value="<?= $rowProfileName['username']?>" class="input-tambah">
                         </div>
                         <div class="form-group container">
                             <label for="email">Email</label>
-                            <input type="email" name="email" id="email" class="input-tambah">
-                        </div>
-                        <div class="form-group container">
-                            <label for="nomor-telepon">Nomor Telepon</label>
-                            <input type="text" name="nomor-telepon" id="nomor-telepon" class="input-tambah">
-                        </div>
-                        <div class="form-group container">
-                            <label for="durasi">Durasi</label>
-                            <select name="durasi" id="durasi" class="input-tambah">
-                                <option value="8x pertemuan">8x Pertemuan</option>
-                                <option value="1 bulan">1 Bulan</option>
-                                <option value="3 bulan">3 Bulan</option>
-                            </select>
-                        </div>
-                        <div class="form-group container">
-                            <label for="tanggal-awal">Tanggal Awal</label>
-                            <input type="date" name="tanggal-awal" id="tanggal-awal" class="input-tambah">
-                        </div>
-                        <div class="form-group container">
-                            <label for="tanggal-akhir">Tanggal Akhir</label>
-                            <input type="date" name="tanggal-akhir" id="tanggal-akhir" class="input-tambah">
-                        </div>
-                        <div class="form-group container">
-                            <label for="no-kwitansi">No Kwitansi</label>
-                            <input type="text" name="no-kwitansi" id="no-kwitansi" class="input-tambah">
+                            <input type="email" name="email" id="email" value="<?= $rowProfileName['email']?>" class="input-tambah">
                         </div>
                         <div class="btn-group container">
-                            <button type="submit" class="btn-tambah">Edit Member</button>
+                            <button type="submit" name="submit" class="btn-tambah">Edit Akun</button>
                             <button class="btn-cancell">Batalkan</button>
                         </div>
                     </form>

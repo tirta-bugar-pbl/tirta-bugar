@@ -1,3 +1,34 @@
+<?php 
+    session_start();
+    include 'koneksi.php';
+
+    if(!isset($_SESSION['email'])){
+        header('Location: admin-login.php');
+        exit();
+    }
+
+    // mengambil data profile di php
+    $adminId = $_SESSION['id_admin'];
+    $queryProfileName = "SELECT username FROM admin WHERE id_admin = $adminId";
+    $resultProfileName = $conn->query($queryProfileName);
+    $rowProfileName = $resultProfileName->fetch(PDO::FETCH_ASSOC);
+
+    // mengambil data absen
+    if(isset($_GET['search']))
+    {
+        $search = $_GET['search'];
+        $queryAbsen = "SELECT TO_CHAR(a.tanggal_datang, 'DD Month YYYY') as tanggal_datang, m.nama_member, p.keterangan_fasilitas, TO_CHAR(m.tanggal_berakhir, 'DD Month YYYY') as tanggal_berakhir, p.keterangan_durasi, COALESCE(a.keterangan, '-') as keterangan_absen  FROM absen_harian a FULL OUTER JOIN member m ON a.id_member = m.id_member FULL OUTER JOIN paket_member p ON m.id_paket = p.id_paket WHERE m.nama_member LIKE '%$search%'";
+
+        $resultAbsen = $conn->query($queryAbsen);
+    }else {
+        $queryAbsen = "SELECT TO_CHAR(a.tanggal_datang, 'DD Month YYYY') as tanggal_datang, m.nama_member, p.keterangan_fasilitas, TO_CHAR(m.tanggal_berakhir, 'DD Month YYYY') as tanggal_berakhir, p.keterangan_durasi, COALESCE(a.keterangan, '-') as keterangan_absen  FROM absen_harian a FULL OUTER JOIN member m ON a.id_member = m.id_member FULL OUTER JOIN paket_member p ON m.id_paket = p.id_paket";
+
+        $resultAbsen = $conn->query($queryAbsen);
+    }
+
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,7 +36,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin</title>
     <!-- link css -->
-    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/admin.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="css/admin-absen.css?v=<?php echo time(); ?>">
     <!-- link google font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,7 +57,7 @@
                 <nav>
                     <ul>
                         <li>
-                            <a href="admin.html" class="menu-item">
+                            <a href="admin.php" class="menu-item">
                                 <div class="menu container">
                                     <img src="assets/home.svg" alt="dashboard-nav">
                                     Beranda
@@ -33,7 +65,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="admin-tambah.html" class="menu-item">
+                            <a href="admin-tambah.php" class="menu-item">
                                 <div class="menu container">
                                     <img src="assets/plus.svg" alt="tambah-nav">
                                     Tambah Member
@@ -41,7 +73,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="admin-paket.html" class="menu-item">
+                            <a href="admin-paket.php" class="menu-item">
                                 <div class="menu container">
                                     <img src="assets/note.svg" alt="paket-nav">
                                     Daftar Paket
@@ -49,7 +81,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="admin-transaksi.html" class="menu-item">
+                            <a href="admin-transaksi.php" class="menu-item">
                                 <div class="menu container">
                                     <img src="assets/transaction.svg" alt="transaction-nav">
                                     Transaksi
@@ -57,7 +89,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="admin-akun.html" class="menu-item">
+                            <a href="admin-akun.php" class="menu-item">
                                 <div class="menu container">
                                     <img src="assets/setting.svg" alt="setting-nav">
                                     Pengaturan Akun
@@ -65,7 +97,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="admin-absen.html" class="menu-item container">
+                            <a href="admin-absen.php" class="menu-item container">
                                 <div class="menu container">
                                     <img src="assets/calendar.svg" alt="calendar-nav">
                                     Absensi Harian
@@ -77,10 +109,10 @@
                 </nav>
             </div>
             <!-- sidebar log out -->
-            <div class="log-out container">
+            <a href="logout.php" class="log-out container">
                 <img src="assets/log-out.svg" alt="log-out">
                 <h3>Log Out</h3>
-            </div>
+            </a>
         </div>
         <div class="content">
             <header>
@@ -94,28 +126,22 @@
                         <div class="account-profile">
                             <!-- icon account -->
                             <img src="assets/profile.svg" alt="profile">
-                            <h3>Admin</h3>
+                            <h3><?= $rowProfileName['username']?></h3>
                         </div>
                     </div>
                 </div>
             </header>
             <main>
-                <!-- filtering member -->
-                <section class="filtering-member">
+                <!-- filtering absen -->
+                <section class="filtering-absen">
                     <div class="container">
-                        <!-- filter member -->
-                        <div class="filter-member">
-                            <select name="filter">
-                                <option value="filter">Filter</option>
-                                <option value="active">Aktif</option>
-                                <option value="nonactive">Tidak Aktif</option>
-                            </select>
-                        </div>
-                        <!-- search member -->
-                        <div class="search-member container">
-                            <input type="text" name="search" id="search" placeholder="Search">
-                            <img src="assets/search.svg" alt="search">
-                        </div>
+                        <form method="GET">
+                            <!-- search absen -->
+                            <div class="search-absen container">
+                                <input type="text" name="search" id="search" placeholder="Search">
+                                <img src="assets/search.svg" alt="search">
+                            </div>
+                        </form>
                     </div>
                 </section>
                 <section class="absen-table">
@@ -123,25 +149,26 @@
                         <!-- head table -->
                         <thead>
                             <tr>
-                                <td style="text-align: center;width: 20%;">Tanggal Datang</td>
-                                <td style="text-align: center; width: 15%;">nama</td>
-                                <td style="text-align: center; width: 15%;">Paket Member</td>
+                                <td style="text-align: center;width: 15%;">Tanggal Datang</td>
+                                <td style="text-align: center; width: 20%;">nama</td>
                                 <td style="text-align: center; width: 10%;">Durasi</td>
                                 <td style="text-align: center; width: 15%;">Tanggal Berlaku</td>
+                                <td style="text-align: center; width: 15%;">Keterangan Member</td>
                                 <td style="text-align: center; width: 15%;">Keterangan</td>
-                                <td style="text-align: center; width: 10%;">Status</td>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td style="text-align: center;">27 Maret 2024</td>
-                                <td style="text-align: center;">Nur Whaid</td>
-                                <td style="text-align: center;">Regullar</td>
-                                <td style="text-align: center;">1 Bulan</td>
-                                <td style="text-align: center;">8x Pertemuan</td>
-                                <td style="text-align: center;">24 Mei 2024</td>
-                                <td style="text-align: center;">Aktif</td>
-                            </tr>
+                            <!-- data table -->
+                            <?php foreach ($resultAbsen as $result) : ?>
+                                <tr>
+                                <td style="text-align: center;"><?= $result['tanggal_datang'] ?></td>
+                                <td><?= $result['nama_member'] ?></td>
+                                <td style="text-align: center;"><?= $result['keterangan_fasilitas'] ?></td>
+                                <td style="text-align: center;"><?= $result['tanggal_berakhir'] ?></td>
+                                <td style="text-align: center;"><?= $result['keterangan_durasi'] ?></td>          
+                                <td style="text-align: center;"><?= $result['keterangan_absen'] ?></td>
+                                </tr>
+                            <?php endforeach; ?>
                         </tbody>
                     </table>
                 </section>
