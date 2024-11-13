@@ -13,7 +13,7 @@
     flex-direction: row;
 }
 
-.detail-member .detail-member-group .label-nama, .detail-member .detail-member-group .label-phone, .detail-member .detail-member-group .label-email, .detail-member .detail-member-group .label-paket, .detail-member .detail-member-group .label-durasi, .detail-member .detail-member-group .label-date-start, .detail-member .detail-member-group .label-date-end, .detail-member .detail-member-group .label-keterangan, .detail-member .detail-member-group .label-status, .detail-member .detail-member-group .label-kwitansi {
+.detail-member .detail-member-group .label-nama, .detail-member .detail-member-group .label-phone, .detail-member .detail-member-group .label-email, .detail-member .detail-member-group .label-paket, .detail-member .detail-member-group .label-durasi, .detail-member .detail-member-group .label-date-start, .detail-member .detail-member-group .label-date-end, .detail-member .detail-member-group .label-keterangan, .detail-member .detail-member-group .label-status, .detail-member .detail-member-group .label-kwitansi, .detail-member .detail-member-group .label-password {
     width: 40%;
 }
 

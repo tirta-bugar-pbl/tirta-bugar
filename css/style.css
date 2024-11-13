@@ -318,3 +318,13 @@ footer .copyright {
     padding: 2rem;
     text-align: center;
 }
+
+@media (max-width: 720px) {
+    .banner .container h1 {
+        font-size: 42px;
+    }
+
+    .about, .why-choose-us, .price {
+        padding: 2rem
+    }
+}

@@ -1,11 +1,34 @@
+<?php
+    include 'koneksi.php';
+
+    if (isset($_POST['submit'])) {
+        $username = $_POST['username'];
+        $email = $_POST['email'];
+        $password = $_POST['password'];
+        $hash_pass = password_hash($password, PASSWORD_DEFAULT);
+
+        if (empty($username) || empty($email) || empty($password)) {
+            echo "<script>alert('Wajib isi Form !');</script>";
+        } else {
+            $sql = "INSERT INTO admin (username, email, password) VALUES ('$username', '$email', '$hash_pass')";
+
+            if ($conn->query($sql)) {
+                header("Location: admin-login.php");
+            } else {
+                echo "Error: " . $sql . "<br>" . $conn->error;
+            }
+        }
+    }
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin</title>
-    <link rel="stylesheet" href="css/admin.css">
-    <link rel="stylesheet" href="css/admin-login.css">
+    <link rel="stylesheet" href="css/admin.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="css/admin-register.css?v=<?php echo time(); ?>">
         <!-- link google font -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,9 +36,13 @@
 </head>
 <body>
     <div class="container">
-        <h2 class="login-title">Login</h2>
-        <form>
+        <h2 class="register-title">Register</h2>
+        <form method="POST">
             <div class="container">
+                <div class="form-group container">
+                    <label for="username">Username</label>
+                    <input type="username" name="username" id="username">
+                </div>
                 <div class="form-group container">
                     <label for="email">Email</label>
                     <input type="email" name="email" id="email">
@@ -27,9 +54,9 @@
                         <img src="assets/show-pw.svg" alt="show-pw" onclick="showPassword()">
                     </div>
                 </div>
-                <div class="btn-group">
-                    <button type="submit" class="btn-login">Login</button>
-                    <p>Don’t have account? <a href="admin-register.html" target="_blank">Register</a></p>
+                <div class="button-group">
+                    <button type="submit" name="submit" class="btn-register">Register</button>
+                    <p class="text-login">Sudah Punya Akun? <a href="admin-login.php">Login</a></p>
                 </div>
             </div>
         </form>

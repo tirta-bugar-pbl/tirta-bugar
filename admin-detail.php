@@ -1,3 +1,26 @@
+<?php 
+    session_start();
+    include 'koneksi.php';
+
+    if(!isset($_SESSION['email'])){
+        header('Location: admin-login.php');
+        exit();
+    }
+
+    // mengambil data profile di php
+    $adminId = $_SESSION['id_admin'];
+    $queryProfileName = "SELECT username FROM admin WHERE id_admin = $adminId";
+    $resultProfileName = $conn->query($queryProfileName);
+    $rowProfileName = $resultProfileName->fetch(PDO::FETCH_ASSOC);
+
+    // mengambil data detail member
+    $id = $_GET['id'];
+    $queryDetailMember = "SELECT m.nama_member, m.email, m.password, m.nomor_telepon, m.no_kwitansi, m.status, TO_CHAR(m.tanggal_awal, 'DD Month YYYY') as tanggal_awal, TO_CHAR(m.tanggal_berakhir, 'DD Month YYYY') as tanggal_berakhir, 
+p.nama_paket, p.keterangan_fasilitas, p.keterangan_durasi FROM member m LEFT OUTER JOIN paket_member p ON m.id_paket = p.id_paket WHERE m.id_member = $id";
+    $resultDetailMember = $conn->query($queryDetailMember);
+    $rowDetailMember = $resultDetailMember->fetch(PDO::FETCH_ASSOC);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,8 +28,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin</title>
     <!-- link css -->
-    <link rel="stylesheet" href="css/admin.css">
-    <link rel="stylesheet" href="css/admin-detail.css">
+    <link rel="stylesheet" href="css/admin.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="css/admin-detail.css?v=<?php echo time(); ?>">
     <!-- link google font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -26,7 +49,7 @@
                 <nav>
                     <ul>
                         <li>
-                            <a href="admin.html" class="menu-item container">
+                            <a href="admin.php" class="menu-item container">
                                 <div class="menu container">
                                     <img src="assets/home.svg" alt="dashboard-nav">
                                     Beranda
@@ -35,7 +58,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="admin-tambah.html" class="menu-item">
+                            <a href="admin-tambah.php" class="menu-item">
                                 <div class="menu container">
                                     <img src="assets/plus.svg" alt="tambah-nav">
                                     Tambah Member
@@ -43,7 +66,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="admin-paket.html" class="menu-item">
+                            <a href="admin-paket.php" class="menu-item">
                                 <div class="menu container">
                                     <img src="assets/note.svg" alt="paket-nav">
                                     Daftar Paket
@@ -51,7 +74,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="admin-transaksi.html" class="menu-item">
+                            <a href="admin-transaksi.php" class="menu-item">
                                 <div class="menu container">
                                     <img src="assets/transaction.svg" alt="transaction-nav">
                                     Transaksi
@@ -59,7 +82,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="admin-akun.html" class="menu-item">
+                            <a href="admin-akun.php" class="menu-item">
                                 <div class="menu container">
                                     <img src="assets/setting.svg" alt="setting-nav">
                                     Pengaturan Akun
@@ -67,7 +90,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="admin-absen.html" class="menu-item">
+                            <a href="admin-absen.php" class="menu-item">
                                 <div class="menu container">
                                     <img src="assets/calendar.svg" alt="calendar-nav">
                                     Absensi Harian
@@ -78,10 +101,10 @@
                 </nav>
             </div>
             <!-- sidebar log out -->
-            <div class="log-out container">
+            <a href="logout.php" class="log-out container">
                 <img src="assets/log-out.svg" alt="log-out">
                 <h3>Log Out</h3>
-            </div>
+            </a>
         </div>
         <div class="content">
             <header>
@@ -95,7 +118,7 @@
                         <div class="account-profile">
                             <!-- icon account -->
                             <img src="assets/profile.svg" alt="profile">
-                            <h3>Admin</h3>
+                            <h3><?= $rowProfileName['username']?></h3>
                         </div>
                     </div>
                 </div>
@@ -108,57 +131,62 @@
                         <div class="detail-member-group container">
                             <p class="label-nama">Nama</p>
                             <p>:</p>
-                            <p>Septian Junior Anada</p>
+                            <p><?= $rowDetailMember['nama_member']?></p>
                         </div>
                         <div class="detail-member-group container">
                             <p class="label-phone">Nomor Telepon</p>
                             <p>:</p>
-                            <p>0837277123</p>
+                            <p><?= $rowDetailMember['nomor_telepon']?></p>
                         </div>
                         <div class="detail-member-group container">
                             <p class="label-email">Email</p>
                             <p>:</p>
-                            <p>septian@gmail.com</p>
+                            <p><?= $rowDetailMember['email']?></p>
+                        </div>
+                        <div class="detail-member-group container">
+                            <p class="label-password">Password</p>
+                            <p>:</p>
+                            <p><?= $rowDetailMember['password']?></p>
                         </div>
                         <div class="detail-member-group container">
                             <p class="label-paket">Jenis Paket</p>
                             <p>:</p>
-                            <p>Regullar Fitness</p>
+                            <p><?= $rowDetailMember['nama_paket']?></p>
                         </div>
                         <div class="detail-member-group container">
                             <p class="label-durasi">Durasi</p>
                             <p>:</p>
-                            <p>1 Bulan</p>
+                            <p><?= $rowDetailMember['keterangan_fasilitas'] ?></p>
                         </div>
                         <div class="detail-member-group container">
                             <p class="label-date-start">Tanggal Awal</p>
                             <p>:</p>
-                            <p>20 Maret 2024</p>
+                            <p><?= $rowDetailMember['tanggal_awal'] ?></p>
                         </div>
                         <div class="detail-member-group container">
                             <p class="label-date-end">Tanggal Akhir</p>
                             <p>:</p>
-                            <p>20 April 2024</p>
+                            <p><?= $rowDetailMember['tanggal_berakhir'] ?></p>
                         </div>
                         <div class="detail-member-group container">
                             <p class="label-keterangan">Keterangan</p>
                             <p>:</p>
-                            <p>Bebas Datang</p>
+                            <p><?= $rowDetailMember['keterangan_durasi'] ?></p>
                         </div>
                         <div class="detail-member-group container">
                             <p class="label-status">Status Keanggotaan</p>
                             <p>:</p>
-                            <p>Aktif</p>
+                            <p><?= $rowDetailMember['status'] ?></p>
                         </div>
                         <div class="detail-member-group container">
                             <p class="label-kwitansi">Nomor Kwitansi</p>
                             <p>:</p>
-                            <p>210</p>
+                            <p><?= $rowDetailMember['no_kwitansi'] ?></p>
                         </div>
                     </div>
                     <div class="btn-group container">
-                        <a href="#edit" class="btn-edit">Edit Member</a>
-                        <a href="#delete" class="btn-delete">Batalkan</a>
+                        <a href="admin-edit.php?id=<?= $id ?>" class="btn-edit">Edit Member</a>
+                        <a href="admin.php" class="btn-delete">Batalkan</a>
                     </div>      
                 </section>
             </main>

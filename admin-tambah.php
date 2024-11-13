@@ -1,3 +1,50 @@
+<?php 
+    session_start();
+    include 'koneksi.php';
+
+    if(!isset($_SESSION['email'])){
+        header('Location: admin-login.php');
+        exit();
+    }
+
+    // mengambil data profile di php
+    $adminId = $_SESSION['id_admin'];
+    $queryProfileName = "SELECT username FROM admin WHERE id_admin = $adminId";
+    $resultProfileName = $conn->query($queryProfileName);
+    $rowProfileName = $resultProfileName->fetch(PDO::FETCH_ASSOC);
+
+    if(isset($_POST['submit'])){
+        $nama = $_POST['nama'];
+        $email = $_POST['email'];
+        $telepon = $_POST['nomor-telepon'];
+        $durasi = $_POST['durasi'];
+        $tanggalAwal = $_POST['tanggal-awal'];
+        $tanggalAkhir = $_POST['tanggal-akhir'];
+        $noKwitansi = $_POST['no-kwitansi'];
+        
+        $characters = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        $passwod = '';
+        for ($i = 0; $i < 8; $i++) {
+            $passwod .= $characters[rand(0, strlen($characters) - 1)];
+        }
+        $pwHash = password_hash($passwod, PASSWORD_DEFAULT); 
+
+        if (!preg_match("/^[0-9]+$/", $telepon)) {
+            echo "<script>alert('Nomor telepon harus berupa angka !');</script>";
+        } else if (!is_numeric($noKwitansi)) {
+            echo "<script>alert('Nomor kwitansi harus berupa angka !');</script>";
+        } else {
+            $query = "INSERT INTO member(nama_member, email, password, nomor_telepon, no_kwitansi, status, tanggal_awal, tanggal_berakhir, id_paket) VALUES ('$nama', '$email', '$pwHash', '$telepon', '$noKwitansi', 'aktif', '$tanggalAwal', '$tanggalAkhir', '$durasi')";
+
+            if ($conn->query($query)) {
+                header("Location: admin.php");
+            } else {
+                echo "Error: " . $sql . "<br>" . $conn->error;
+            }
+        }
+    }
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,8 +52,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin</title>
     <!-- link css -->
-    <link rel="stylesheet" href="css/admin.css">
-    <link rel="stylesheet" href="css/admin-tambah.css">
+    <link rel="stylesheet" href="css/admin.css?v=<?php echo time(); ?>"">
+    <link rel="stylesheet" href="css/admin-tambah.css?v=<?php echo time(); ?>"">
     <!-- link google font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -26,7 +73,7 @@
                 <nav>
                     <ul>
                         <li>
-                            <a href="admin.html" class="menu-item">
+                            <a href="admin.php" class="menu-item">
                                 <div class="menu container">
                                     <img src="assets/home.svg" alt="dashboard-nav">
                                     Beranda
@@ -34,7 +81,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="admin-tambah.html" class="menu-item container">
+                            <a href="admin-tambah.php" class="menu-item container">
                                 <div class="menu container">
                                     <img src="assets/plus.svg" alt="tambah-nav">
                                     Tambah Member
@@ -43,7 +90,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="admin-paket.html" class="menu-item">
+                            <a href="admin-paket.php" class="menu-item">
                                 <div class="menu container">
                                     <img src="assets/note.svg" alt="paket-nav">
                                     Daftar Paket
@@ -51,7 +98,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="admin-transaksi.html" class="menu-item">
+                            <a href="admin-transaksi.php" class="menu-item">
                                 <div class="menu container">
                                     <img src="assets/transaction.svg" alt="transaction-nav">
                                     Transaksi
@@ -59,7 +106,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="admin-akun.html" class="menu-item">
+                            <a href="admin-akun.php" class="menu-item">
                                 <div class="menu container">
                                     <img src="assets/setting.svg" alt="setting-nav">
                                     Pengaturan Akun
@@ -67,7 +114,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="admin-absen.html" class="menu-item">
+                            <a href="admin-absen.php" class="menu-item">
                                 <div class="menu container">
                                     <img src="assets/calendar.svg" alt="calendar-nav">
                                     Absensi Harian
@@ -78,10 +125,10 @@
                 </nav>
             </div>
             <!-- sidebar log out -->
-            <div class="log-out container">
+            <a href="logout.php" class="log-out container">
                 <img src="assets/log-out.svg" alt="log-out">
                 <h3>Log Out</h3>
-            </div>
+            </a>
         </div>
         <div class="content">
             <header>
@@ -95,7 +142,7 @@
                         <div class="account-profile">
                             <!-- icon account -->
                             <img src="assets/profile.svg" alt="profile">
-                            <h3>Admin</h3>
+                            <h3><?= $rowProfileName['username']?></h3>
                         </div>
                     </div>
                 </div>
@@ -103,42 +150,42 @@
             <main>
                 <!-- form tambah member -->
                 <section class="tambah-member">
-                    <form class="form-tambah container">
+                    <form method="POST" class="form-tambah container">
                         <div class="form-group container">
                             <label for="nama">Nama (Sesuai KTP)</label>
-                            <input type="text" name="nama" id="nama" class="input-tambah">
+                            <input type="text" name="nama" id="nama" class="input-tambah" required>
                         </div>
                         <div class="form-group container">
                             <label for="email">Email</label>
-                            <input type="email" name="email" id="email" class="input-tambah">
+                            <input type="email" name="email" id="email" class="input-tambah" required>
                         </div>
                         <div class="form-group container">
                             <label for="nomor-telepon">Nomor Telepon</label>
-                            <input type="text" name="nomor-telepon" id="nomor-telepon" class="input-tambah">
+                            <input type="text" name="nomor-telepon" id="nomor-telepon" class="input-tambah" required>
                         </div>
                         <div class="form-group container">
                             <label for="durasi">Durasi</label>
                             <select name="durasi" id="durasi" class="input-tambah">
-                                <option value="8x pertemuan">8x Pertemuan</option>
-                                <option value="1 bulan">1 Bulan</option>
-                                <option value="3 bulan">3 Bulan</option>
+                                <option value="1">8x Pertemuan</option>
+                                <option value="2">1 Bulan</option>
+                                <option value="3">3 Bulan</option>
                             </select>
                         </div>
                         <div class="form-group container">
                             <label for="tanggal-awal">Tanggal Awal</label>
-                            <input type="date" name="tanggal-awal" id="tanggal-awal" class="input-tambah">
+                            <input type="date" name="tanggal-awal" id="tanggal-awal" class="input-tambah" value="<?= date('Y-m-d') ?>">
                         </div>
                         <div class="form-group container">
                             <label for="tanggal-akhir">Tanggal Akhir</label>
-                            <input type="date" name="tanggal-akhir" id="tanggal-akhir" class="input-tambah">
+                            <input type="date" name="tanggal-akhir" id="tanggal-akhir" class="input-tambah" required>
                         </div>
                         <div class="form-group container">
                             <label for="no-kwitansi">No Kwitansi</label>
-                            <input type="text" name="no-kwitansi" id="no-kwitansi" class="input-tambah">
+                            <input type="text" name="no-kwitansi" id="no-kwitansi" class="input-tambah" required>
                         </div>
                         <div class="btn-group container">
-                            <button type="submit" class="btn-tambah">Tambah Member</button>
-                            <button class="btn-cancell">Batalkan</button>
+                            <button type="submit" name="submit" class="btn-tambah">Tambah Member</button>
+                            <a href="admin.php" class="btn-cancell">Batalkan</a>
                         </div>
                     </form>
                 </section>

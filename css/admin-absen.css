@@ -1,0 +1,24 @@
+.filtering-absen {
+    padding: 20px;
+}
+
+.filtering-absen .container {
+    justify-content: flex-end;
+}
+
+.filtering-absen .filter-absen, .filtering-absen .search-absen {
+    padding: 8px;
+    border: 1px solid #CECECE;
+    border-radius: 8px;
+} 
+
+.filtering-absen .search-absen.container {
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+11
+.filtering-absen .search-absen img {
+    width: 18px;
+    height: 18px;
+}

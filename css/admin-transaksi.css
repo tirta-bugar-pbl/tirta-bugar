@@ -1,0 +1,23 @@
+.filtering-transaksi {
+    padding: 20px;
+}
+
+.filtering-transaksi .container {
+    justify-content: space-between;
+}
+
+.filtering-transaksi .filter-transaksi, .filtering-transaksi .search-transaksi {
+    padding: 8px;
+    border: 1px solid #CECECE;
+    border-radius: 8px;
+} 
+
+.filtering-transaksi .search-transaksi.container {
+    align-items: center;
+    width: 20%;
+}
+
+.filtering-transaksi .search-transaksi img {
+    width: 18px;
+    height: 18px;
+}

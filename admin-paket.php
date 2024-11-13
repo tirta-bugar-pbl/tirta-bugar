@@ -1,3 +1,24 @@
+<?php
+    session_start();
+    include 'koneksi.php';
+
+    if(!isset($_SESSION['email'])){
+        header('Location: admin-login.php');
+        exit();
+    }
+
+    // mengambil data profile di php
+    $adminId = $_SESSION['id_admin'];
+    $queryProfileName = "SELECT username FROM admin WHERE id_admin = $adminId";
+    $resultProfileName = $conn->query($queryProfileName);
+    $rowProfileName = $resultProfileName->fetch(PDO::FETCH_ASSOC);
+
+    // mengambil data paket
+    $queryTampilPaket = "SELECT nama_paket, keterangan_fasilitas, keterangan_durasi, 'Rp ' || TO_CHAR(harga, 'FM999,999,999') as harga FROM paket_member";
+    $resultTampilPaket = $conn->query($queryTampilPaket);
+    $rowTampilPaket = $resultTampilPaket->fetchAll(PDO::FETCH_ASSOC);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,8 +26,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin</title>
     <!-- link css -->
-    <link rel="stylesheet" href="css/admin.css">
-    <link rel="stylesheet" href="css/admin-tambah.css">
+    <link rel="stylesheet" href="css/admin.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="css/admin-packet.css?v=<?php echo time(); ?>">
     <!-- link google font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -26,7 +47,7 @@
                 <nav>
                     <ul>
                         <li>
-                            <a href="admin.html" class="menu-item">
+                            <a href="admin.php" class="menu-item">
                                 <div class="menu container">
                                     <img src="assets/home.svg" alt="dashboard-nav">
                                     Beranda
@@ -34,7 +55,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="admin-tambah.html" class="menu-item">
+                            <a href="admin-tambah.php" class="menu-item">
                                 <div class="menu container">
                                     <img src="assets/plus.svg" alt="tambah-nav">
                                     Tambah Member
@@ -42,15 +63,16 @@
                             </a>
                         </li>
                         <li>
-                            <a href="admin-paket.html" class="menu-item">
+                            <a href="admin-paket.php" class="menu-item container">
                                 <div class="menu container">
                                     <img src="assets/note.svg" alt="paket-nav">
                                     Daftar Paket
                                 </div>
+                                <img src="assets/active-menu.svg" alt="active-icon">
                             </a>
                         </li>
                         <li>
-                            <a href="admin-transaksi.html" class="menu-item">
+                            <a href="admin-transaksi.php" class="menu-item">
                                 <div class="menu container">
                                     <img src="assets/transaction.svg" alt="transaction-nav">
                                     Transaksi
@@ -58,16 +80,15 @@
                             </a>
                         </li>
                         <li>
-                            <a href="admin-akun.html" class="menu-item container">
+                            <a href="admin-akun.php" class="menu-item">
                                 <div class="menu container">
                                     <img src="assets/setting.svg" alt="setting-nav">
                                     Pengaturan Akun
                                 </div>
-                                <img src="assets/active-menu.svg" alt="active-icon">
                             </a>
                         </li>
                         <li>
-                            <a href="admin-absen.html" class="menu-item">
+                            <a href="admin-absen.php" class="menu-item">
                                 <div class="menu container">
                                     <img src="assets/calendar.svg" alt="calendar-nav">
                                     Absensi Harian
@@ -78,16 +99,16 @@
                 </nav>
             </div>
             <!-- sidebar log out -->
-            <div class="log-out container">
+            <a href="logout.php" class="log-out container">
                 <img src="assets/log-out.svg" alt="log-out">
                 <h3>Log Out</h3>
-            </div>
+            </a>
         </div>
         <div class="content">
             <header>
                 <div class="container">
                     <div class="title-page">
-                        <h2>Edit Member</h2>
+                        <h2>Daftar Paket</h2>
                     </div>
                     <div class="account">
                         <!-- notif account -->
@@ -95,28 +116,35 @@
                         <div class="account-profile">
                             <!-- icon account -->
                             <img src="assets/profile.svg" alt="profile">
-                            <h3>Admin</h3>
+                            <h3><?= $rowProfileName['username']?></h3>
                         </div>
                     </div>
                 </div>
             </header>
             <main>
-                <!-- form tambah member -->
-                <section class="tambah-member">
-                    <form class="form-tambah container">
-                        <div class="form-group container">
-                            <label for="username">Username</label>
-                            <input type="text" name="username" id="username" class="input-tambah">
-                        </div>
-                        <div class="form-group container">
-                            <label for="email">Email</label>
-                            <input type="email" name="email" id="email" class="input-tambah">
-                        </div>
-                        <div class="btn-group container">
-                            <button type="submit" class="btn-tambah">Edit Akun</button>
-                            <button class="btn-cancell">Batalkan</button>
-                        </div>
-                    </form>
+                <!-- paket list -->
+                <section class="packet-table">
+                    <table>
+                        <!-- head table -->
+                        <thead>
+                            <tr>
+                                <td>Nama Paket</td>
+                                <td>Harga</td>
+                                <td>Durasi</td>
+                                <td>Keterangan Fasilitas</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <?php foreach ($rowTampilPaket as $result) : ?>
+                            <tr>
+                                <td><?= $result['nama_paket']?></td>
+                                <td><?= $result['harga']?></td>
+                                <td><?= $result['keterangan_durasi']?></td>
+                                <td><?= $result['keterangan_fasilitas']?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                        </tbody>
+                    </table>
                 </section>
             </main>
         </div>
