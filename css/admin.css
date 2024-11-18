@@ -204,6 +204,7 @@ main {
 
 .filtering-member .container {
     justify-content: space-between;
+    gap: 10px;
 }
 
 .filtering-member .filter-member, .filtering-member .search-member {
@@ -214,11 +215,16 @@ main {
 
 .filtering-member .search-member.container {
     align-items: center;
+    width: 20%;
 }
 
 .filtering-member .search-member img {
     width: 18px;
     height: 18px;
+}
+
+.filtering-member .search-member input {
+    width: 100%;
 }
 
 select {

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tirta Bugar Fitness</title>
     <!-- link css -->
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=<?php echo time(); ?>">
     <!-- link google font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,6 +19,11 @@
                 <h1>TB</h1>
             </div>
             <nav class="container">
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
                 <ul class="menu container">
                     <li>
                         <a href="#home">Home</a>
@@ -36,11 +41,16 @@
                         <a href="#contact">Contact</a>
                     </li>
                 </ul>
-                <a href="#daftar" target="_blank">
+                <a href="daftar.php" target="_blank">
                     <button class="btn-daftar">
                         Daftar
                     </button>
                 </a>
+
+                <!-- Tombol Hamburger -->
+                <button class="hamburger">
+                    ☰
+                </button>
             </nav>
         </div>
     </header>
@@ -57,7 +67,7 @@
             <div class="container">
                 <h2 class="about-title">About us</h2>
                 <p>Kami adalah GYM yang berlokasi di JL. Bugel Indah Raya Perumahan Bugel Indah blok A9, No. 123, Bugel, Kecamatan Karawaci, Kota Tangerang, Banten 15114 dengan harga terjangkau. Tirta Bugar Fitness dengan fasilitas yang lengkap dengan konsep kekeluargaan 
-                    di Tirta Bugar Fitness memiliki layanan personal trainer bersertifikat nasional dengan harga terjangkau untuk membantu mencapai tujuan kesehatan kamu. Di sini juga terdapat cardio fitness dance yang dapat membakar kalori kamu secara maksimal  </p>
+                    di Tirta Bugar Fitness memiliki layanan personal trainer bersertifikat nasional dengan harga terjangkau untuk membantu mencapai tujuan kesehatan kamu. Di sini juga terdapat cardio fitness dance yang dapat membakar kalori kamu secara maksimal </p>
             </div>
         </section>
         <!-- why choose us -->
@@ -134,17 +144,17 @@
                             <li>Fitness selama 1 bulan</li>
                             <li>8x Pertemuan</li>
                         </ul>
-                        <button class="btn-buy">Buy Now</button>
+                        <button class="btn-buy" onclick="directDaftarMenu(1)">Buy Now</button>
                     </div>
                 </div>
                 <div class="card-price">
                     <div class="container">
-                        <h3 class="price-card-title">Rp 180.000,00</h3>
+                        <h3 class="price-card-title">Rp 185.000,00</h3>
                         <ul class="list-price-fasility">
                             <li>Fitness selama 1 bulan</li>
                             <li>Bebas Datang</li>
                         </ul>
-                        <button class="btn-buy">Buy Now</button>
+                        <button class="btn-buy" onclick="directDaftarMenu(2)">Buy Now</button>
                     </div>
                 </div>
                 <div class="card-price">
@@ -154,7 +164,7 @@
                             <li>Fitness selama 3 bulan</li>
                             <li>Bebas Datang</li>
                         </ul>
-                        <button class="btn-buy">Buy Now</button>
+                        <button class="btn-buy" onclick="directDaftarMenu(3)">Buy Now</button>
                     </div>
                 </div>
             </div>
@@ -182,11 +192,22 @@
                 <!-- google maps -->
                 <div class="map">
                     <h2 class="title-location">Our Location</h2>
-                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.614477651008!2d106.60354527453056!3d-6.182323560575348!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69fedb9b713f75%3A0xc9dcb97f8ed138!2sTirta%20Bugar%20Fitness!5e0!3m2!1sid!2sid!4v1728318312548!5m2!1sid!2sid" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.614477651008!2d106.60354527453056!3d-6.182323560575348!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69fedb9b713f75%3A0xc9dcb97f8ed138!2sTirta%20Bugar%20Fitness!5e0!3m2!1sid!2sid!4v1728318312548!5m2!1sid!2sid" width="600" height="450"
+                    style="border:0;" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                 </div>
             </div>
             <p class="copyright">Copyright&copy; 2024 Tirta Bugar Fitness</p>
         </div>
     </footer>
+    <script>
+        function toggleMenu() {
+            const menu = document.querySelector('.menu');
+            menu.classList.toggle('menu-active');
+        }
+
+        function directDaftarMenu(t) {
+            return window.location.href = `daftar.php?id_paket=${t}`;
+        }
+    </script>
 </body>
 </html>

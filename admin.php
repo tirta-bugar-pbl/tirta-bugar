@@ -64,7 +64,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin</title>
     <!-- link css -->
-    <link rel="stylesheet" href="css/admin.css?v=<?php echo time(); ?>"">
+    <link rel="stylesheet" href="css/admin.css?v=<?php echo time(); ?>">
     <!-- link google font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -203,25 +203,21 @@
                 </section>
                 <!-- filtering member -->
                 <section class="filtering-member">
-                    <div class="container">
+                    <form method="GET" class="container">
                         <!-- filter member -->
-                        <form method="GET">
-                            <div class="filter-member">
-                                <select name="filter">
-                                    <option value="filter">Filter</option>
-                                    <option value="aktif">Aktif</option>
-                                    <option value="tidak-aktif">Tidak Aktif</option>
-                                </select>
-                            </div>
-                        </form>
+                        <div class="filter-member">
+                            <select name="">
+                                <option value="filter">Filter</option>
+                                <option value="aktif">Aktif</option>
+                                <option value="tidak aktif">Tidak Aktif</option>
+                            </select>
+                        </div>
                         <!-- search member -->
-                        <form method="GET">
-                            <div class="search-member container">
-                                <input type="text" name="search" id="search" placeholder="Search" value="<?= $_GET['search'] ?? '' ?>">
-                                <img src="assets/search.svg" alt="search">
-                            </div>
-                        </form>
-                    </div>
+                        <div class="search-member container">
+                            <input type="text" name="search" id="search" placeholder="Search" value="<?= $_GET['search'] ?? '' ?>">
+                            <img src="assets/search.svg" alt="search">
+                        </div>
+                    </form>
                 </section>
                 <section class="member-table">
                     <table>
