@@ -1,330 +1,422 @@
 /* css reset */
 *, *::after, *::before {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 /* variabel warna */
 :root{
-    --primary-color: #1F1F1F;
-    --secondary-color: #FFFFFF;
-    --acent-color: #DFA100;
+  --primary-color: #1F1F1F;
+  --secondary-color: #FFFFFF;
+  --acent-color: #DFA100;
 }
 
 /* global style */
 body {
-    background-color: var(--primary-color);
-    color: var(--secondary-color);
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
 }
 
 .container {
-    display: flex;
+  display: flex;
 }
 
 input, select {
-    background-color: transparent;
-    outline: none;
-    border: none;
+  background-color: transparent;
+  outline: none;
+  border: none;
 }
 
 img {
-    width: 100%;
+  width: 100%;
 }
 
 a {
-    color: inherit;
-    text-decoration: none;
+  color: inherit;
+  text-decoration: none;
 }
 
 ul {
-    list-style-type: none;
+  list-style-type: none;
 }
 
 button {
-    border: none;
-    background-color: transparent;
-    cursor: pointer;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
 }
 
 header, .gallery{
-    padding: 10px 20px;
+  padding: 10px 20px;
 }
 
 .about, .why-choose-us, .price {
-    padding: 15rem;
-    text-align: center;
+  padding: 15rem;
+  text-align: center;
 }
 
 .about-title, .why-title, .gallery-title, .price-title {
-    font-size: 1.6rem;
-    font-weight: bold;
-    text-transform: uppercase;
-    font-family: "Montserrat", system-ui;
+  font-size: 1.6rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-family: "Montserrat", system-ui;
 }
 
 /* header */
 header .container {
-    justify-content: space-between;
-    align-items: center;
+  justify-content: space-between;
+  align-items: center;
 }
 
 header .logo-brand {
-    font-size: 24px;
-    font-weight: bold;
-    font-family: "Playfair Display", system-ui;
+  font-size: 24px;
+  font-weight: bold;
+  font-family: "Playfair Display", system-ui;
 }
 
 header nav.container {
-    column-gap: 50px;
+  column-gap: 50px;
 }
 
 header nav .btn-daftar {
-    border: 1px solid var(--secondary-color);
-    font-size: 1.5rem;
-    padding: 10px 25px;
-    border-radius: 8px;
-    color: var(--secondary-color);
-    text-transform: uppercase;
+  border: 1px solid var(--secondary-color);
+  font-size: 1.5rem;
+  padding: 10px 25px;
+  border-radius: 8px;
+  color: var(--secondary-color);
+  text-transform: uppercase;
 }
 
 header nav a:hover .btn-daftar {
-    background-color: var(--secondary-color);
-    color: black;
+  background-color: var(--secondary-color);
+  color: black;
 }
 
 header .menu.container {
-    column-gap: 20px;
+  column-gap: 20px;
+
 }
 
 header .menu li a {
-    font-family: "Montserrat", system-ui;
-    font-weight: 600;
-    text-transform: uppercase;
+  font-family: "Montserrat", system-ui;
+  font-weight: 600;
+  text-transform: uppercase;
 }
 
 /* banner */
 .banner {
-    background-image: url("https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
-    background-size: cover;
-    background-position: center;
-    height: 70vh;
-    position: relative;
+  background-image: url("https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
+  background-size: cover;
+  background-position: center;
+  height: 70vh;
+  position: relative;
 }
 
 .banner .container {
-    width: 100%;
-    height: 100%;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    font-size: 64px;
-    background: rgba(233, 161, 0, 0.2);
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 64px;
+  background: rgba(233, 161, 0, 0.2);
 }
 
 /* about */
 .about .container {
-    flex-direction: column;
+  flex-direction: column;
 }
 
 .about .about-title {
-    padding-bottom: 2rem;
+  padding-bottom: 2rem;
 }
 
 .about p {
-    font-family: "Roboto", system-ui;
+  font-family: "Roboto", system-ui;
 }
 
 /* why choose us */
-.why-choose-us .why-title {
-    padding-bottom: 4rem;
-}
-
-.why-choose-us .container {
-    justify-content: space-between;
-    align-items: flex-start;
+.why-choose-us {
+  padding: 0 20px;
+  text-align: center;
 }
 
 .why-choose-us .card-why {
-    width: 20%;
-    height: 100%;
+  margin-bottom: 20px;
+}
+
+.why-choose-us .why-title {
+  padding-bottom: 4rem;
+}
+
+.why-choose-us .container {
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 20px;
 }
 
 .why-choose-us .card-why.container {
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
 }
 
 .why-choose-us .card-why.containe .card-why-img {
-    width: 100%;
-    height: 200px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 15px;
+  width: 100%;
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 15px;
 }
 
 .why-choose-us .card-why.containe .card-why-img img {
-    width: 200px;
-    height: 200px;
-    object-fit: contain;
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
 }
 
 .why-choose-us .card-why .why-card-title {
-    font-size: 1.3rem;
-    font-weight: 500;
-    font-family: "Roboto", system-ui;
-    min-height: 2em;
+  font-weight: 500;
+  font-family: "Roboto", system-ui;
+
+  margin-bottom: 20px;
 }
 
 /* gallery */
 .gallery .gallery-title {
-    padding-bottom: 4rem;
+  padding-bottom: 4rem;
+  padding-left: 2rem;
 }
 
 .gallery .container {
-    justify-content: space-between;
-    flex-wrap: wrap;
-    width: 100%;
-    gap: 20px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  width: 100%;
+  gap: 20px;
 }
 
 .gallery .gallery-img {
-    flex: 0 1 calc(33% - 25px);
-    height: 300px;
+  flex: 0 1 calc(33% - 25px);
+  height: 300px;
 }
 
 .gallery .gallery-img img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
-
 /* price */
 .price .price-title {
-    padding-bottom: 4rem;
+  padding-bottom: 4rem;
 }
 
 .price .container {
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 25px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 25px;
 }
 
 .price .card-price {
-    border: 3px solid white;
-    border-radius: 10px;
-    padding: 10px;
-    width: 300px;
-    height: 350px;
-    gap: 20px;
+  border: 3px solid white;
+  border-radius: 10px;
+  padding: 10px;
+  width: 300px;
+  height: 350px;
+  gap: 20px;
 }
 
 .price .card-price .container {
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: space-between;
-    height: 100%;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  height: 100%;
 }
 
 .price .card-price .price-card-title {
-    font-size: 1.6rem;
-    font-family: "Montserrat", system-ui;
-    font-weight: 600;  
-    justify-self: center;
-    padding: 38px;
+  font-size: 1.6rem;
+  font-family: "Montserrat", system-ui;
+  font-weight: 600;  
+  justify-self: center;
+  padding: 38px;
 }
 
 .price .card-price .list-price-fasility {
-    text-align: left;
+  text-align: left;
 }
 
 .price .card-price .list-price-fasility li {
-    margin-bottom: 15px;
+  margin-bottom: 15px;
 }
 
 .price .card-price .list-price-fasility li {
-    display: flex;
-    align-items: center;
-    margin: 10px 0;
-    gap: 10px;
-    font-family: "Roboto", system-ui;
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+  gap: 10px;
+  font-family: "Roboto", system-ui;
 }
 
 .price .card-price .list-price-fasility li:before {
-    content: '✓';
-    color: var(--acent-color);
-    font-size: 20px;
+  content: '✓';
+  color: var(--acent-color);
+  font-size: 20px;
 }
 
 .price .card-price .btn-buy {
-    border: none;
-    background-color: var(--acent-color);
-    width: 100%;
-    padding: 10px 25px;
-    border-radius: 8px;
-    color: white;
-    text-transform: uppercase;
+  border: none;
+  background-color: var(--acent-color);
+  width: 100%;
+  padding: 10px 25px;
+  border-radius: 8px;
+  color: white;
+  text-transform: uppercase;
 }
 
 /* footer */
 footer {
-    padding: 10px 20px 0 20px;
+  padding: 10px 20px 0 20px;
 }
 
 footer .kontak.container {
-    justify-content: space-between;
+  justify-content: space-between;
 
 }
 
 footer .contact p {
-    width: 55%;
-    padding-bottom: 1rem;
-    font-family: "Roboto", system-ui;
+  width: 55%;
+  padding-bottom: 1rem;
+  font-family: "Roboto", system-ui;
 }
 
 footer .map .title-location {
-    text-align: right;
+  text-align: right;
 }
 
 footer .contact .social-media .whatsapp-icon.container, footer .contact .social-media .instagram-icon.container {
-    align-items: center;
-    column-gap: 10px;
+  align-items: center;
+  column-gap: 10px;
 }
 
 footer .social-media .whatsapp-icon img, footer .social-media .instagram-icon img{
-    width: 3%;
+  width: 3%;
 }
 
 
 footer .contact .social-media .whatsapp-icon.container p, footer .contact .social-media .instagram-icon.container p {
-    font-family: "Roboto", system-ui;
-    margin-top: 12px;
+  font-family: "Roboto", system-ui;
+  margin-top: 12px;
 }
 
 .title-location, .title-contact {
-    font-size: 1.6rem;
-    font-weight: bold;
-    text-transform: uppercase;
-    font-family: "Montserrat", system-ui;
-    padding-bottom: 2rem;
+  font-size: 1.6rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-family: "Montserrat", system-ui;
+  padding-bottom: 2rem;
 }
 
 footer .copyright {
-    font-family: "Roboto", system-ui;
-    font-size: 14px;
-    padding: 2rem;
-    text-align: center;
+  font-family: "Roboto", system-ui;
+  font-size: 14px;
+  padding: 2rem;
+  text-align: center;
+}
+
+
+/* Sidebar and Hamburger for Mobile */
+.menu-button {
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: none;
+  z-index: 101;
+}
+
+/* Sidebar styling */
+.sidebar {
+  display: none;
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 250px;
+  background-color: var(--primary-color);
+  padding-top: 60px;
+  transition: transform 0.3s ease;
+  transform: translateX(100%);
+  z-index: 100;
+}
+
+.sidebar.active {
+  display: flex;
+  transform: translateX(0);
+  flex-direction: column;
+  padding-left: 20px;
+}
+
+.sidebar ul {
+  list-style-type: none;
+}
+
+.sidebar ul li {
+  padding: 15px 0;
+}
+
+.sidebar ul li a {
+  font-size: 1.5rem;
+  color: var(--secondary-color);
+  text-decoration: none;
 }
 
 @media (max-width: 720px) {
-    .banner .container h1 {
-        font-size: 42px;
-    }
+  .banner,
+  .gallery .container,
+  .banner .container,
+  .gallery .gallery-img,
+  .why-choose-us .container,
+  footer .container,
+  .price {
+    width: 100%;
+    margin: 0 auto;
+    padding: 20px;
+    flex-direction: column;
+    align-items: center;
+  }
 
-    .about, .why-choose-us, .price {
-        padding: 2rem
-    }
+  .banner .container {
+    font-size: 32px;
+  }
+  .price .container {
+    gap: 25px;
+    justify-content: center;
+    padding: 0 10px;
+  }
+
+  .price .card-price,
+  .why-choose-us .card-why {
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+    font-size: 1.2rem;
+  }
+
+  .why-choose-us {
+    padding: 0 20px;
+    text-align: center;
+    padding-top: 50px;
+  }
+
+  .why-choose-us .card-why {
+    margin-bottom: 20px;
+  }
+
+  .hideOnMobile {
+    display: none;
+  }
+  .menu-button {
+    display: block;
+  }
 }
