@@ -18,36 +18,24 @@
             <div class="logo-brand">
                 <h1>TB</h1>
             </div>
-              <!-- Hamburger Menu Button for Mobile -->
-            <div class="menu-button hideOnDesktop" onclick="toggleSidebar()">&#9776;</div>
-            <nav class="container hideOnMobile">
-                <ul class="menu container">
-                    <li><a href="#home">Home</a></li>
-                    <li><a href="#about">About</a></li>
-                    <li><a href="#gallery">Gallery</a></li>
-                    <li><a href="#price">Price</a></li>
-                    <li><a href="#contact">Contact</a></li>
-                </ul>
-                <a href="#daftar" target="_blank">
-                    <button class="btn-daftar">Daftar</button>
-                </a>
-            </nav>
-        </div>
-    </header>
-
-    <!-- Sidebar for Mobile -->
-    <div id="sidebar" class="sidebar hideOnDesktop">
-        <ul>
-            <li><a href="#home" onclick="toggleSidebar()">Home</a></li>
-            <li><a href="#about" onclick="toggleSidebar()">About</a></li>
-            <li><a href="#gallery" onclick="toggleSidebar()">Gallery</a></li>
-            <li><a href="#price" onclick="toggleSidebar()">Price</a></li>
-            <li><a href="#contact" onclick="toggleSidebar()">Contact</a></li>
-            <li><a href="#daftar" onclick="toggleSidebar()">Daftar</a></li>
-        </ul>
-    </div>
-   
             <nav class="container">
+                <ul class="menu container">
+                    <li>
+                        <a href="#home">Home</a>
+                    </li>
+                    <li>
+                        <a href="#about">About</a>
+                    </li>
+                    <li>
+                        <a href="#gallery">Gallery</a>
+                    </li>
+                    <li>
+                        <a href="#price">Price</a>
+                    </li>
+                    <li>
+                        <a href="#contact">Contact</a>
+                    </li>
+                </ul>
                 <a href="#daftar" target="_blank">
                     <button class="btn-daftar">
                         Daftar
@@ -200,13 +188,5 @@
             <p class="copyright">Copyright&copy; 2024 Tirta Bugar Fitness</p>
         </div>
     </footer>
-
-    <script>
-        // Toggle sidebar display on mobile
-        function toggleSidebar() {
-            const sidebar = document.getElementById("sidebar");
-            sidebar.classList.toggle("active");
-        }
-    </script>
 </body>
 </html>

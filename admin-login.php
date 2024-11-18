@@ -1,9 +1,6 @@
 <?php
-session_start();
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
-include 'koneksi.php';
+    session_start();
+    include 'koneksi.php';
 
     if (isset($_POST['submit'])) {
         $email = $_POST['email'];
@@ -26,7 +23,6 @@ include 'koneksi.php';
             }
         }
     }
-        
 ?>
 
 <!DOCTYPE html>
@@ -75,6 +71,5 @@ include 'koneksi.php';
             }
         }
     </script>
-    
 </body>
 </html>
