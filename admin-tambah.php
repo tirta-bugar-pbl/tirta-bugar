@@ -27,7 +27,7 @@
         for ($i = 0; $i < 8; $i++) {
             $passwod .= $characters[rand(0, strlen($characters) - 1)];
         }
-        $pwHash = password_hash($passwod, PASSWORD_DEFAULT); 
+        $pwHash = base64_encode($password); 
 
         if (!preg_match("/^[0-9]+$/", $telepon)) {
             echo "<script>alert('Nomor telepon harus berupa angka !');</script>";

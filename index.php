@@ -18,12 +18,9 @@
             <div class="logo-brand">
                 <h1>TB</h1>
             </div>
-            <nav class="container">
-                <div class="hamburger">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
+            <!-- Hamburger Menu Button for Mobile -->
+            <div class="menu-button hideOnDesktop" onclick="toggleSidebar()">&#9776;</div>
+            <nav class="container hideOnMobile">
                 <ul class="menu container">
                     <li>
                         <a href="#home">Home</a>
@@ -46,12 +43,18 @@
                         Daftar
                     </button>
                 </a>
-
-                <!-- Tombol Hamburger -->
-                <button class="hamburger">
-                    ☰
-                </button>
             </nav>
+            <!-- Sidebar for Mobile -->
+            <div id="sidebar" class="sidebar hideOnDesktop">
+                <ul>
+                    <li><a href="#home" onclick="toggleSidebar()">Home</a></li>
+                    <li><a href="#about" onclick="toggleSidebar()">About</a></li>
+                    <li><a href="#gallery" onclick="toggleSidebar()">Gallery</a></li>
+                    <li><a href="#price" onclick="toggleSidebar()">Price</a></li>
+                    <li><a href="#contact" onclick="toggleSidebar()">Contact</a></li>
+                    <li><a href="daftar.php" onclick="toggleSidebar()">Daftar</a></li>
+                </ul>
+            </div>
         </div>
     </header>
     <!-- main -->
@@ -200,13 +203,15 @@
         </div>
     </footer>
     <script>
-        function toggleMenu() {
-            const menu = document.querySelector('.menu');
-            menu.classList.toggle('menu-active');
-        }
-
+        // function directMenu
         function directDaftarMenu(t) {
             return window.location.href = `daftar.php?id_paket=${t}`;
+        }
+
+        // Toggle sidebar display on mobile
+        function toggleSidebar() {
+            const sidebar = document.getElementById("sidebar");
+            sidebar.classList.toggle("active");
         }
     </script>
 </body>

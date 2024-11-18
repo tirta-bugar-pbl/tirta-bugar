@@ -6,6 +6,9 @@
         header('Location: admin-login.php');
         exit();
     }
+    $limit = 10; // Example limit per page
+    $page = isset($_GET['page']) ? $_GET['page'] : 1; // Current page, default to 1
+    $offset = ($page - 1) * $limit; // Offset for SQL query
 
     // mengambil data profile di php
     $adminId = $_SESSION['id_admin'];
@@ -19,27 +22,33 @@
     $updateStatusQuery = "UPDATE member SET status = 'tidak aktif' WHERE tanggal_berakhir < CURRENT_DATE AND status = 'aktif'";
     $conn->query($updateStatusQuery);
 
+    // Mengambil nilai filter dan search dari URL
+    $filter = isset($_GET['filter']) ? $_GET['filter'] : '';
+    $search = isset($_GET['search']) ? $_GET['search'] : '';
 
-    // kondisi data member dengan search
-    if(isset($_GET['search']))
-    {
-        $search = $_GET['search'];
-        $queryMember = "SELECT m.id_member, m.nama_member, m.nomor_telepon, p.keterangan_durasi, p.keterangan_fasilitas, TO_CHAR(m.tanggal_berakhir, 'DD Month YYYY') as tanggal_berakhir, COALESCE(m.status, 'tidak ada') as status FROM member m LEFT OUTER JOIN paket_member p ON p.id_paket = m.id_paket WHERE m.nama_member LIKE '%$search%'";
-        $resultMember = $conn->query($queryMember);
-    } else if(isset($_GET['filter'])) {
-        $filter = $_GET['filter'];
+    // Menyusun query berdasarkan filter status dan search
+    $queryMember = "SELECT m.id_member, m.nama_member, m.nomor_telepon, p.keterangan_durasi, p.keterangan_fasilitas, TO_CHAR(m.tanggal_berakhir, 'DD Month YYYY') as tanggal_berakhir, COALESCE(m.status, 'tidak ada') as status FROM member m RIGHT OUTER JOIN paket_member p ON p.id_paket = m.id_paket 
+    WHERE 1=1";
 
-        if($filter === "aktif") {
-            $queryMember = "SELECT m.id_member, m.nama_member, m.nomor_telepon, p.keterangan_durasi, p.keterangan_fasilitas, TO_CHAR(m.tanggal_berakhir, 'DD Month YYYY') as tanggal_berakhir, COALESCE(m.status, 'tidak ada') as status FROM member m LEFT OUTER JOIN paket_member p ON p.id_paket = m.id_paket WHERE m.status = 'aktif'";
-            $resultMember = $conn->query($queryMember);
-        } else if($filter === "tidak-aktif") {
-            $queryMember = "SELECT m.id_member, m.nama_member, m.nomor_telepon, p.keterangan_durasi, p.keterangan_fasilitas, TO_CHAR(m.tanggal_berakhir, 'DD Month YYYY') as tanggal_berakhir, COALESCE(m.status, 'tidak ada') as status FROM member m LEFT OUTER JOIN paket_member p ON p.id_paket = m.id_paket WHERE m.status = 'tidak aktif'";
-            $resultMember = $conn->query($queryMember);
-        }
-    }else {
-        $queryMember = "SELECT m.id_member, m.nama_member, m.nomor_telepon, p.keterangan_durasi, p.keterangan_fasilitas, TO_CHAR(m.tanggal_berakhir, 'DD Month YYYY') as tanggal_berakhir, COALESCE(m.status, 'tidak ada') as status FROM member m LEFT OUTER JOIN paket_member p ON p.id_paket = m.id_paket;";
-        $resultMember = $conn->query($queryMember);
+    // Menambahkan kondisi filter status jika ada
+    if ($filter == 'aktif') {
+        $queryMember .= " AND m.status = 'aktif'";
+    } else if ($filter == 'tidak-aktif') {
+        $queryMember .= " AND (m.status != 'aktif' OR m.status IS NULL)";
     }
+
+    // Menambahkan kondisi pencarian nama_member jika ada
+    if (!empty($search)) {
+        $searchTerm = strtolower($search);
+        $queryMember .= " AND LOWER(m.nama_member) LIKE '%$searchTerm%'";
+    }
+
+    // Tambahkan LIMIT dan OFFSET untuk pagination
+    $queryMember .= " LIMIT $limit OFFSET $offset";
+
+    // Eksekusi query
+    $resultMember = $conn->query($queryMember);
+
 
     // jumlah data member
     $queryAmountMember = "SELECT COUNT(id_member) As total_member FROM member";
@@ -55,6 +64,10 @@
     $queryAmountMemberNonactive = "SELECT COUNT(id_member) As total_member_nonaktif FROM member WHERE status = 'tidak aktif'";
     $resultAmountMemberNonactive = $conn->query($queryAmountMemberNonactive);
     $rowAmountMemberNonactive = $resultAmountMemberNonactive->fetch(PDO::FETCH_ASSOC);
+
+
+    // hitung total number of pages
+    $totalPages = ceil($rowAmountMember['total_member'] / $limit);  
 ?>
 
 <!DOCTYPE html>
@@ -64,12 +77,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin</title>
     <!-- link css -->
-    <link rel="stylesheet" href="css/admin.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="css/admin.css?v=<?php echo time(); ?>"">
     <!-- link google font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
 </head>
+
 <body>
     <div class="container">
         <!-- sidebar -->
@@ -135,6 +149,8 @@
                     </ul>
                 </nav>
             </div>
+
+            
             <!-- sidebar log out -->
             <a href="logout.php" class="log-out container">
                 <img src="assets/log-out.svg" alt="log-out">
@@ -201,24 +217,33 @@
                         </div>
                     </div>
                 </section>
-                <!-- filtering member -->
-                <section class="filtering-member">
-                    <form method="GET" class="container">
-                        <!-- filter member -->
+        <!-- filtering member -->
+        <section class="filtering-member">
+            <!-- form gabungan untuk filter dan search -->
+            <form method="GET">
+                <div class="filter-group container">
+                    <!-- filter member -->
+                    <div>
                         <div class="filter-member">
-                            <select name="">
-                                <option value="filter">Filter</option>
-                                <option value="aktif">Aktif</option>
-                                <option value="tidak aktif">Tidak Aktif</option>
+                            <select name="filter" id=filter onchange="applyFilter()">
+                                <option value="">Pilih Filter</option>
+                                <option value="aktif" <?= isset($_GET['filter']) && $_GET['filter'] === 'aktif' ? 'selected' : '' ?>>Aktif</option>
+                                <option value="tidak-aktif" <?= isset($_GET['filter']) && $_GET['filter'] === 'tidak-aktif' ? 'selected' : '' ?>>Tidak Aktif</option>
                             </select>
                         </div>
-                        <!-- search member -->
-                        <div class="search-member container">
-                            <input type="text" name="search" id="search" placeholder="Search" value="<?= $_GET['search'] ?? '' ?>">
-                            <img src="assets/search.svg" alt="search">
-                        </div>
-                    </form>
-                </section>
+                        <!-- tombol submit -->
+                        <!-- <button type="submit" class="btn-submit">Filter</button> --> 
+                        <!-- tombol reset -->
+                        <!-- <a href="admin.php" class="btn-reset">Reset</a> -->
+                    </div>
+                    <!-- search member -->
+                    <div class="search-member container">
+                        <input type="text" name="search" id="search" placeholder="Search" value="<?= $_GET['search'] ?? '' ?>">
+                        <img src="assets/search.svg" alt="search">
+                    </div>
+                </div>
+            </form>     
+        </section>
                 <section class="member-table">
                     <table>
                         <!-- head table -->
@@ -246,7 +271,7 @@
                                 <td>
                                     <div class="action container">
                                         <a href="admin-detail.php?id=<?=$result['id_member']; ?>" class="detail">Detail</a>
-                                        <a href="delete-member.php?id=<?=$result['id_member']; ?>" class="hapus">Hapus</a>
+                                        <a href="delete-member.php?id=<?=$result['id_member']; ?>" class="hapus"  onclick="return confirmDelete();">Hapus</a>
                                     </div>
                                 </td>
                             </tr>
@@ -254,8 +279,30 @@
                         </tbody>
                     </table>
                 </section>
+            <!-- Pagination -->
+            <section class="pagination">
+                <div class="container">
+                    <ul>
+                        <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                            <li><a href="?page=<?= $i ?>&filter=<?= $filter ?>&search=<?= $search ?>" class="<?= ($i == $page) ? 'active' : '' ?>"><?= $i ?></a></li>
+                        <?php endfor; ?>
+                    </ul>
+                </div>
+            </section>
             </main>
         </div>
     </div>
+    <script>
+        function confirmDelete() {
+            return confirm("Apakah Anda yakin ingin menghapus member ini?");
+        }
+
+        function applyFilter() {
+            const filter = document.getElementById('filter').value;
+            const url = new URL(window.location.href);
+            url.searchParams.set('filter', filter);
+            window.location.href = url.toString();
+        }
+    </script>
 </body>
 </html>

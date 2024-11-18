@@ -135,6 +135,7 @@ header nav .btn-daftar {
     text-transform: uppercase;
 }
 
+
 header nav a:hover .btn-daftar {
     background-color: var(--secondary-color);
     color: black;
@@ -366,6 +367,50 @@ footer .copyright {
     text-align: center;
 }
 
+/* Sidebar and Hamburger for Mobile */
+.menu-button {
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: none;
+    z-index: 101;
+}
+
+/* Sidebar styling */
+.sidebar {
+    display: none;
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 250px;
+    background-color: var(--primary-color);
+    padding-top: 60px;
+    transition: transform 0.3s ease;
+    transform: translateX(100%);
+    z-index: 100;
+}
+
+.sidebar.active {
+    display: flex;
+    transform: translateX(0);
+    flex-direction: column;
+    padding-left: 20px;
+}
+
+.sidebar ul {
+    list-style-type: none;
+}
+
+.sidebar ul li {
+    padding: 15px 0;
+}
+
+.sidebar ul li a {
+    font-size: 1.5rem;
+    color: var(--secondary-color);
+    text-decoration: none;
+}
+
 @media (max-width: 720px) {
     .hamburger {
         display: flex;
@@ -466,4 +511,12 @@ footer .copyright {
         height: 250px;
         border: none;
     }
+
+    .hideOnMobile, .btn-daftar {
+        display: none;
+    }
+
+    .menu-button {
+        display: block;
+      }
 }
