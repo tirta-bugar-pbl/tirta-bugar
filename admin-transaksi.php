@@ -7,11 +7,67 @@
         exit();
     }
 
+    function rupiah($angka) {
+        return "Rp " . number_format($angka, 0, ',', '.');
+    }
+
     // mengambil data profile di php
     $adminId = $_SESSION['id_admin'];
     $queryProfileName = "SELECT username FROM admin WHERE id_admin = $adminId";
     $resultProfileName = $conn->query($queryProfileName);
     $rowProfileName = $resultProfileName->fetch(PDO::FETCH_ASSOC);
+
+    // logika pagination
+    $limit = 10; // Example limit per page
+    $page = isset($_GET['page']) ? $_GET['page'] : 1; // Current page, default to 1
+    $offset = ($page - 1) * $limit; // Offset for SQL query 
+
+    // Eksekusi query
+    // $resultTransaksi = $conn->query($queryTransaksi);
+
+    // Mengambil nilai filter dan search dari URL
+    // $filter = isset($_GET['filter']) ? $_GET['filter'] : '';
+    $search = isset($_GET['search']) ? $_GET['search'] : '';
+
+    // Menyusun query berdasarkan filter status dan search
+    // $queryTransaksi = "SELECT DISTINCT TO_CHAR(t.tanggal_transaksi, 'DD Month YYYY') AS tanggal_transaksi, m.nama_member, m.nomor_telepon, t.id_paket, p.id_paket, p.keterangan_fasilitas, p.keterangan_durasi, m.id_member, t.id_member, t.status_pembayaran, t.total_harga FROM member m JOIN transaksi t ON m.id_member = t.id_member JOIN paket_member p ON t.id_paket = p.id_paket 
+    // WHERE 1=1";
+
+    // Menambahkan kondisi filter status jika ada
+    // if ($filter == 'aktif') {
+    //     $queryTransaksi .= " AND m.status = 'aktif'";
+    // } else if ($filter == 'tidak-aktif') {
+    //     $queryTransaksi .= " AND (m.status != 'aktif' OR m.status IS NULL)";
+    // }
+
+    // Menambahkan kondisi pencarian nama_member jika ada
+    if (!empty($search)) {
+        $queryTransaksi = "SELECT DISTINCT TO_CHAR(t.tanggal_transaksi, 'DD Month YYYY') AS tanggal_transaksi, m.nama_member, m.nomor_telepon, p.keterangan_fasilitas, p.keterangan_durasi, t.status_pembayaran, 
+t.total_harga FROM member m JOIN transaksi t ON m.id_member = t.id_member JOIN paket_member p ON t.id_paket = p.id_paket WHERE m.nama_member LIKE '%$search%'";
+
+        // Eksekusi query
+        $resultTransaksi = $conn->query($queryTransaksi);
+
+        // Hitung total transaksi untuk pagination
+        $queryCount = "SELECT COUNT(DISTINCT t.id_transaksi) AS total FROM transaksi t JOIN member m ON m.id_member = t.id_member";
+        $resultCount = $conn->query($queryCount);
+        $totalCount = $resultCount->fetch(PDO::FETCH_ASSOC)['total'];
+        $totalPages = ceil($totalCount / $limit);
+    } else {
+        // Tambahkan LIMIT dan OFFSET untuk pagination
+        $queryTransaksi = "SELECT DISTINCT TO_CHAR(t.tanggal_transaksi, 'DD Month YYYY') AS tanggal_transaksi, m.nama_member, m.nomor_telepon, p.keterangan_fasilitas, p.keterangan_durasi, t.status_pembayaran, 
+t.total_harga FROM member m JOIN transaksi t ON m.id_member = t.id_member JOIN paket_member p ON t.id_paket = p.id_paket LIMIT $limit OFFSET $offset";
+
+        // Eksekusi query
+        $resultTransaksi = $conn->query($queryTransaksi);
+
+        // Hitung total transaksi untuk pagination
+        $queryCount = "SELECT COUNT(DISTINCT t.id_transaksi) AS total FROM transaksi t JOIN member m ON m.id_member = t.id_member";
+        $resultCount = $conn->query($queryCount);
+        $totalCount = $resultCount->fetch(PDO::FETCH_ASSOC)['total'];
+        $totalPages = ceil($totalCount / $limit);
+    }
+
 ?>
 
 <!DOCTYPE html>
@@ -119,7 +175,7 @@
             <main>
                 <!-- filtering transaksi -->
                 <section class="filtering-transaksi">
-                    <div class="container">
+                    <form method="GET" class="container">
                         <!-- filter member -->
                         <div class="filter-transaksi">
                             <select name="filter">
@@ -134,41 +190,47 @@
                             <input type="text" name="search" id="search" placeholder="Search">
                             <img src="assets/search.svg" alt="search">
                         </div>
-                    </div>
+                    </form>
                 </section>
                 <section class="member-table">
                     <table>
                         <!-- head table -->
                         <thead>
                             <tr>
-                                <td style="text-align: center;width: 20%;">Tanggal Transaksi</td>
-                                <td style="text-align: center;width: 20%;">Nama</td>
+                                <td style="text-align: center;width: 15%;">Tanggal Transaksi</td>
+                                <td style="text-align: center;width: 15%;">Nama</td>
                                 <td style="text-align: center; width: 15%;">Nomor Telepon</td>
                                 <td style="text-align: center; width: 10%;">Durasi</td>
                                 <td style="text-align: center; width: 15%;">Keterangan</td>
+                                <td style="text-align: center; width: 15%;">Status Pembayaran</td>
                                 <td style="text-align: center; width: 15%;">Total Bayar</td>
 
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td style="text-align: center;">24 Mei 2024</td>
-                                <td>Nur Whaid</td>
-                                <td style="text-align: center;">08568560253</td>
-                                <td style="text-align: center;">1 Bulan</td>
-                                <td style="text-align: center;">8x Pertemuan</td>
-                                <td style="text-align: center;">Rp 150.000,00</td>
+                            <?php foreach ($resultTransaksi as $result) : ?>
+                                <tr>
+                                <td style="text-align: center;"><?= $result['tanggal_transaksi']?></td>
+                                <td><?= $result['nama_member']?></td>
+                                <td style="text-align: center;"><?= $result['nomor_telepon']?></td>
+                                <td style="text-align: center;"><?= $result['keterangan_fasilitas']?></td>
+                                <td style="text-align: center;"><?= $result['keterangan_durasi']?></td>
+                                <td style="text-align: center;"><b><?= $result['status_pembayaran']?></b></td>
+                                <td style="text-align: center;"><?= rupiah($result['total_harga'])?></td>
                             </tr>
-                            <tr>
-                                <td style="text-align: center;">25 Mei 2024</td>
-                                <td>Septian Junior Ananda</td>
-                                <td style="text-align: center;">08568560252</td>
-                                <td style="text-align: center;">1 Bulan</td>
-                                <td style="text-align: center;">Bebas Datang</td>
-                                <td style="text-align: center;">Rp 235.000,00</td>
-                            </tr>
+                            <?php endforeach; ?>
                         </tbody>
                     </table>
+                </section>
+                <!-- Pagination -->
+                <section class="pagination">
+                    <div class="container">
+                        <ul>
+                            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                                <li><a href="?page=<?= $i ?>&search=<?= $search ?>" class="<?= ($i == $page) ? 'active' : '' ?>"><?= $i ?></a></li>
+                            <?php endfor; ?>
+                        </ul>
+                    </div>
                 </section>
             </main>
         </div>

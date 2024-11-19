@@ -6,9 +6,11 @@
         header('Location: admin-login.php');
         exit();
     }
-    $limit = 10; // Example limit per page
-    $page = isset($_GET['page']) ? $_GET['page'] : 1; // Current page, default to 1
-    $offset = ($page - 1) * $limit; // Offset for SQL query
+
+    // variabel pagination
+    $limit = 10;
+    $page = isset($_GET['page']) ? $_GET['page'] : 1; 
+    $offset = ($page - 1) * $limit; 
 
     // mengambil data profile di php
     $adminId = $_SESSION['id_admin'];
@@ -217,33 +219,29 @@
                         </div>
                     </div>
                 </section>
-        <!-- filtering member -->
-        <section class="filtering-member">
-            <!-- form gabungan untuk filter dan search -->
-            <form method="GET">
-                <div class="filter-group container">
-                    <!-- filter member -->
-                    <div>
-                        <div class="filter-member">
-                            <select name="filter" id=filter onchange="applyFilter()">
-                                <option value="">Pilih Filter</option>
-                                <option value="aktif" <?= isset($_GET['filter']) && $_GET['filter'] === 'aktif' ? 'selected' : '' ?>>Aktif</option>
-                                <option value="tidak-aktif" <?= isset($_GET['filter']) && $_GET['filter'] === 'tidak-aktif' ? 'selected' : '' ?>>Tidak Aktif</option>
-                            </select>
+                <!-- filtering member -->
+                <section class="filtering-member">
+                    <!-- form gabungan untuk filter dan search -->
+                    <form method="GET">
+                        <div class="filter-group container">
+                            <!-- filter member -->
+                            <div>
+                                <div class="filter-member">
+                                    <select name="filter" id=filter onchange="applyFilter()">
+                                        <option value="">Pilih Filter</option>
+                                        <option value="aktif" <?= isset($_GET['filter']) && $_GET['filter'] === 'aktif' ? 'selected' : '' ?>>Aktif</option>
+                                        <option value="tidak-aktif" <?= isset($_GET['filter']) && $_GET['filter'] === 'tidak-aktif' ? 'selected' : '' ?>>Tidak Aktif</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <!-- search member -->
+                            <div class="search-member container">
+                                <input type="text" name="search" id="search" placeholder="Search" value="<?= $_GET['search'] ?? '' ?>">
+                                <img src="assets/search.svg" alt="search">
+                            </div>
                         </div>
-                        <!-- tombol submit -->
-                        <!-- <button type="submit" class="btn-submit">Filter</button> --> 
-                        <!-- tombol reset -->
-                        <!-- <a href="admin.php" class="btn-reset">Reset</a> -->
-                    </div>
-                    <!-- search member -->
-                    <div class="search-member container">
-                        <input type="text" name="search" id="search" placeholder="Search" value="<?= $_GET['search'] ?? '' ?>">
-                        <img src="assets/search.svg" alt="search">
-                    </div>
-                </div>
-            </form>     
-        </section>
+                    </form>     
+                </section>
                 <section class="member-table">
                     <table>
                         <!-- head table -->
@@ -260,7 +258,6 @@
                         </thead>
                         <tbody>
                         <?php foreach ($resultMember as $result) : ?>
-                            <tr>
                             <tr>
                                 <td><?= $result['nama_member']?></td>
                                 <td style="text-align: center;"><?= $result['nomor_telepon']?></td>
@@ -279,16 +276,16 @@
                         </tbody>
                     </table>
                 </section>
-            <!-- Pagination -->
-            <section class="pagination">
-                <div class="container">
-                    <ul>
-                        <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                            <li><a href="?page=<?= $i ?>&filter=<?= $filter ?>&search=<?= $search ?>" class="<?= ($i == $page) ? 'active' : '' ?>"><?= $i ?></a></li>
-                        <?php endfor; ?>
-                    </ul>
-                </div>
-            </section>
+                <!-- Pagination -->
+                <section class="pagination">
+                    <div class="container">
+                        <ul>
+                            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                                <li><a href="?page=<?= $i ?>&filter=<?= $filter ?>&search=<?= $search ?>" class="<?= ($i == $page) ? 'active' : '' ?>"><?= $i ?></a></li>
+                            <?php endfor; ?>
+                        </ul>
+                    </div>
+                </section>
             </main>
         </div>
     </div>

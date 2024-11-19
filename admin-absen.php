@@ -13,20 +13,36 @@
     $resultProfileName = $conn->query($queryProfileName);
     $rowProfileName = $resultProfileName->fetch(PDO::FETCH_ASSOC);
 
+    // variabel pagination
+    $limit = 10; 
+    $page = isset($_GET['page']) ? $_GET['page'] : 1; 
+    $offset = ($page - 1) * $limit; 
+
+    // Mengambil search
+    $search = isset($_GET['search']) ? $_GET['search'] : '';
+
     // mengambil data absen
-    if(isset($_GET['search']))
-    {
-        $search = $_GET['search'];
+    if($search) {
         $queryAbsen = "SELECT TO_CHAR(a.tanggal_datang, 'DD Month YYYY') as tanggal_datang, m.nama_member, p.keterangan_fasilitas, TO_CHAR(m.tanggal_berakhir, 'DD Month YYYY') as tanggal_berakhir, p.keterangan_durasi, COALESCE(a.keterangan, '-') as keterangan_absen  FROM absen_harian a LEFT OUTER JOIN member m ON a.id_member = m.id_member LEFT OUTER JOIN paket_member p ON m.id_paket = p.id_paket WHERE m.nama_member LIKE '%$search%'";
 
         $resultAbsen = $conn->query($queryAbsen);
+
+        // Hitung total absen untuk pagination
+        $queryCount = "SELECT COUNT(DISTINCT a.id_pertemuan) AS total FROM absen_harian a JOIN member m ON m.id_member = a.id_member";
+        $resultCount = $conn->query($queryCount);
+        $totalCount = $resultCount->fetch(PDO::FETCH_ASSOC)['total'];
+        $totalPages = ceil($totalCount / $limit);
     }else {
-        $queryAbsen = "SELECT TO_CHAR(a.tanggal_datang, 'DD Month YYYY') as tanggal_datang, m.nama_member, p.keterangan_fasilitas, TO_CHAR(m.tanggal_berakhir, 'DD Month YYYY') as tanggal_berakhir, p.keterangan_durasi, COALESCE(a.keterangan, '-') as keterangan_absen  FROM absen_harian a LEFT OUTER JOIN member m ON a.id_member = m.id_member LEFT OUTER JOIN paket_member p ON m.id_paket = p.id_paket";
+        $queryAbsen = "SELECT TO_CHAR(a.tanggal_datang, 'DD Month YYYY') as tanggal_datang, m.nama_member, p.keterangan_fasilitas, TO_CHAR(m.tanggal_berakhir, 'DD Month YYYY') as tanggal_berakhir, p.keterangan_durasi, COALESCE(a.keterangan, '-') as keterangan_absen  FROM absen_harian a LEFT OUTER JOIN member m ON a.id_member = m.id_member LEFT OUTER JOIN paket_member p ON m.id_paket = p.id_paket LIMIT $limit OFFSET $offset";
 
         $resultAbsen = $conn->query($queryAbsen);
+
+        // Hitung total absen untuk pagination
+        $queryCount = "SELECT COUNT(DISTINCT a.id_pertemuan) AS total FROM absen_harian a JOIN member m ON a.id_member = m.id_member ";
+        $resultCount = $conn->query($queryCount);
+        $totalCount = $resultCount->fetch(PDO::FETCH_ASSOC)['total'];
+        $totalPages = ceil($totalCount / $limit);
     }
-
-
 ?>
 
 <!DOCTYPE html>
@@ -171,6 +187,16 @@
                             <?php endforeach; ?>
                         </tbody>
                     </table>
+                </section>
+                <!-- Pagination -->
+                <section class="pagination">
+                    <div class="container">
+                        <ul>
+                            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                                <li><a href="?page=<?= $i ?>&search=<?= $search ?>" class="<?= ($i == $page) ? 'active' : '' ?>"><?= $i ?></a></li>
+                            <?php endfor; ?>
+                        </ul>
+                    </div>
                 </section>
             </main>
         </div>
