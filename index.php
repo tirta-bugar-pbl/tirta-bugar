@@ -6,6 +6,8 @@
     <title>Tirta Bugar Fitness</title>
     <!-- link css -->
     <link rel="stylesheet" href="css/style.css?v=<?php echo time(); ?>">
+    <!-- link favicon -->
+    <link rel="shortcut icon" href="assets/logo-favicon.png" type="image/x-icon">
     <!-- link google font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

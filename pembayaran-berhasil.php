@@ -85,7 +85,7 @@
                     <p><b>Keterangan</b> : ' . $keterangan  . '</p>
                 </div>
                 <div>
-                    <p><b>Total yang sudah dibayarkan</b> : ' . $total  . '</p>
+                    <p><b>Total yang sudah dibayarkan</b> : ' . rupiah($total)  . '</p>
                 </div>';
 
             // Kirim email
