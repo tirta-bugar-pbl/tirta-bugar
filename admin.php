@@ -261,8 +261,8 @@
                             <tr>
                                 <td><?= $result['nama_member']?></td>
                                 <td style="text-align: center;"><?= $result['nomor_telepon']?></td>
-                                <td style="text-align: center;"><?= $result['keterangan_fasilitas']?></td>
                                 <td style="text-align: center;"><?= $result['keterangan_durasi']?></td>
+                                <td style="text-align: center;"><?= $result['keterangan_fasilitas']?></td>
                                 <td style="text-align: center;"><?= $result['tanggal_berakhir']?></td>
                                 <td style="text-align: center;"><?= $result['status']?></td>
                                 <td>

@@ -40,25 +40,18 @@
 </head>
 <body>
     <div class="container">
-        <h2 class="login-title">Login</h2>
+        <h2 class="login-title">Reset Your Password</h2>
         <form method="POST">
             <div class="form-login container">
                 <div class="form-group container">
-                    <label for="email">Email</label>
-                    <input type="email" name="email" id="email">
-                </div>
-                <div class="form-group container">
-                    <label for="password">Password</label>
+                    <label for="password">Masukan password baru</label>
                     <div class="pw-group container">
                         <input type="password" name="password" id="password">
                         <img src="assets/show-pw.svg" alt="show-pw" onclick="showPassword()">
                     </div>
-                    <a class="auth-link" href="admin-forgot-password.php" target="_blank">Forgot Password</a>
                 </div>
                 <div class="btn-group">
                     <button type="submit" name="submit" class="btn-login">Login</button>
-                    <p>Don’t have account? <a class="auth-link" href="admin-register.php" target="_blank">Register</a></p>
-                </div>
             </div>
         </form>
     </div>
