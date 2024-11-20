@@ -179,9 +179,9 @@
                                 <tr>
                                 <td style="text-align: center;"><?= $result['tanggal_datang'] ?></td>
                                 <td><?= $result['nama_member'] ?></td>
-                                <td style="text-align: center;"><?= $result['keterangan_fasilitas'] ?></td>
+                                <td style="text-align: center;"><?= $result['keterangan_durasi'] ?></td>
                                 <td style="text-align: center;"><?= $result['tanggal_berakhir'] ?></td>
-                                <td style="text-align: center;"><?= $result['keterangan_durasi'] ?></td>          
+                                <td style="text-align: center;"><?= $result['keterangan_fasilitas'] ?></td>          
                                 <td style="text-align: center;"><?= $result['keterangan_absen'] ?></td>
                                 </tr>
                             <?php endforeach; ?>

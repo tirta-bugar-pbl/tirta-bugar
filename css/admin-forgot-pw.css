@@ -3,14 +3,14 @@ body {
     color: var(--secondary-color);
 }
 
-body .container {
+body .forgot-layout.container {
     flex-direction: column;
     justify-content: center;
     align-items: center;
     height: 100vh;
 }
 
-.login-title {
+.forgot-title {
     font-size: 32px;
     font-weight: bold;
     margin-bottom: 30px;
@@ -22,9 +22,8 @@ form {
     border-radius: 10px;
 }
 
-form .form-login.container {
-    height: 50vh;
-    gap: 45px;
+form .form-forgot.container {
+    flex-direction: column;
 }
 
 form .auth-link {
@@ -48,6 +47,7 @@ input[type="password"], input[type="text"] {
 
 .form-group.container {
     align-items: flex-start;
+    flex-direction: column;
     height: 10vh;
     width: 100%;
     gap: 10px;
@@ -77,7 +77,7 @@ input[type="password"], input[type="text"] {
     width: 100%;
 }
 
-.btn-group .btn-login {
+.btn-group .btn-forgot {
     background-color: var(--acent-color);
     color: var(--secondary-color);
     padding: 10px 20px;

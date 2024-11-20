@@ -39,6 +39,8 @@
     <title>Pendaftaran - Tirta Bugar Fitness</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/daftar-style.css">
+    <!-- link favicon -->
+    <link rel="shortcut icon" href="assets/logo-favicon.png" type="image/x-icon">
 </head>
 <body>
     <div class="form-container">

@@ -213,8 +213,8 @@ t.total_harga FROM member m JOIN transaksi t ON m.id_member = t.id_member JOIN p
                                 <td style="text-align: center;"><?= $result['tanggal_transaksi']?></td>
                                 <td><?= $result['nama_member']?></td>
                                 <td style="text-align: center;"><?= $result['nomor_telepon']?></td>
-                                <td style="text-align: center;"><?= $result['keterangan_fasilitas']?></td>
                                 <td style="text-align: center;"><?= $result['keterangan_durasi']?></td>
+                                <td style="text-align: center;"><?= $result['keterangan_fasilitas']?></td>
                                 <td style="text-align: center;"><b><?= $result['status_pembayaran']?></b></td>
                                 <td style="text-align: center;"><?= rupiah($result['total_harga'])?></td>
                             </tr>
