@@ -1,0 +1,75 @@
+/* Table header and "Edit" button styling */
+table th, table td {
+    text-align: left;
+    padding: 10px;
+    border: 1px solid #CECECE;
+}
+
+table th {
+    background-color: black; /* Matches header background */
+    color: white; /* Matches header text color */
+}
+
+table td a {
+    display: inline-block;
+    text-align: center;
+    color: white; /* White text to match header */
+    background-color: black; /* Black background to match header */
+    padding: 5px 10px;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+table td a:hover {
+    background-color: #333; /* Slight hover effect */
+}
+
+/* Form adjustments */
+.edit-paket label {
+    width: 30%; /* Consistent label width */
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.edit-paket .input-edit {
+    border: 1px solid #CECECE;
+    border-radius: 5px;
+    padding: 10px;
+    width: 100%;
+}
+
+.form-tambah.container, .form-edit.container {
+    display: flex;
+    flex-direction: column;
+    row-gap: 20px; /* Spacing between form fields */
+}
+
+.btn-group.container {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 30px;
+}
+
+.btn-group .btn-edit {
+    background-color: var(--acent-color);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-group .btn-cancell {
+    background-color: var(--acent2-color);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+}
+
