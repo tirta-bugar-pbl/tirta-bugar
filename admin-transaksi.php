@@ -178,7 +178,7 @@
                                 <option value="month" <?= isset($_GET['filter']) && $_GET['filter'] === 'month' ? 'selected' : '' ?>>Bulan ini</option>
                             </select>
                         </div>
-                         <!-- search member -->
+                        <!-- search member -->
                         <div class="search-transaksi container">
         <input type="text" name="search" id="search" placeholder="Search" value="<?= htmlspecialchars($search) ?>">
         <img src="assets/search.svg" alt="search">

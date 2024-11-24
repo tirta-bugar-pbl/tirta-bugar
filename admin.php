@@ -28,13 +28,12 @@
     $sortByDate = isset($_GET['sort_by_date']) ? $_GET['sort_by_date'] : '';
 
     // Query dasar
-    $baseQuery = "SELECT m.id_member, m.nama_member, m.nomor_telepon, p.keterangan_durasi, p.keterangan_fasilitas, m.tanggal_berakhir as tanggal_berakhir_raw, TO_CHAR(m.tanggal_berakhir, 'DD Month YYYY') as tanggal_berakhir, COALESCE(m.status, 'tidak ada') as status, (m.tanggal_berakhir - m.tanggal_awal) AS selisih FROM member m LEFT JOIN paket_member p ON p.id_paket = m.id_paket
-    WHERE 1=1";
+    $baseQuery = "SELECT m.id_member, m.nama_member, m.nomor_telepon, p.keterangan_durasi, p.keterangan_fasilitas, m.tanggal_berakhir as tanggal_berakhir_raw, TO_CHAR(m.tanggal_berakhir, 'DD Month YYYY') as tanggal_berakhir, COALESCE(m.status, 'tidak ada') as status, (m.tanggal_berakhir - m.tanggal_awal) AS selisih FROM member m LEFT JOIN paket_member p ON p.id_paket = m.id_paket WHERE 1=1";
 
     // Tambahkan kondisi pencarian
     if (!empty($search)) {
         $searchTerm = '%' . strtolower($search) . '%';
-        $baseQuery .= " AND LOWER(m.nama_member) LIKE :searchTerm";
+        $baseQuery .= " AND LOWER(m.nama_member) LIKE '$searchTerm'";
     }
 
     // Array untuk ORDER BY clauses
@@ -74,11 +73,7 @@
     $countQuery = preg_replace('/ORDER BY.*$/', '', $countQuery);
 
     // Eksekusi query untuk menghitung total records
-    $stmt = $conn->prepare($countQuery);
-    if (!empty($search)) {
-        $stmt->bindParam(':searchTerm', $searchTerm, PDO::PARAM_STR);
-    }
-    $stmt->execute();
+    $stmt = $conn->query($countQuery);
     $rowCount = $stmt->fetch(PDO::FETCH_ASSOC);
     $totalPages = ceil($rowCount['total'] / $limit);
 
@@ -86,11 +81,7 @@
     $baseQuery .= " LIMIT $limit OFFSET $offset";
 
     // Eksekusi query final
-    $stmt = $conn->prepare($baseQuery);
-    if (!empty($search)) {
-        $stmt->bindParam(':searchTerm', $searchTerm, PDO::PARAM_STR);
-    }
-    $stmt->execute();
+    $stmt = $conn->query($baseQuery);
     $resultMember = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // Statistik tetap sama seperti sebelumnya
@@ -106,7 +97,9 @@
     // jumlah data member nonaktif
     $queryAmountMemberNonactive = "SELECT COUNT(id_member) As total_member_nonaktif FROM member WHERE status ILIKE 'tidak aktif'";
     $resultAmountMemberNonactive = $conn->query($queryAmountMemberNonactive);
+    $rowAmountMemberNonActive = $resultAmountMemberNonactive->fetch(PDO::FETCH_ASSOC);
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -248,7 +241,7 @@
                             <!-- title amount -->
                             <div class="title-amount-group">
                                 <h3>Tidak Aktif</h3>
-                                <h4><?= $rowAmountMemberNonactive['total_member_nonaktif'] ?></h4>
+                                <h4><?= $rowAmountMemberNonActive['total_member_nonaktif'] ?></h4>
                             </div>
                         </div>
                     </div>

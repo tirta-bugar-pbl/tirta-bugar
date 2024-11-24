@@ -13,7 +13,6 @@
         
         if($rowCheck['status_verify'] == 0){
             $tokenVerify = $rowCheck['token_verify']; 
-            echo $tokeVerify;
             $queryUpdate = "UPDATE admin SET status_verify = '1' WHERE token_verify = '$tokenVerify'";
             $conn->query($queryUpdate);
 

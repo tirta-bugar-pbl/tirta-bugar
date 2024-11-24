@@ -160,7 +160,7 @@
                                         <input type="hidden" name="id_paket" value="<?= $result['id_paket'] ?>">
                                         <button type="submit" class="btn-hapus" onclick="return confirm('Apakah Anda yakin ingin menghapus paket ini?')">Hapus</button>
                                     </form>
-                                </td>max
+                                </td>
                             </tr>
                         <?php endforeach; ?>
                         </tbody>
