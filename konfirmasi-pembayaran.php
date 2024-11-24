@@ -78,6 +78,8 @@ if (isset($_POST['submit'])) {
     <title>Pembayaran - Tirta Bugar Fitness</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/pembayaran.css">
+     <!-- link favicon -->
+     <link rel="shortcut icon" href="assets/logo-favicon.png" type="image/x-icon">
 </head>
 <body>
     <?php if(isset($_SESSION['form_data'])): ?>

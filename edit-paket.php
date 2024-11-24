@@ -1,34 +1,63 @@
-<?php 
-    session_start();
-    include 'koneksi.php';
+<?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+session_start();
+include 'koneksi.php';
 
-    if(!isset($_SESSION['email'])){
-        header('Location: admin-login.php');
+if (!isset($_SESSION['email'])) {
+    die("Anda belum login.");
+}
+
+// Cek ID Paket
+if (!isset($_GET['id_paket']) || !is_numeric($_GET['id_paket']) || empty($_GET['id_paket'])) {
+    die("ID Paket tidak ditemukan atau tidak valid.");
+}
+
+$id_paket = (int)$_GET['id_paket'];
+
+// Ambil data paket
+$queryPaket = "SELECT * FROM paket_member WHERE id_paket = :id_paket";
+$stmt = $conn->prepare($queryPaket);
+$stmt->bindParam(':id_paket', $id_paket, PDO::PARAM_INT);
+
+if (!$stmt->execute()) {
+    die("Query gagal dijalankan: " . implode(", ", $stmt->errorInfo()));
+}
+
+$paket = $stmt->fetch(PDO::FETCH_ASSOC);
+if (!$paket) {
+    die("Data paket tidak ditemukan.");
+}
+
+// Proses update data
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $nama_paket = $_POST['nama_paket'];
+    $keterangan_fasilitas = $_POST['keterangan_fasilitas'];
+    $keterangan_durasi = $_POST['keterangan_durasi'];
+    $harga = $_POST['harga'];
+
+    $queryUpdate = "
+        UPDATE paket_member 
+        SET nama_paket = :nama_paket, 
+            keterangan_fasilitas = :keterangan_fasilitas,
+            keterangan_durasi = :keterangan_durasi,
+            harga = :harga
+        WHERE id_paket = :id_paket
+    ";
+    $stmt = $conn->prepare($queryUpdate);
+    $stmt->bindParam(':nama_paket', $nama_paket);
+    $stmt->bindParam(':keterangan_fasilitas', $keterangan_fasilitas);
+    $stmt->bindParam(':keterangan_durasi', $keterangan_durasi);
+    $stmt->bindParam(':harga', $harga);
+    $stmt->bindParam(':id_paket', $id_paket, PDO::PARAM_INT);
+
+    if ($stmt->execute()) {
+        header('Location: admin-paket.php');
         exit();
+    } else {
+        die("Gagal menyimpan perubahan: " . implode(", ", $stmt->errorInfo()));
     }
-
-    // mengambil data profile di php // mengambil data profile di php
-    $adminId = $_SESSION['id_admin'];
-    $queryProfileName = "SELECT id_admin, username, email FROM admin WHERE id_admin = $adminId";
-    $resultProfileName = $conn->query($queryProfileName);
-    $rowProfileName = $resultProfileName->fetch(PDO::FETCH_ASSOC);
-
-    // update profile
-    if(isset($_POST['submit'])){
-        $username = $_POST['username'];
-        $email = $_POST['email'];
-
-        if(empty($username) || empty($email)){
-            echo "<script>alert('Wajib isi Form !');</script>";
-        } else {
-            $queryUpdateProfile = "UPDATE admin SET username = '$username', email = '$email' WHERE id_admin = $adminId";
-            $resultUpdateProfile = $conn->query($queryUpdateProfile);
-            if($resultUpdateProfile){
-                header('Location: admin-akun.php');
-                exit();
-            }
-        }
-    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -36,28 +65,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin</title>
-    <!-- link css -->
+    <title>Edit Paket</title>
+    <!-- Link CSS -->
     <link rel="stylesheet" href="css/admin.css?v=<?php echo time(); ?>">
-    <link rel="stylesheet" href="css/admin-tambah.css?v=<?php echo time(); ?>">
-     <!-- link favicon -->
-     <link rel="shortcut icon" href="assets/logo-favicon.png" type="image/x-icon">
-    <!-- link google font -->
+    <link rel="stylesheet" href="css/edit-paket.css?v=<?php echo time(); ?>">
+    <!-- Link favicon -->
+    <link rel="shortcut icon" href="assets/logo-favicon.png" type="image/x-icon">
+    <!-- Link Google Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <!-- sidebar -->
+        <!-- Sidebar -->
         <div class="sidebar container">
-            <!-- sidebar layout -->
             <div class="navbar-menu">
-                <!-- sidebar logo -->
                 <div class="logo-sidebar">
                     <h1>TB</h1>
                 </div>
-                <!-- sidebar menu -->
                 <nav>
                     <ul>
                         <li>
@@ -77,11 +103,12 @@
                             </a>
                         </li>
                         <li>
-                            <a href="admin-paket.php" class="menu-item">
+                            <a href="admin-paket.php" class="menu-item container">
                                 <div class="menu container">
                                     <img src="assets/note.svg" alt="paket-nav">
                                     Daftar Paket
                                 </div>
+                                <img src="assets/active-menu.svg" alt="active-icon">
                             </a>
                         </li>
                         <li>
@@ -93,12 +120,11 @@
                             </a>
                         </li>
                         <li>
-                            <a href="admin-akun.php" class="menu-item container">
+                            <a href="admin-akun.php" class="menu-item">
                                 <div class="menu container">
                                     <img src="assets/setting.svg" alt="setting-nav">
                                     Pengaturan Akun
                                 </div>
-                                <img src="assets/active-menu.svg" alt="active-icon">
                             </a>
                         </li>
                         <li>
@@ -112,44 +138,55 @@
                     </ul>
                 </nav>
             </div>
-            <!-- sidebar log out -->
             <a href="logout.php" class="log-out container">
                 <img src="assets/log-out.svg" alt="log-out">
                 <h3>Log Out</h3>
             </a>
         </div>
+        
         <div class="content">
             <header>
                 <div class="container">
                     <div class="title-page">
-                        <h2>Edit Member</h2>
+                        <h2>Edit Paket</h2>
                     </div>
                     <div class="account">
-                        <!-- notif account -->
                         <img src="assets/notification.svg" alt="notifivation">
                         <div class="account-profile">
-                            <!-- icon account -->
                             <img src="assets/profile.svg" alt="profile">
-                            <h3><?= $rowProfileName['username']?></h3>
                         </div>
                     </div>
                 </div>
             </header>
             <main>
-                <!-- form tambah member -->
-                <section class="tambah-member">
-                    <form class="form-tambah container" method="POST">
+                <!-- form edit paket -->
+                <section class="edit-paket">
+                    <form method="POST" class="form-edit container">
+                        <input type="hidden" name="id_paket" value="<?= $paket['id_paket'] ?>">
+
                         <div class="form-group container">
-                            <label for="username">Username</label>
-                            <input type="text" name="username" id="username" value="<?= $rowProfileName['username']?>" class="input-tambah">
+                            <label for="nama_paket">Nama Paket</label>
+                            <input type="text" name="nama_paket" id="nama_paket" class="input-edit" value="<?= $paket['nama_paket'] ?>" required>
                         </div>
+                        
                         <div class="form-group container">
-                            <label for="email">Email</label>
-                            <input type="email" name="email" id="email" value="<?= $rowProfileName['email']?>" class="input-tambah">
+                            <label for="keterangan_fasilitas">Keterangan Fasilitas</label>
+                            <input type="text" name="keterangan_fasilitas" id="keterangan_fasilitas" class="input-edit" value="<?= $paket['keterangan_fasilitas'] ?>" required>
                         </div>
+
+                        <div class="form-group container">
+                            <label for="keterangan_durasi">Keterangan Durasi</label>
+                            <input type="text" name="keterangan_durasi" id="keterangan_durasi" class="input-edit" value="<?= $paket['keterangan_durasi'] ?>" required>
+                        </div>
+
+                        <div class="form-group container">
+                            <label for="harga">Harga</label>
+                            <input type="number" name="harga" id="harga" class="input-edit" value="<?= $paket['harga'] ?>" step="0.01" required>
+                        </div>
+
                         <div class="btn-group container">
-                            <button type="submit" name="submit" class="btn-tambah">Edit Akun</button>
-                            <button class="btn-cancell">Batalkan</button>
+                            <button type="submit" name="submit" class="btn-edit">Simpan</button>
+                            <a href="admin-paket.php" class="btn-cancell">Kembali</a>
                         </div>
                     </form>
                 </section>

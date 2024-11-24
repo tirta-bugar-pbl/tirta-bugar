@@ -79,6 +79,8 @@ t.total_harga FROM member m JOIN transaksi t ON m.id_member = t.id_member JOIN p
     <!-- link css -->
     <link rel="stylesheet" href="css/admin.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="css/admin-transaksi.css?v=<?php echo time(); ?>">
+     <!-- link favicon -->
+     <link rel="shortcut icon" href="assets/logo-favicon.png" type="image/x-icon">
     <!-- link google font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

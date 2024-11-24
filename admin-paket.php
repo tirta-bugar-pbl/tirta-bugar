@@ -14,9 +14,12 @@
     $rowProfileName = $resultProfileName->fetch(PDO::FETCH_ASSOC);
 
     // mengambil data paket
-    $queryTampilPaket = "SELECT nama_paket, keterangan_fasilitas, keterangan_durasi, 'Rp ' || TO_CHAR(harga, 'FM999,999,999') as harga FROM paket_member";
+    $queryTampilPaket = "SELECT id_paket, nama_paket, keterangan_fasilitas, keterangan_durasi, 'Rp ' || TO_CHAR(harga, 'FM999,999,999') as harga FROM paket_member";
     $resultTampilPaket = $conn->query($queryTampilPaket);
     $rowTampilPaket = $resultTampilPaket->fetchAll(PDO::FETCH_ASSOC);
+
+  
+
 ?>
 
 <!DOCTYPE html>
@@ -141,10 +144,26 @@
                                 <td><?= $result['harga']?></td>
                                 <td><?= $result['keterangan_durasi']?></td>
                                 <td><?= $result['keterangan_fasilitas']?></td>
+                                <td>
+       
+          <!-- Tombol Edit -->
+<form action="edit-paket.php" method="GET" style="display: inline;">
+    <input type="hidden" name="id_paket" value="<?= $result['id_paket'] ?>">
+    <button type="submit" class="btn-edit">Edit</button>
+</form>
+            <!-- Tombol Hapus -->
+            <form action="hapus-paket.php" method="POST" style="display: inline;">
+                <input type="hidden" name="id_paket" value="<?= $result['id_paket'] ?>">
+                <button type="submit" class="btn-hapus" onclick="return confirm('Apakah Anda yakin ingin menghapus paket ini?')">Hapus</button>
+            </form>
+        </td>
                             </tr>
                         <?php endforeach; ?>
                         </tbody>
                     </table>
+                    <div style="text-align: right; margin-top: 10px;">
+    <a href="tambah-paket.php" class="button">Tambah Paket</a>
+</div>
                 </section>
             </main>
         </div>

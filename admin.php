@@ -1,75 +1,122 @@
-<?php 
-    session_start();
-    include 'koneksi.php';
+<?php
+session_start();
+include 'koneksi.php';
 
-    if(!isset($_SESSION['email'])){
-        header('Location: admin-login.php');
-        exit();
+if (!isset($_SESSION['email'])) {
+    header('Location: admin-login.php');
+    exit();
+}
+
+// variabel pagination
+$limit = 10;
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1; 
+$offset = ($page - 1) * $limit; 
+
+// mengambil data profile
+$adminId = $_SESSION['id_admin'];
+$queryProfileName = "SELECT username FROM admin WHERE id_admin = :adminId";
+$stmt = $conn->prepare($queryProfileName);
+$stmt->bindParam(':adminId', $adminId, PDO::PARAM_INT);
+$stmt->execute();
+$rowProfileName = $stmt->fetch(PDO::FETCH_ASSOC);
+
+// Update status otomatis
+$updateStatusQuery = "UPDATE member SET status = 'tidak aktif' WHERE tanggal_berakhir < CURRENT_DATE AND status = 'aktif'";
+$conn->query($updateStatusQuery);
+
+// Mengambil nilai filter dari URL
+$combinedFilter = isset($_GET['combined_filter']) ? $_GET['combined_filter'] : '';
+$search = isset($_GET['search']) ? $_GET['search'] : '';
+$sortByDate = isset($_GET['sort_by_date']) ? $_GET['sort_by_date'] : '';
+
+// Query dasar
+$baseQuery = "SELECT 
+    m.id_member, 
+    m.nama_member, 
+    m.nomor_telepon, 
+    p.keterangan_durasi, 
+    p.keterangan_fasilitas, 
+    m.tanggal_berakhir as tanggal_berakhir_raw,
+    TO_CHAR(m.tanggal_berakhir, 'DD Month YYYY') as tanggal_berakhir,
+    COALESCE(m.status, 'tidak ada') as status
+FROM member m
+LEFT JOIN paket_member p ON p.id_paket = m.id_paket
+WHERE 1=1";
+
+// Tambahkan kondisi pencarian
+if (!empty($search)) {
+    $searchTerm = '%' . strtolower($search) . '%';
+    $baseQuery .= " AND LOWER(m.nama_member) LIKE :searchTerm";
+}
+
+// Array untuk ORDER BY clauses
+$orderClauses = array();
+
+// Tambahkan kondisi filter gabungan
+if ($combinedFilter) {
+    list($status, $sort) = explode('-', $combinedFilter);
+    
+    if ($status !== 'all') {
+        if ($status === 'aktif') {
+            $baseQuery .= " AND m.status = 'aktif'";
+        } else if ($status === 'tidak_aktif') {
+            $baseQuery .= " AND (m.status != 'aktif' OR m.status IS NULL)";
+        }
     }
-
-    // variabel pagination
-    $limit = 10;
-    $page = isset($_GET['page']) ? $_GET['page'] : 1; 
-    $offset = ($page - 1) * $limit; 
-
-    // mengambil data profile di php
-    $adminId = $_SESSION['id_admin'];
-    $queryProfileName = "SELECT username FROM admin WHERE id_admin = $adminId";
-    $resultProfileName = $conn->query($queryProfileName);
-    $rowProfileName = $resultProfileName->fetch(PDO::FETCH_ASSOC);
-    $queryMember = "SELECT m.id_member, m.nama_member, m.nomor_telepon, p.keterangan_durasi, p.keterangan_fasilitas, TO_CHAR(m.tanggal_berakhir, 'DD Month YYYY') as tanggal_berakhir, COALESCE(m.status, 'tidak ada') as status FROM member m LEFT OUTER JOIN paket_member p ON p.id_paket = m.id_paket;";
-
-
-    // Update otomatis status keanggotaan jika tanggal_berakhir sudah jatuh tempo
-    $updateStatusQuery = "UPDATE member SET status = 'tidak aktif' WHERE tanggal_berakhir < CURRENT_DATE AND status = 'aktif'";
-    $conn->query($updateStatusQuery);
-
-    // Mengambil nilai filter dan search dari URL
-    $filter = isset($_GET['filter']) ? $_GET['filter'] : '';
-    $search = isset($_GET['search']) ? $_GET['search'] : '';
-
-    // Menyusun query berdasarkan filter status dan search
-    $queryMember = "SELECT m.id_member, m.nama_member, m.nomor_telepon, p.keterangan_durasi, p.keterangan_fasilitas, TO_CHAR(m.tanggal_berakhir, 'DD Month YYYY') as tanggal_berakhir, COALESCE(m.status, 'tidak ada') as status FROM member m RIGHT OUTER JOIN paket_member p ON p.id_paket = m.id_paket 
-    WHERE 1=1";
-
-    // Menambahkan kondisi filter status jika ada
-    if ($filter == 'aktif') {
-        $queryMember .= " AND m.status = 'aktif'";
-    } else if ($filter == 'tidak-aktif') {
-        $queryMember .= " AND (m.status != 'aktif' OR m.status IS NULL)";
+    
+    if ($sort === 'asc') {
+        $orderClauses[] = "m.nama_member ASC";
+    } else if ($sort === 'desc') {
+        $orderClauses[] = "m.nama_member DESC";
     }
+}
 
-    // Menambahkan kondisi pencarian nama_member jika ada
-    if (!empty($search)) {
-        $searchTerm = strtolower($search);
-        $queryMember .= " AND LOWER(m.nama_member) LIKE '%$searchTerm%'";
-    }
+// Tambahkan sort by date
+if ($sortByDate) {
+    $orderClauses[] = "m.tanggal_berakhir " . ($sortByDate === 'asc' ? 'ASC' : 'DESC') . " NULLS LAST";
+}
 
-    // Tambahkan LIMIT dan OFFSET untuk pagination
-    $queryMember .= " LIMIT $limit OFFSET $offset";
+// Tambahkan ORDER BY ke query jika ada
+if (!empty($orderClauses)) {
+    $baseQuery .= " ORDER BY " . implode(", ", $orderClauses);
+}
 
-    // Eksekusi query
-    $resultMember = $conn->query($queryMember);
+// Query untuk menghitung total records
+$countQuery = preg_replace('/SELECT.*?FROM/s', 'SELECT COUNT(*) as total FROM', $baseQuery);
+$countQuery = preg_replace('/ORDER BY.*$/', '', $countQuery);
 
+// Eksekusi query untuk menghitung total records
+$stmt = $conn->prepare($countQuery);
+if (!empty($search)) {
+    $stmt->bindParam(':searchTerm', $searchTerm, PDO::PARAM_STR);
+}
+$stmt->execute();
+$rowCount = $stmt->fetch(PDO::FETCH_ASSOC);
+$totalPages = ceil($rowCount['total'] / $limit);
 
-    // jumlah data member
-    $queryAmountMember = "SELECT COUNT(id_member) As total_member FROM member";
-    $resultAmountMember = $conn->query($queryAmountMember);
-    $rowAmountMember = $resultAmountMember->fetch(PDO::FETCH_ASSOC);
+// Tambahkan LIMIT dan OFFSET
+$baseQuery .= " LIMIT $limit OFFSET $offset";
 
-    // jumlah data member aktif
-    $queryAmountMemberActive = "SELECT COUNT(id_member) As total_member_aktif FROM member WHERE status = 'aktif'";
-    $resultAmountMemberActive = $conn->query($queryAmountMemberActive);
-    $rowAmountMemberActive = $resultAmountMemberActive->fetch(PDO::FETCH_ASSOC);
+// Eksekusi query final
+$stmt = $conn->prepare($baseQuery);
+if (!empty($search)) {
+    $stmt->bindParam(':searchTerm', $searchTerm, PDO::PARAM_STR);
+}
+$stmt->execute();
+$resultMember = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // jumlah data member nonaktif
-    $queryAmountMemberNonactive = "SELECT COUNT(id_member) As total_member_nonaktif FROM member WHERE status = 'tidak aktif'";
-    $resultAmountMemberNonactive = $conn->query($queryAmountMemberNonactive);
-    $rowAmountMemberNonactive = $resultAmountMemberNonactive->fetch(PDO::FETCH_ASSOC);
+// Statistik tetap sama seperti sebelumnya
+$queryAmountMember = "SELECT COUNT(id_member) As total_member FROM member";
+$queryAmountMemberActive = "SELECT COUNT(id_member) As total_member_aktif FROM member WHERE status = 'aktif'";
+$queryAmountMemberNonactive = "SELECT COUNT(id_member) As total_member_nonaktif FROM member WHERE status = 'tidak aktif'";
 
+$resultAmountMember = $conn->query($queryAmountMember);
+$resultAmountMemberActive = $conn->query($queryAmountMemberActive);
+$resultAmountMemberNonactive = $conn->query($queryAmountMemberNonactive);
 
-    // hitung total number of pages
-    $totalPages = ceil($rowAmountMember['total_member'] / $limit);  
+$rowAmountMember = $resultAmountMember->fetch(PDO::FETCH_ASSOC);
+$rowAmountMemberActive = $resultAmountMemberActive->fetch(PDO::FETCH_ASSOC);
+$rowAmountMemberNonactive = $resultAmountMemberNonactive->fetch(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -80,6 +127,8 @@
     <title>Admin</title>
     <!-- link css -->
     <link rel="stylesheet" href="css/admin.css?v=<?php echo time(); ?>"">
+     <!-- link favicon -->
+     <link rel="shortcut icon" href="assets/logo-favicon.png" type="image/x-icon">
     <!-- link google font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -141,25 +190,16 @@
                             </a>
                         </li>
                         <li>
-                            <a href="admin-absen.php" class="menu-item">
+                            <a href="admin-logout.php" class="menu-item">
                                 <div class="menu container">
-                                    <img src="assets/calendar.svg" alt="calendar-nav">
-                                    Absensi Harian
+                                    <img src="assets/logout.svg" alt="logout-nav">
+                                    Logout
                                 </div>
                             </a>
                         </li>
                     </ul>
                 </nav>
             </div>
-
-            
-            <!-- sidebar log out -->
-            <a href="logout.php" class="log-out container">
-                <img src="assets/log-out.svg" alt="log-out">
-                <h3>
-                    Log Out
-                </h3>
-            </a>
         </div>
         <div class="content">
             <header>
@@ -219,29 +259,46 @@
                         </div>
                     </div>
                 </section>
-                <!-- filtering member -->
-                <section class="filtering-member">
-                    <!-- form gabungan untuk filter dan search -->
-                    <form method="GET">
-                        <div class="filter-group container">
-                            <!-- filter member -->
-                            <div>
-                                <div class="filter-member">
-                                    <select name="filter" id=filter onchange="applyFilter()">
-                                        <option value="">Pilih Filter</option>
-                                        <option value="aktif" <?= isset($_GET['filter']) && $_GET['filter'] === 'aktif' ? 'selected' : '' ?>>Aktif</option>
-                                        <option value="tidak-aktif" <?= isset($_GET['filter']) && $_GET['filter'] === 'tidak-aktif' ? 'selected' : '' ?>>Tidak Aktif</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <!-- search member -->
-                            <div class="search-member container">
-                                <input type="text" name="search" id="search" placeholder="Search" value="<?= $_GET['search'] ?? '' ?>">
-                                <img src="assets/search.svg" alt="search">
-                            </div>
-                        </div>
-                    </form>     
-                </section>
+
+        <!-- filtering member -->
+        <section class="filtering-member">
+        <form method="GET" action="">
+    <div class="filter-group container">
+        <!-- Combined filter for status and name -->
+        <div>
+            <div class="filter-member">
+                <select name="combined_filter" id="combined_filter">
+                    <option value="">Filter & Sort</option>
+                    <option value="all-asc" <?= $combinedFilter === 'all-asc' ? 'selected' : '' ?>>All Members (A-Z)</option>
+                    <option value="all-desc" <?= $combinedFilter === 'all-desc' ? 'selected' : '' ?>>All Members (Z-A)</option>
+                    <option value="aktif-asc" <?= $combinedFilter === 'aktif-asc' ? 'selected' : '' ?>>Members Aktif (A-Z)</option>
+                    <option value="aktif-desc" <?= $combinedFilter === 'aktif-desc' ? 'selected' : '' ?>>Member Aktif (Z-A)</option>
+                    <option value="tidak_aktif-asc" <?= $combinedFilter === 'tidak_aktif-asc' ? 'selected' : '' ?>>Member Tidak Aktif (A-Z)</option>
+                    <option value="tidak_aktif-desc" <?= $combinedFilter === 'tidak_aktif-desc' ? 'selected' : '' ?>>Member Tidak Aktif (Z-A)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- sort member by date -->
+        <div>
+            <div class="filter-member">
+                <select name="sort_by_date" id="sort_by_date">
+                    <option value="">Sort by Date</option>
+                    <option value="asc" <?= $sortByDate === 'asc' ? 'selected' : '' ?>>Lama ke Baru</option>
+                    <option value="desc" <?= $sortByDate === 'desc' ? 'selected' : '' ?>>Baru ke Lama</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- search member -->
+        <div class="search-member container">
+            <input type="text" name="search" id="search" placeholder="Search" value="<?= htmlspecialchars($search) ?>">
+            <img src="assets/search.svg" alt="search">
+        </div>
+    </div>
+</form>
+</section>
+
                 <section class="member-table">
                     <table>
                         <!-- head table -->
@@ -277,29 +334,34 @@
                     </table>
                 </section>
                 <!-- Pagination -->
-                <section class="pagination">
-                    <div class="container">
-                        <ul>
-                            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                                <li><a href="?page=<?= $i ?>&filter=<?= $filter ?>&search=<?= $search ?>" class="<?= ($i == $page) ? 'active' : '' ?>"><?= $i ?></a></li>
-                            <?php endfor; ?>
-                        </ul>
-                    </div>
-                </section>
+              
+<section class="pagination">
+    <div class="container">
+        <ul>
+            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                <li>
+                    <a href="?page=<?= $i ?>&combined_filter=<?= urlencode($combinedFilter) ?>&search=<?= urlencode($search) ?>&sort_by_date=<?= urlencode($sortByDate) ?>" 
+                       class="<?= ($i == $page) ? 'active' : '' ?>">
+                        <?= $i ?>
+                    </a>
+                </li>
+            <?php endfor; ?>
+        </ul>
+    </div>
+</section>
             </main>
         </div>
     </div>
     <script>
-        function confirmDelete() {
-            return confirm("Apakah Anda yakin ingin menghapus member ini?");
-        }
+   document.getElementById('combined_filter').addEventListener('change', function() {
+    this.form.submit();
+});
 
-        function applyFilter() {
-            const filter = document.getElementById('filter').value;
-            const url = new URL(window.location.href);
-            url.searchParams.set('filter', filter);
-            window.location.href = url.toString();
-        }
-    </script>
+document.getElementById('sort_by_date').addEventListener('change', function() {
+    // Reset combined_filter saat memilih sort by date
+    document.getElementById('combined_filter').value = '';  // Reset combined_filter
+    this.form.submit();  // Submit form setelah mereset combined_filter
+});
+</script>
 </body>
 </html>
