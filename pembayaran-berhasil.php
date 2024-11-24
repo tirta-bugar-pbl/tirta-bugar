@@ -42,19 +42,28 @@
             $harga_paket = 0;
             $keterangan = '';
             $keteranganDurasi = '';
+            $keteranganPrivate = '';
 
             if($durasi == '1') {
                 $harga_paket = 100000;
                 $keterangan = '8x Pertemuan';
                 $keteranganDurasi = '1 Bulan';
+                $keteranganPrivate = '-';
             } else if ($durasi == '2') {
                 $harga_paket = 185000;
                 $keterangan = 'Bebas Datang';
                 $keteranganDurasi = '1 Bulan';
-            } else {
+                $keteranganPrivate = '-';
+            } else if ($durasi == '3') {
                 $harga_paket = 500000;
                 $keterangan = 'Bebas Datang';
                 $keteranganDurasi = '3 Bulan';
+                $keteranganPrivate = '-';
+            } else {
+                $harga_paket = 550000;
+                $keterangan = 'Bebas Datang';
+                $keteranganDurasi = '1 Bulan';
+                $keteranganPrivate = '4x Pertemuan';
             }
 
             $biaya_pendaftaran = 50000;
@@ -63,6 +72,9 @@
             $subject = 'Konfirmasi Pendaftaran';
             $body = '<p>Hi, ' .$nama. '. Terima kasih sudah bergabung menjadi anggota Tirta Bugar Fitness. Berikut rincian pembayarannya : <p>
                 <br>
+                <div>
+                    <h2>Invoice : ' . $order_id . '</h2>
+                </div>
                 <div>
                     <p><b>Nama</b> : ' . $nama . '</p>
                 </div>
@@ -85,6 +97,9 @@
                     <p><b>Keterangan</b> : ' . $keterangan  . '</p>
                 </div>
                 <div>
+                    <p><b>Private Fitness</b> : ' . $keteranganPrivate . '</p>
+                </div>
+                <div>
                     <p><b>Total yang sudah dibayarkan</b> : ' . rupiah($total)  . '</p>
                 </div>';
 
@@ -92,7 +107,7 @@
             $result = sendEmail($email, $nama, $subject, $body);
 
             if($result) {
-            if($durasi == '1' || $durasi == '2') {
+            if($durasi == '1' || $durasi == '2' || $durasi == '4') {
                     // query menambahkan data member
                     $queryTambahMember = "INSERT INTO member(nama_member, email, password, nomor_telepon, no_kwitansi, status, tanggal_awal, tanggal_berakhir, id_paket) VALUES ('$nama', '$email', '$pwHash', '$nomor_telepon', null, 'aktif', CURRENT_DATE, CURRENT_DATE + INTERVAL '1 month', '$durasi')";
                     $resultMember = $conn->query($queryTambahMember);

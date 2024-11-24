@@ -24,20 +24,20 @@
             <div class="menu-button hideOnDesktop" onclick="toggleSidebar()">&#9776;</div>
             <nav class="container hideOnMobile">
                 <ul class="menu container">
-                    <li>
-                        <a href="#home">Home</a>
+                    <li class="beranda red">
+                        <a href="#beranda">Home</a>
                     </li>
-                    <li>
-                        <a href="#about">About</a>
+                    <li class="tentang">
+                        <a href="#tentang">About</a>
                     </li>
-                    <li>
-                        <a href="#gallery">Gallery</a>
+                    <li class="galeri">
+                        <a href="#galeri">Gallery</a>
                     </li>
-                    <li>
-                        <a href="#price">Price</a>
+                    <li class="harga">
+                        <a href="#harga">Price</a>
                     </li>
-                    <li>
-                        <a href="#contact">Contact</a>
+                    <li class="kontak">
+                        <a href="#kontak">Contact</a>
                     </li>
                 </ul>
                 <a href="daftar.php" target="_blank">
@@ -62,13 +62,13 @@
     <!-- main -->
     <main>
         <!-- banner -->
-        <section class="banner" id="home">
+        <section class="banner" id="beranda">
             <div class="container">
                 <h1>Tirta Bugar Fitness</h1>
             </div>
         </section>
         <!-- about -->
-        <section class="about" id="about">
+        <section class="about" id="tentang">
             <div class="container">
                 <h2 class="about-title">About us</h2>
                 <p>Kami adalah GYM yang berlokasi di JL. Bugel Indah Raya Perumahan Bugel Indah blok A9, No. 123, Bugel, Kecamatan Karawaci, Kota Tangerang, Banten 15114 dengan harga terjangkau. Tirta Bugar Fitness dengan fasilitas yang lengkap dengan konsep kekeluargaan 
@@ -76,7 +76,7 @@
             </div>
         </section>
         <!-- why choose us -->
-        <section class="why-choose-us">
+        <section class="why-choose-us" id="tentang">
             <h2 class="why-title">Why Choose Us</h2>
             <div class="container">
                 <!-- card why choose us -->
@@ -115,7 +115,7 @@
             </div>
         </section>
         <!-- gallery -->
-        <section class="gallery" id="#gallery">
+        <section class="gallery" id="galeri">
             <h2 class="gallery-title">Gallery</h2>
             <div class="container">
                 <div class="gallery-img">
@@ -139,7 +139,7 @@
             </div>
         </section>
         <!-- price -->
-        <section class="price" id="#price">
+        <section class="price" id="harga">
             <h2 class="price-title">Price</h2>
             <div class="container">
                 <div class="card-price">
@@ -172,13 +172,24 @@
                         <button class="btn-buy" onclick="directDaftarMenu(3)">Buy Now</button>
                     </div>
                 </div>
+                <div class="card-price">
+                    <div class="container">
+                        <h3 class="price-card-title">Rp 550.000,00</h3>
+                        <ul class="list-price-fasility">
+                            <li>Fitness selama 1 bulan</li>
+                            <li>Bebas Datang</li>
+                            <li>Private Fitness 4x Pertemuan</li>
+                        </ul>
+                        <button class="btn-buy" onclick="directDaftarMenu(4)">Buy Now</button>
+                    </div>
+                </div>
             </div>
         </section>
     </main>
     <!-- footer -->
-    <footer>
-        <div>
-            <div class="kontak container" id="contact">
+    <footer id="kontak">
+        <section id="kontak" class="kontak">
+            <div class="k container">
                 <!-- contact -->
                 <div class="contact">
                     <h2 class="title-contact">Our Address</h2>
@@ -202,9 +213,13 @@
                 </div>
             </div>
             <p class="copyright">Copyright&copy; 2024 Tirta Bugar Fitness</p>
-        </div>
+        </section>
     </footer>
     <script>
+        // Toggle sidebar 
+        const sections = document.querySelectorAll('section');
+        const nav = document.querySelectorAll('nav ul li');
+
         // function directMenu
         function directDaftarMenu(t) {
             return window.location.href = `daftar.php?id_paket=${t}`;
@@ -215,6 +230,28 @@
             const sidebar = document.getElementById("sidebar");
             sidebar.classList.toggle("active");
         }
+
+        // scroll animation
+        window.addEventListener('scroll', () => {
+        let current = '';
+        
+        sections.forEach( section => {
+            const sectionTop = section.offsetTop;
+            const sectionHeight = section.clientHeight;
+
+            if (pageYOffset > (sectionTop - sectionHeight / 3)) {
+                current = section.getAttribute('id');
+            }
+        })
+
+        nav.forEach( li => {
+            li.classList.remove('red');
+
+            if (li.classList.contains(current)) {
+                li.classList.add('red');
+            }
+        })
+        })
     </script>
 </body>
 </html>

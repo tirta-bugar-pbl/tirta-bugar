@@ -14,13 +14,11 @@
 
     // mengambil data profile
     $adminId = $_SESSION['id_admin'];
-    $queryProfileName = "SELECT username FROM admin WHERE id_admin = :adminId";
-    $stmt = $conn->prepare($queryProfileName);
-    $stmt->bindParam(':adminId', $adminId, PDO::PARAM_INT);
-    $stmt->execute();
-    $rowProfileName = $stmt->fetch(PDO::FETCH_ASSOC);
+    $queryProfileName = "SELECT username FROM admin WHERE id_admin = $adminId";
+    $resultProfileName = $conn->query($queryProfileName);
+    $rowProfileName = $resultProfileName->fetch(PDO::FETCH_ASSOC);
 
-    // Update status otomatis
+    // Update otomatis status keanggotaan jika tanggal_berakhir sudah jatuh tempo
     $updateStatusQuery = "UPDATE member SET status = 'tidak aktif' WHERE tanggal_berakhir < CURRENT_DATE AND status = 'aktif'";
     $conn->query($updateStatusQuery);
 
@@ -30,7 +28,7 @@
     $sortByDate = isset($_GET['sort_by_date']) ? $_GET['sort_by_date'] : '';
 
     // Query dasar
-    $baseQuery = "SELECT m.id_member, m.nama_member, m.nomor_telepon, p.keterangan_durasi, p.keterangan_fasilitas, m.tanggal_berakhir as tanggal_berakhir_raw, TO_CHAR(m.tanggal_berakhir, 'DD Month YYYY') as tanggal_berakhir, COALESCE(m.status, 'tidak ada') as status FROM member m LEFT JOIN paket_member p ON p.id_paket = m.id_paket
+    $baseQuery = "SELECT m.id_member, m.nama_member, m.nomor_telepon, p.keterangan_durasi, p.keterangan_fasilitas, m.tanggal_berakhir as tanggal_berakhir_raw, TO_CHAR(m.tanggal_berakhir, 'DD Month YYYY') as tanggal_berakhir, COALESCE(m.status, 'tidak ada') as status, (m.tanggal_berakhir - m.tanggal_awal) AS selisih FROM member m LEFT JOIN paket_member p ON p.id_paket = m.id_paket
     WHERE 1=1";
 
     // Tambahkan kondisi pencarian
@@ -97,16 +95,17 @@
 
     // Statistik tetap sama seperti sebelumnya
     $queryAmountMember = "SELECT COUNT(id_member) As total_member FROM member";
-    $queryAmountMemberActive = "SELECT COUNT(id_member) As total_member_aktif FROM member WHERE status = 'aktif'";
-    $queryAmountMemberNonactive = "SELECT COUNT(id_member) As total_member_nonaktif FROM member WHERE status = 'tidak aktif'";
-
     $resultAmountMember = $conn->query($queryAmountMember);
-    $resultAmountMemberActive = $conn->query($queryAmountMemberActive);
-    $resultAmountMemberNonactive = $conn->query($queryAmountMemberNonactive);
-
     $rowAmountMember = $resultAmountMember->fetch(PDO::FETCH_ASSOC);
+
+    // jumlah data member aktif
+    $queryAmountMemberActive = "SELECT COUNT(id_member) As total_member_aktif FROM member WHERE status ILIKE 'aktif'";
+    $resultAmountMemberActive = $conn->query($queryAmountMemberActive);
     $rowAmountMemberActive = $resultAmountMemberActive->fetch(PDO::FETCH_ASSOC);
-    $rowAmountMemberNonactive = $resultAmountMemberNonactive->fetch(PDO::FETCH_ASSOC);
+
+    // jumlah data member nonaktif
+    $queryAmountMemberNonactive = "SELECT COUNT(id_member) As total_member_nonaktif FROM member WHERE status ILIKE 'tidak aktif'";
+    $resultAmountMemberNonactive = $conn->query($queryAmountMemberNonactive);
 ?>
 
 <!DOCTYPE html>
@@ -116,7 +115,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin</title>
     <!-- link css -->
-    <link rel="stylesheet" href="css/admin.css?v=<?php echo time(); ?>"">
+    <link rel="stylesheet" href="css/admin.css?v=<?php echo time(); ?>">
     <!-- link favicon -->
     <link rel="shortcut icon" href="assets/logo-favicon.png" type="image/x-icon">
     <!-- link google font -->
@@ -310,7 +309,17 @@
                         </thead>
                         <tbody>
                         <?php foreach ($resultMember as $result) : ?>
-                            <tr>
+                            <?php 
+                                $style = '';
+
+                                // kondisi menentukan 
+                                if($result['selisih'] == 7) {
+                                    $style = "style='background-color: yellow';";
+                                } elseif ($result['selisih'] == 0) {
+                                    $style = "style='background-color: red';";
+                                } 
+                            ?>
+                            <tr <?= $style ?>>
                                 <td><?= $result['nama_member']?></td>
                                 <td style="text-align: center;"><?= $result['nomor_telepon']?></td>
                                 <td style="text-align: center;"><?= $result['keterangan_durasi']?></td>

@@ -137,7 +137,7 @@
                                 <td>Harga</td>
                                 <td>Durasi</td>
                                 <td>Keterangan Fasilitas</td>
-                                <td>Keterangan Private</td>
+                                <td>Kunjungan Private</td>
                                 <td>Aksi</td>
                             </tr>
                         </thead>
@@ -160,7 +160,7 @@
                                         <input type="hidden" name="id_paket" value="<?= $result['id_paket'] ?>">
                                         <button type="submit" class="btn-hapus" onclick="return confirm('Apakah Anda yakin ingin menghapus paket ini?')">Hapus</button>
                                     </form>
-                                </td>
+                                </td>max
                             </tr>
                         <?php endforeach; ?>
                         </tbody>

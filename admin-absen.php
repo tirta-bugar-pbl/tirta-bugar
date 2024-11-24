@@ -23,7 +23,7 @@
 
     // mengambil data absen
     if($search) {
-        $queryAbsen = "SELECT TO_CHAR(a.tanggal_datang, 'DD Month YYYY') as tanggal_datang, m.nama_member, p.keterangan_fasilitas, TO_CHAR(m.tanggal_berakhir, 'DD Month YYYY') as tanggal_berakhir, p.keterangan_durasi, COALESCE(a.keterangan, '-') as keterangan_absen  FROM absen_harian a LEFT OUTER JOIN member m ON a.id_member = m.id_member LEFT OUTER JOIN paket_member p ON m.id_paket = p.id_paket WHERE m.nama_member LIKE '%$search%'";
+        $queryAbsen = "SELECT TO_CHAR(a.tanggal_datang, 'DD Month YYYY') as tanggal_datang, m.nama_member, p.keterangan_fasilitas, TO_CHAR(m.tanggal_berakhir, 'DD Month YYYY') as tanggal_berakhir, p.keterangan_durasi, COALESCE(a.keterangan, '-') as keterangan_absen  FROM absen_harian a LEFT OUTER JOIN member m ON a.id_member = m.id_member LEFT OUTER JOIN paket_member p ON m.id_paket = p.id_paket WHERE LOWER(m.nama_member) LIKE '%$search%'";
 
         $resultAbsen = $conn->query($queryAbsen);
 

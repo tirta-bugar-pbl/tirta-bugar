@@ -12,14 +12,20 @@
             $sql = "SELECT * FROM admin WHERE email = '$email'";
             $result = $conn->query($sql);
             $user = $result->fetch(PDO::FETCH_ASSOC);
-    
-            if ($user && password_verify($password, $user['password'])) {
-                $_SESSION['email'] = $user['email'];
-                $_SESSION['id_admin'] = $user['id_admin'];
-                header('Location: admin.php');
-                exit();
-            } else {
-                echo "<script>alert('Email atau password salah!');</script>";
+
+            if($result) {
+                if($user['status_verify'] == 0) {
+                    echo "<script>alert('Akun kamu belum di verifikasi !');</script>";
+                } else {
+                    if ($user && password_verify($password, $user['password'])) {
+                        $_SESSION['email'] = $user['email'];
+                        $_SESSION['id_admin'] = $user['id_admin'];
+                        header('Location: admin.php');
+                        exit();
+                    } else {
+                        echo "<script>alert('Email atau password salah!');</script>";
+                    }
+                }
             }
         }
     }
@@ -59,14 +65,15 @@
                 </div>
                 <div class="btn-group">
                     <button type="submit" name="submit" class="btn-login">Login</button>
-                    <p>Don’t have account? <a class="auth-link" href="admin-register.php" target="_blank">Register</a></p>
+                    <p>Don’t have account? <a class="auth-link" href="admin-register.php">Register</a></p>
                 </div>
             </div>
         </form>
     </div>
     <script>
+        // fungsi show password
         function showPassword() {
-            var passwordInput = document.getElementById("password");
+            let passwordInput = document.getElementById("password");
             if (passwordInput.type === "password") {
                 passwordInput.type = "text";
             } else {

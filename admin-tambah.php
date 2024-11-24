@@ -166,11 +166,12 @@
                             <input type="text" name="nomor-telepon" id="nomor-telepon" class="input-tambah" required>
                         </div>
                         <div class="form-group container">
-                            <label for="durasi">Durasi</label>
+                            <label for="durasi">Pilih Paket</label>
                             <select name="durasi" id="durasi" class="input-tambah">
-                                <option value="1">8x Pertemuan</option>
-                                <option value="2">1 Bulan</option>
-                                <option value="3">3 Bulan</option>
+                                <option value="1">Regullar - 1 Bulan 8x Fitness</option>
+                                <option value="2">Regullar - 1 Bulan Fitness Sepuasnya</option>
+                                <option value="3">Regullar - 3 Bulan Fitness Sepuasnya</option>
+                                <option value="4">Regullar - 1 Bulan Sepuasnya + 4x Private Fitness</option>
                             </select>
                         </div>
                         <div class="form-group container">

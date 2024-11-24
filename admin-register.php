@@ -1,19 +1,42 @@
 <?php
     include 'koneksi.php';
+    require 'send-email.php';
 
     if (isset($_POST['submit'])) {
         $username = $_POST['username'];
         $email = $_POST['email'];
         $password = $_POST['password'];
         $hash_pass = password_hash($password, PASSWORD_DEFAULT);
+        $verify_token = md5(rand());
+
+        // mengecek akun yang sudah terdaftar
+        $sql = "SELECT email FROM admin WHERE email = '$email'";
+        $result = $conn->query($sql);
+        $rowDuplicateEmail = $result->fetch(PDO::FETCH_ASSOC);
 
         if (empty($username) || empty($email) || empty($password)) {
-            echo "<script>alert('Wajib isi Form !');</script>";
+            echo "<script>
+                alert('Wajib isi Form !');
+            </script>";
+        } else if($rowDuplicateEmail){
+            echo "<script>
+                alert('Email sudah terdaftar, silahkan gunakan email yang lain!');
+            </script>";
         } else {
-            $sql = "INSERT INTO admin (username, email, password) VALUES ('$username', '$email', '$hash_pass')";
+            $sql = "INSERT INTO admin (username, email, password,token_verify,status_verify) VALUES ('$username', '$email', '$hash_pass', '$verify_token', 0)";
 
             if ($conn->query($sql)) {
-                header("Location: admin-login.php");
+                 // variabel untuk mengirim email
+                $subject = 'Registrasi Akun';
+                $body = "Akun anda sudah di registrasi, silahkan buka link <a href='http://localhost/tirta-bugar/verify-regist.php?token=$verify_token'>di sini</a> untuk melakukan verifikasi";
+                sendEmail($email, $username, $subject, $body);
+
+                echo "<script>
+                    alert('Akun anda sudah berhasil diregistrasi, silahkan cek email untuk melakukan verifikasi');
+                    setTimeout(function() {
+                        window.location.href = 'admin-login.php';
+                        }, 1000);
+                </script>";
             } else {
                 echo "Error: " . $sql . "<br>" . $conn->error;
             }
@@ -64,6 +87,7 @@
         </form>
     </div>
     <script>
+        // fungsi show password
         function showPassword() {
             var passwordInput = document.getElementById("password");
             if (passwordInput.type === "password") {

@@ -291,27 +291,6 @@ button, .btn-reset, .btn-submit {
     transition: background-color 0.3s;
 }
 
-/* Styling untuk tombol submit */
-button.btn-submit {
-    background-color: #4CAF50;
-    color: white;
-}
-
-button.btn-submit:hover {
-    background-color: #45a049;
-}
-
-/* Styling untuk tombol reset */
-a.btn-reset {
-    background-color: #f44336;
-    color: white;
-    margin-left: 10px;
-}
-
-a.btn-reset:hover {
-    background-color: #e53935;
-}
-
 /* Pagination */
 .pagination {
     text-align: center;
@@ -346,13 +325,13 @@ a.btn-reset:hover {
 }
 
 .pagination a:hover {
-    background-color: #007bff;
-    color: white;
+    background-color: var(--acent-color);
+    color: var(--secondary-color);
 }
 
 .pagination a.active {
-    background-color: #007bff;
-    color: white;
+    background-color: var(--acent-color);
+    color: var(--secondary-color);
     font-weight: bold;
 }
 
