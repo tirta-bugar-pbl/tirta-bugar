@@ -26,11 +26,6 @@ form .form-forgot.container {
     flex-direction: column;
 }
 
-form .auth-link {
-    color: var(--acent-color);
-    text-decoration: underline;
-}
-
 input {
     border: 1px solid var(--secondary-color);
     color: var(--secondary-color);
@@ -48,7 +43,6 @@ input[type="password"], input[type="text"] {
 .form-group.container {
     align-items: flex-start;
     flex-direction: column;
-    height: 10vh;
     width: 100%;
     gap: 10px;
 }
@@ -87,15 +81,4 @@ input[type="password"], input[type="text"] {
 
 .btn-group {
     margin-top: 40px;
-}
-
-.btn-group p {
-    font-weight: 500;
-    margin-top: 12px;
-    text-align: center;
-    font-size: 0.9rem;
-}
-
-.btn-group p a {
-    color: var(--acent-color);
 }

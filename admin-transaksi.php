@@ -22,52 +22,43 @@
     $page = isset($_GET['page']) ? $_GET['page'] : 1; // Current page, default to 1
     $offset = ($page - 1) * $limit; // Offset for SQL query 
 
-    // Eksekusi query
-    // $resultTransaksi = $conn->query($queryTransaksi);
-
-    // Mengambil nilai filter dan search dari URL
-    // $filter = isset($_GET['filter']) ? $_GET['filter'] : '';
+    $filter = isset($_GET['filter']) ? $_GET['filter'] : '';
     $search = isset($_GET['search']) ? $_GET['search'] : '';
 
-    // Menyusun query berdasarkan filter status dan search
-    // $queryTransaksi = "SELECT DISTINCT TO_CHAR(t.tanggal_transaksi, 'DD Month YYYY') AS tanggal_transaksi, m.nama_member, m.nomor_telepon, t.id_paket, p.id_paket, p.keterangan_fasilitas, p.keterangan_durasi, m.id_member, t.id_member, t.status_pembayaran, t.total_harga FROM member m JOIN transaksi t ON m.id_member = t.id_member JOIN paket_member p ON t.id_paket = p.id_paket 
-    // WHERE 1=1";
+    $queryTransaksi = "SELECT DISTINCT TO_CHAR(t.tanggal_transaksi, 'DD Month YYYY') AS tanggal_transaksi, m.nama_member, m.nomor_telepon, p.keterangan_fasilitas, p.keterangan_durasi, t.status_pembayaran, t.total_harga FROM member m JOIN transaksi t ON m.id_member = t.id_member JOIN paket_member p ON t.id_paket = p.id_paket WHERE 1=1";
 
-    // Menambahkan kondisi filter status jika ada
-    // if ($filter == 'aktif') {
-    //     $queryTransaksi .= " AND m.status = 'aktif'";
-    // } else if ($filter == 'tidak-aktif') {
-    //     $queryTransaksi .= " AND (m.status != 'aktif' OR m.status IS NULL)";
-    // }
+    
+    // Hitung total transaksi untuk pagination
+    $queryCount = "SELECT COUNT(DISTINCT t.id_transaksi) AS total FROM transaksi t JOIN member m ON m.id_member = t.id_member";
+    $resultCount = $conn->query($queryCount);
+    $totalCount = $resultCount->fetch(PDO::FETCH_ASSOC)['total'];
+    $totalPages = ceil($totalCount / $limit);
 
-    // Menambahkan kondisi pencarian nama_member jika ada
+    // kondisi searching 
     if (!empty($search)) {
-        $queryTransaksi = "SELECT DISTINCT TO_CHAR(t.tanggal_transaksi, 'DD Month YYYY') AS tanggal_transaksi, m.nama_member, m.nomor_telepon, p.keterangan_fasilitas, p.keterangan_durasi, t.status_pembayaran, 
-t.total_harga FROM member m JOIN transaksi t ON m.id_member = t.id_member JOIN paket_member p ON t.id_paket = p.id_paket WHERE m.nama_member LIKE '%$search%'";
+        $queryTransaksi .= " AND LOWER(m.nama_member) LIKE '%$search%'";
+    } 
 
-        // Eksekusi query
-        $resultTransaksi = $conn->query($queryTransaksi);
-
-        // Hitung total transaksi untuk pagination
-        $queryCount = "SELECT COUNT(DISTINCT t.id_transaksi) AS total FROM transaksi t JOIN member m ON m.id_member = t.id_member";
-        $resultCount = $conn->query($queryCount);
-        $totalCount = $resultCount->fetch(PDO::FETCH_ASSOC)['total'];
-        $totalPages = ceil($totalCount / $limit);
-    } else {
-        // Tambahkan LIMIT dan OFFSET untuk pagination
-        $queryTransaksi = "SELECT DISTINCT TO_CHAR(t.tanggal_transaksi, 'DD Month YYYY') AS tanggal_transaksi, m.nama_member, m.nomor_telepon, p.keterangan_fasilitas, p.keterangan_durasi, t.status_pembayaran, 
-t.total_harga FROM member m JOIN transaksi t ON m.id_member = t.id_member JOIN paket_member p ON t.id_paket = p.id_paket LIMIT $limit OFFSET $offset";
-
-        // Eksekusi query
-        $resultTransaksi = $conn->query($queryTransaksi);
-
-        // Hitung total transaksi untuk pagination
-        $queryCount = "SELECT COUNT(DISTINCT t.id_transaksi) AS total FROM transaksi t JOIN member m ON m.id_member = t.id_member";
-        $resultCount = $conn->query($queryCount);
-        $totalCount = $resultCount->fetch(PDO::FETCH_ASSOC)['total'];
-        $totalPages = ceil($totalCount / $limit);
+    // Tambahkan filter waktu
+    if ($filter == 'today') {
+        $queryTransaksi .= " AND DATE(t.tanggal_transaksi) = CURRENT_DATE";
+    } else if ($filter == 'week') {
+        $queryTransaksi .= " AND DATE(t.tanggal_transaksi) >= (CURRENT_DATE - INTERVAL '7 days')";
+    } else if ($filter == 'month') {
+        $queryTransaksi .= " AND DATE_PART('month', t.tanggal_transaksi) = DATE_PART('month', CURRENT_DATE) AND DATE_PART('year', t.tanggal_transaksi) = DATE_PART('year', CURRENT_DATE)";
     }
 
+    // Tambahkan LIMIT dan OFFSET untuk pagination
+    $queryTransaksi .= " LIMIT $limit OFFSET $offset";
+
+    // Eksekusi query
+    $resultTransaksi = $conn->query($queryTransaksi);
+
+    // Hitung total transaksi untuk pagination
+    $queryCount = "SELECT COUNT(DISTINCT t.id_transaksi) AS total FROM transaksi t JOIN member m ON m.id_member = t.id_member";
+    $resultCount = $conn->query($queryCount);
+    $totalCount = $resultCount->fetch(PDO::FETCH_ASSOC)['total'];
+    $totalPages = ceil($totalCount / $limit);
 ?>
 
 <!DOCTYPE html>
@@ -79,6 +70,8 @@ t.total_harga FROM member m JOIN transaksi t ON m.id_member = t.id_member JOIN p
     <!-- link css -->
     <link rel="stylesheet" href="css/admin.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="css/admin-transaksi.css?v=<?php echo time(); ?>">
+    <!-- link favicon -->
+    <link rel="shortcut icon" href="assets/logo-favicon.png" type="image/x-icon">
     <!-- link google font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -178,19 +171,18 @@ t.total_harga FROM member m JOIN transaksi t ON m.id_member = t.id_member JOIN p
                     <form method="GET" class="container">
                         <!-- filter member -->
                         <div class="filter-transaksi">
-                            <select name="filter">
+                            <select name="filter" id=filter onchange="applyFilter()">
                                 <option value="">Filter</option>
-                                <option value="today">Hari Ini</option>
-                                <option value="week">Minggu Ini</option>
-                                <option value="month">Bulan ini</option>
+                                <option value="today" <?= isset($_GET['filter']) && $_GET['filter'] === 'today' ? 'selected' : '' ?>>Hari Ini</option>
+                                <option value="week" <?= isset($_GET['filter']) && $_GET['filter'] === 'week' ? 'selected' : '' ?>>Minggu Ini</option>
+                                <option value="month" <?= isset($_GET['filter']) && $_GET['filter'] === 'month' ? 'selected' : '' ?>>Bulan ini</option>
                             </select>
                         </div>
-                        <!-- search member -->
+                         <!-- search member -->
                         <div class="search-transaksi container">
-                            <input type="text" name="search" id="search" placeholder="Search">
-                            <img src="assets/search.svg" alt="search">
-                        </div>
-                    </form>
+        <input type="text" name="search" id="search" placeholder="Search" value="<?= htmlspecialchars($search) ?>">
+        <img src="assets/search.svg" alt="search">
+    </div>
                 </section>
                 <section class="member-table">
                     <table>
@@ -235,5 +227,13 @@ t.total_harga FROM member m JOIN transaksi t ON m.id_member = t.id_member JOIN p
             </main>
         </div>
     </div>
+    <script>
+        function applyFilter() {
+            const filter = document.getElementById('filter').value;
+            const url = new URL(window.location.href);
+            url.searchParams.set('filter', filter);
+            window.location.href = url.toString();
+        }
+    </script>
 </body>
 </html>

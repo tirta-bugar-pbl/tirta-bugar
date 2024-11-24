@@ -1,26 +1,33 @@
 <?php
     session_start();
     include 'koneksi.php';
+    require 'send-email.php';
 
     if (isset($_POST['submit'])) {
+        // variabel email
         $email = $_POST['email'];
-        $password = $_POST['password'];
 
-        if (empty($email) || empty($password)) {
-            echo "<script>alert('Wajib isi Form !');</script>";
+        //generate token
+        $token = bin2hex(random_bytes(16));
+        $token_hash = hash('sha256', $token);
+
+        //generate token expire
+        $expire = date('Y-m-d H:i:s', time() + 60 * 30);
+
+        // query update token
+        $queryResetCode = "UPDATE admin SET reset_token_hash = '$token_hash', reset_token_expires_at = '$expire' WHERE email = '$email'";
+        $resultResetCode = $conn->query($queryResetCode);
+
+        if($resultResetCode) {
+            // variabel untuk mengirim email
+            $subject = 'Reset Password';
+            $body = "silahkan buka link <a href='http://localhost/tirta-bugar/admin-new-pw.php?token=$token'>di sini</a> untuk mengganti password kamu. Terima kasih";
+
+            sendEmail($email, "anonymus", $subject, $body);
+
+            echo "<script>alert('Pesan sudah dikirim, silahkan cek email anda');</script>";
         } else {
-            $sql = "SELECT * FROM admin WHERE email = '$email'";
-            $result = $conn->query($sql);
-            $user = $result->fetch(PDO::FETCH_ASSOC);
-    
-            if ($user && password_verify($password, $user['password'])) {
-                $_SESSION['email'] = $user['email'];
-                $_SESSION['id_admin'] = $user['id_admin'];
-                header('Location: admin.php');
-                exit();
-            } else {
-                echo "<script>alert('Email atau password salah!');</script>";
-            }
+            echo "<script>alert('Email kamu tidak terdaftar, silahkan registrasi');</script>";
         }
     }
 ?>
@@ -53,15 +60,5 @@
             </div>
         </form>
     </div>
-    <script>
-        function showPassword() {
-            var passwordInput = document.getElementById("password");
-            if (passwordInput.type === "password") {
-                passwordInput.type = "text";
-            } else {
-                passwordInput.type = "password";
-            }
-        }
-    </script>
 </body>
 </html>

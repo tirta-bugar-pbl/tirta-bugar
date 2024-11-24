@@ -1,0 +1,85 @@
+body {
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+}
+
+body .container {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.new-pw-title {
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 30px;
+}
+
+form {
+    width: 500px;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+form .form-new-pw.container {
+    height: 40vh;
+    gap: 45px;
+}
+
+input {
+    border: 1px solid var(--secondary-color);
+    color: var(--secondary-color);
+    padding: 10px;
+    width: 100%;
+    border-radius: 8px;
+}
+
+input[type="password"], input[type="text"] {
+    margin-bottom: 0;
+    padding: 0;
+    border: none;
+}
+
+.form-group.container {
+    align-items: flex-start;
+    height: 10vh;
+    width: 100%;
+    gap: 10px;
+}
+
+.form-group .pw-group {
+    border: 1px solid var(--secondary-color);
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.form-group .pw-group.container {
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    height: 100%;
+}
+
+.form-group .pw-group img {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+}
+
+.btn-group, .pw-group {
+    width: 100%;
+}
+
+.btn-group .btn-new-pw {
+    background-color: var(--acent-color);
+    color: var(--secondary-color);
+    padding: 10px 20px;
+    border-radius: 8px;
+    width: 100%;
+}
+
+.btn-group {
+    margin-top: 20px;
+}

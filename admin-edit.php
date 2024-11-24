@@ -162,11 +162,12 @@
                             <input type="text" name="nomor-telepon" value="<?= $rowDetailMember['nomor_telepon'] ?>" id="nomor-telepon" class="input-tambah">
                         </div>
                         <div class="form-group container">
-                            <label for="durasi">Durasi</label>
+                            <label for="durasi">Pilihan Paket</label>
                             <select name="durasi" id="durasi" class="input-tambah">
-                                <option value="1" <?php if($rowDetailMember['id_paket'] == 1) echo "selected"?>>8x Pertemuan</option>
-                                <option value="2" <?php if($rowDetailMember['id_paket'] == 2) echo "selected"?>>1 Bulan</option>
-                                <option value="3" <?php if($rowDetailMember['id_paket'] == 3) echo "selected"?>>3 Bulan</option>
+                                <option value="1" <?php if($rowDetailMember['id_paket'] == 1) echo "selected"?>>Regullar - 1 Bulan 8x Fitness</option>
+                                <option value="2" <?php if($rowDetailMember['id_paket'] == 2) echo "selected"?>>Regullar - 1 Bulan Fitness Sepuasnya</option>
+                                <option value="3" <?php if($rowDetailMember['id_paket'] == 3) echo "selected"?>>Regullar - 3 Bulan Fitness Sepuasnya</option>
+                                <option value="4" <?php if($rowDetailMember['id_paket'] == 3) echo "selected"?>>Regullar - 1 Bulan Sepuasnya + 4x Private Fitness</option>
                             </select>
                         </div>
                         <div class="form-group container">

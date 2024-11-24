@@ -15,18 +15,30 @@
             if (!preg_match("/^[0-9]+$/", $telepon)) {
                 echo "<script>alert('Nomor telepon harus berupa angka!');</script>";
             } else {
-                // Simpan data ke session jika valid
-                $_SESSION['form_data'] = [
-                    'nama' => $nama,
-                    'email' => $email,
-                    'nomor_telepon' => $telepon,
-                    'durasi' => $durasi
-                ];
 
-                // Redirect ke konfirmasi-pembayaran.php
-                // header("Location: konfirmasi-pembayaran.php");
-                header("Location: ./midtrans/examples/snap/checkout-process-simple-version.php?order_id=$order_id");
-                exit;
+                // query untuk mendapatkan data member
+                $queryMember = "SELECT email, nomor_telepon FROM member WHERE email = '$email'  nomor_telepon = '$telepon'";
+                $resultMember = $conn->query($queryMember);
+                $rowMember = $resultMember->fetch(PDO::FETCH_ASSOC);
+
+                if($rowMember) {
+                    echo "<script>
+                        alert('Email atau nomor telepon sudah terdaftar !');
+                    </script>";
+                } else {
+                    // Simpan data ke session jika valid
+                    $_SESSION['form_data'] = [
+                        'nama' => $nama,
+                        'email' => $email,
+                        'nomor_telepon' => $telepon,
+                        'durasi' => $durasi
+                    ];
+
+                    // Redirect ke konfirmasi-pembayaran.php
+                    // header("Location: konfirmasi-pembayaran.php");
+                    header("Location: ./midtrans/examples/snap/checkout-process-simple-version.php?order_id=$order_id");
+                    exit;
+                }
             }
         }
 ?>
@@ -59,11 +71,12 @@
                 <input type="text" name="nomor-telepon" id="nomor-telepon" class="input-daftar" required>
             </div>
             <div class="form-group container">
-                <label for="durasi">Durasi</label>
+                <label for="durasi">Pilihan Paket</label>
                 <select name="durasi" id="durasi" class="input-daftar">
-                    <option value="1" <?php if($id_paket == 1) echo "selected" ?>>8x Pertemuan</option>
-                    <option value="2" <?php if($id_paket == 2) echo "selected" ?>>1 Bulan</option>
-                    <option value="3" <?php if($id_paket == 3) echo "selected" ?>>3 Bulan</option>
+                    <option value="1" <?php if($id_paket == 1) echo "selected" ?>>Regullar - 1 Bulan 8x Fitness</option>
+                    <option value="2" <?php if($id_paket == 2) echo "selected" ?>>Regullar - 1 Bulan Fitness Sepuasnya</option>
+                    <option value="3" <?php if($id_paket == 3) echo "selected" ?>>Regullar - 3 Bulan Fitness Sepuasnya</option>
+                    <option value="4" <?php if($id_paket == 4) echo "selected" ?>>Regullar - 1 Bulan Sepuasnya + 4x Private Fitness</option>
                 </select>
             </div>
             <button type="submit" name="submit" class="btn-daftar">Daftar</button>

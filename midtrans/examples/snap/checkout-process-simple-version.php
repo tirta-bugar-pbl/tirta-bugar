@@ -30,6 +30,11 @@
         echo "<script>alert('Data pendaftaran tidak ditemukan.'); window.location.href='../../../daftar.php';</script>";
     }
 
+    $harga_paket = 0;
+    $keteranganFasilitas = '-';
+    $keteranganDurasi = '-';
+    $keteranganPrivate = '-';
+
     if($durasi == '1') {
         $harga_paket = 100000;
         $keterangan = '8x Pertemuan';
@@ -38,10 +43,15 @@
         $harga_paket = 185000;
         $keterangan = 'Bebas Datang';
         $keteranganDurasi = '1 Bulan';
-    } else {
+    } else if ($durasi == '3') {
         $harga_paket = 500000;
         $keterangan = 'Bebas Datang';
         $keteranganDurasi = '3 Bulan';
+    } else {
+        $harga_paket = 550000;
+        $keterangan = 'Bebas Datang';
+        $keteranganDurasi = '1 Bulan';
+        $keteranganPrivate = '4x Pertemuan';
     }
 
     $biaya_pendaftaran = 50000;
@@ -162,6 +172,13 @@
                     <p>:</p>
                 </div>
                 <p><?= htmlspecialchars($keterangan) ?></p>
+            </div>
+            <div class="detail-payment-group container">
+                <div class="label-detail-payment container">
+                    <p>Private Fitness</p>
+                    <p>:</p>
+                </div>
+                <p><?= htmlspecialchars($keteranganPrivate) ?></p>
             </div>
             <div class="detail-payment-group container">
                 <div class="label-detail-payment container">

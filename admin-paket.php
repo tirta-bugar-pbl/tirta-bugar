@@ -14,7 +14,7 @@
     $rowProfileName = $resultProfileName->fetch(PDO::FETCH_ASSOC);
 
     // mengambil data paket
-    $queryTampilPaket = "SELECT nama_paket, keterangan_fasilitas, keterangan_durasi, 'Rp ' || TO_CHAR(harga, 'FM999,999,999') as harga FROM paket_member";
+    $queryTampilPaket = "SELECT nama_paket, keterangan_fasilitas, keterangan_durasi, 'Rp ' || TO_CHAR(harga, 'FM999,999,999') as harga, COALESCE(keterangan_private, '-') as keterangan_private FROM paket_member";
     $resultTampilPaket = $conn->query($queryTampilPaket);
     $rowTampilPaket = $resultTampilPaket->fetchAll(PDO::FETCH_ASSOC);
 ?>
@@ -132,6 +132,7 @@
                                 <td>Harga</td>
                                 <td>Durasi</td>
                                 <td>Keterangan Fasilitas</td>
+                                <td>Kunjungan Private</td>
                             </tr>
                         </thead>
                         <tbody>
@@ -141,6 +142,7 @@
                                 <td><?= $result['harga']?></td>
                                 <td><?= $result['keterangan_durasi']?></td>
                                 <td><?= $result['keterangan_fasilitas']?></td>
+                                <td><?= $result['keterangan_private']?></td>
                             </tr>
                         <?php endforeach; ?>
                         </tbody>

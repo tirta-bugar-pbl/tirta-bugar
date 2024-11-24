@@ -17,8 +17,6 @@
     $queryProfileName = "SELECT username FROM admin WHERE id_admin = $adminId";
     $resultProfileName = $conn->query($queryProfileName);
     $rowProfileName = $resultProfileName->fetch(PDO::FETCH_ASSOC);
-    $queryMember = "SELECT m.id_member, m.nama_member, m.nomor_telepon, p.keterangan_durasi, p.keterangan_fasilitas, TO_CHAR(m.tanggal_berakhir, 'DD Month YYYY') as tanggal_berakhir, COALESCE(m.status, 'tidak ada') as status FROM member m LEFT OUTER JOIN paket_member p ON p.id_paket = m.id_paket;";
-
 
     // Update otomatis status keanggotaan jika tanggal_berakhir sudah jatuh tempo
     $updateStatusQuery = "UPDATE member SET status = 'tidak aktif' WHERE tanggal_berakhir < CURRENT_DATE AND status = 'aktif'";
@@ -29,8 +27,7 @@
     $search = isset($_GET['search']) ? $_GET['search'] : '';
 
     // Menyusun query berdasarkan filter status dan search
-    $queryMember = "SELECT m.id_member, m.nama_member, m.nomor_telepon, p.keterangan_durasi, p.keterangan_fasilitas, TO_CHAR(m.tanggal_berakhir, 'DD Month YYYY') as tanggal_berakhir, COALESCE(m.status, 'tidak ada') as status FROM member m RIGHT OUTER JOIN paket_member p ON p.id_paket = m.id_paket 
-    WHERE 1=1";
+    $queryMember = "SELECT m.id_member, m.nama_member, m.nomor_telepon, p.keterangan_durasi, p.keterangan_fasilitas, TO_CHAR(m.tanggal_berakhir, 'DD Month YYYY') as tanggal_berakhir, COALESCE(m.status, 'tidak ada') as status, (m.tanggal_berakhir - m.tanggal_awal) AS selisih FROM member m LEFT OUTER JOIN paket_member p ON p.id_paket = m.id_paket WHERE 1=1";
 
     // Menambahkan kondisi filter status jika ada
     if ($filter == 'aktif') {
@@ -58,12 +55,12 @@
     $rowAmountMember = $resultAmountMember->fetch(PDO::FETCH_ASSOC);
 
     // jumlah data member aktif
-    $queryAmountMemberActive = "SELECT COUNT(id_member) As total_member_aktif FROM member WHERE status = 'aktif'";
+    $queryAmountMemberActive = "SELECT COUNT(id_member) As total_member_aktif FROM member WHERE status ILIKE 'aktif'";
     $resultAmountMemberActive = $conn->query($queryAmountMemberActive);
     $rowAmountMemberActive = $resultAmountMemberActive->fetch(PDO::FETCH_ASSOC);
 
     // jumlah data member nonaktif
-    $queryAmountMemberNonactive = "SELECT COUNT(id_member) As total_member_nonaktif FROM member WHERE status = 'tidak aktif'";
+    $queryAmountMemberNonactive = "SELECT COUNT(id_member) As total_member_nonaktif FROM member WHERE status ILIKE 'tidak aktif'";
     $resultAmountMemberNonactive = $conn->query($queryAmountMemberNonactive);
     $rowAmountMemberNonactive = $resultAmountMemberNonactive->fetch(PDO::FETCH_ASSOC);
 
@@ -79,7 +76,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin</title>
     <!-- link css -->
-    <link rel="stylesheet" href="css/admin.css?v=<?php echo time(); ?>"">
+    <link rel="stylesheet" href="css/admin.css?v=<?php echo time(); ?>">
     <!-- link google font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -258,7 +255,17 @@
                         </thead>
                         <tbody>
                         <?php foreach ($resultMember as $result) : ?>
-                            <tr>
+                            <?php 
+                                $style = '';
+
+                                // kondisi menentukan 
+                                if($result['selisih'] == 7) {
+                                    $style = "style='background-color: yellow';";
+                                } elseif ($result['selisih'] == 0) {
+                                    $style = "style='background-color: red';";
+                                } 
+                            ?>
+                            <tr <?= $style ?>>
                                 <td><?= $result['nama_member']?></td>
                                 <td style="text-align: center;"><?= $result['nomor_telepon']?></td>
                                 <td style="text-align: center;"><?= $result['keterangan_durasi']?></td>
