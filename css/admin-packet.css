@@ -11,16 +11,6 @@
 
 .packet-table tbody td {
     padding: 10px;
-    border-bottom: 1px solid #ddd;
-}
-
-/* Alternating row colors */
-.packet-table tbody tr:nth-child(odd) {
-    background-color: #f9f9f9;
-}
-
-.packet-table tbody tr:hover {
-    background-color: #f1f1f1;
 }
 
 /* Tombol Tambah Paket */
@@ -38,9 +28,6 @@
     transition: background-color 0.3s ease;
 }
 
-.button:hover {
-    background-color: #45a049; /* Warna hijau lebih gelap saat hover */
-}
 
 /* Container tombol Tambah Paket */
 .tambah-container {
@@ -52,7 +39,7 @@
 
 /* Tombol Hapus */
 .btn-hapus {
-    background-color: #FF6347; /* Warna merah */
+    background-color: var(--acent2-color); 
     color: white;
     padding: 8px 16px;
     border: none;
@@ -64,13 +51,10 @@
     transition: background-color 0.3s ease;
 }
 
-.btn-hapus:hover {
-    background-color: #FF4500; /* Warna merah lebih gelap saat hover */
-}
 
 /* Tombol Edit */
 .btn-edit {
-    background-color: #4CAF50; /* Warna hijau */
+    background-color: var(--acent-color); 
     color: white;
     padding: 8px 16px;
     border: none;
@@ -80,13 +64,4 @@
     cursor: pointer;
     text-decoration: none;
     transition: background-color 0.3s ease;
-}
-
-.btn-edit:hover {
-    background-color: #45A049; /* Warna hijau lebih gelap saat hover */
-}
-
-.btn-edit:active {
-    background-color: #3E8E41; /* Warna hijau lebih gelap saat ditekan */
-    transform: scale(0.98); /* Efek klik */
 }

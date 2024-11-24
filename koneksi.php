@@ -1,8 +1,8 @@
 <?php 
     $host = 'localhost';
-    $name = 'nurwahid';
-    $pwd = '123';
-    $db = 'tb_db';
+    $name = 'postgres';
+    $pwd = 'admin';
+    $db = 'tirta_bugar_db';
     $port = '5432';
     
     $conn = new PDO("pgsql:host=$host;port=$port;dbname=$db;user=$name;password=$pwd");

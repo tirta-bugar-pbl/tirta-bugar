@@ -13,20 +13,16 @@ table th {
 table td a {
     display: inline-block;
     text-align: center;
-    color: white; /* White text to match header */
-    background-color: black; /* Black background to match header */
+    color: white;
+    background-color: black; 
     padding: 5px 10px;
     border-radius: 5px;
     text-decoration: none;
 }
 
-table td a:hover {
-    background-color: #333; /* Slight hover effect */
-}
-
 /* Form adjustments */
 .edit-paket label {
-    width: 30%; /* Consistent label width */
+    width: 40%; 
     display: inline-block;
     margin-right: 10px;
 }
@@ -46,7 +42,7 @@ table td a:hover {
 
 .btn-group.container {
     display: flex;
-    justify-content: space-between;
+    width: 100%;
     gap: 10px;
     margin-top: 30px;
 }
@@ -55,6 +51,7 @@ table td a:hover {
     background-color: var(--acent-color);
     color: white;
     border: none;
+    width: 100%;
     padding: 10px 20px;
     border-radius: 5px;
     font-weight: bold;
@@ -63,6 +60,7 @@ table td a:hover {
 
 .btn-group .btn-cancell {
     background-color: var(--acent2-color);
+    width: 100%;
     color: white;
     border: none;
     padding: 10px 20px;

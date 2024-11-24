@@ -14,12 +14,9 @@
     $rowProfileName = $resultProfileName->fetch(PDO::FETCH_ASSOC);
 
     // mengambil data paket
-    $queryTampilPaket = "SELECT id_paket, nama_paket, keterangan_fasilitas, keterangan_durasi, 'Rp ' || TO_CHAR(harga, 'FM999,999,999') as harga FROM paket_member";
+    $queryTampilPaket = "SELECT id_paket, nama_paket, keterangan_fasilitas, keterangan_durasi, 'Rp ' || TO_CHAR(harga, 'FM999,999,999') as harga, COALESCE(keterangan_private, '-') as keterangan_private FROM paket_member";
     $resultTampilPaket = $conn->query($queryTampilPaket);
     $rowTampilPaket = $resultTampilPaket->fetchAll(PDO::FETCH_ASSOC);
-
-  
-
 ?>
 
 <!DOCTYPE html>
@@ -31,6 +28,8 @@
     <!-- link css -->
     <link rel="stylesheet" href="css/admin.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="css/admin-packet.css?v=<?php echo time(); ?>">
+    <!-- link favicon -->
+    <link rel="shortcut icon" href="assets/logo-favicon.png" type="image/x-icon">
     <!-- link google font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -127,6 +126,9 @@
             <main>
                 <!-- paket list -->
                 <section class="packet-table">
+                    <div style="text-align: right; margin-top: 10px;">
+                        <a href="tambah-paket.php" class="button">Tambah Paket</a>
+                    </div>
                     <table>
                         <!-- head table -->
                         <thead>
@@ -135,6 +137,8 @@
                                 <td>Harga</td>
                                 <td>Durasi</td>
                                 <td>Keterangan Fasilitas</td>
+                                <td>Keterangan Private</td>
+                                <td>Aksi</td>
                             </tr>
                         </thead>
                         <tbody>
@@ -144,26 +148,23 @@
                                 <td><?= $result['harga']?></td>
                                 <td><?= $result['keterangan_durasi']?></td>
                                 <td><?= $result['keterangan_fasilitas']?></td>
+                                <td><?= $result['keterangan_private']?></td>
                                 <td>
-       
-          <!-- Tombol Edit -->
-<form action="edit-paket.php" method="GET" style="display: inline;">
-    <input type="hidden" name="id_paket" value="<?= $result['id_paket'] ?>">
-    <button type="submit" class="btn-edit">Edit</button>
-</form>
-            <!-- Tombol Hapus -->
-            <form action="hapus-paket.php" method="POST" style="display: inline;">
-                <input type="hidden" name="id_paket" value="<?= $result['id_paket'] ?>">
-                <button type="submit" class="btn-hapus" onclick="return confirm('Apakah Anda yakin ingin menghapus paket ini?')">Hapus</button>
-            </form>
-        </td>
+                                    <!-- Tombol Edit -->
+                                    <form action="admin-edit-paket.php" method="GET" style="display: inline;">
+                                        <input type="hidden" name="id_paket" value="<?= $result['id_paket'] ?>">
+                                        <button type="submit" class="btn-edit">Edit</button>
+                                    </form>
+                                    <!-- Tombol Hapus -->
+                                    <form action="hapus-paket.php" method="POST" style="display: inline;">
+                                        <input type="hidden" name="id_paket" value="<?= $result['id_paket'] ?>">
+                                        <button type="submit" class="btn-hapus" onclick="return confirm('Apakah Anda yakin ingin menghapus paket ini?')">Hapus</button>
+                                    </form>
+                                </td>
                             </tr>
                         <?php endforeach; ?>
                         </tbody>
                     </table>
-                    <div style="text-align: right; margin-top: 10px;">
-    <a href="tambah-paket.php" class="button">Tambah Paket</a>
-</div>
                 </section>
             </main>
         </div>

@@ -214,6 +214,10 @@ main {
     border-radius: 8px;
 } 
 
+.filtering-member .filter-group .f.container {
+    gap: 12px;
+}
+
 .filtering-member .search-member.container {
     align-items: center;
     width: 18%;

@@ -42,8 +42,7 @@
 
     // Menambahkan kondisi pencarian nama_member jika ada
     if (!empty($search)) {
-        $queryTransaksi = "SELECT DISTINCT TO_CHAR(t.tanggal_transaksi, 'DD Month YYYY') AS tanggal_transaksi, m.nama_member, m.nomor_telepon, p.keterangan_fasilitas, p.keterangan_durasi, t.status_pembayaran, 
-t.total_harga FROM member m JOIN transaksi t ON m.id_member = t.id_member JOIN paket_member p ON t.id_paket = p.id_paket WHERE m.nama_member LIKE '%$search%'";
+        $queryTransaksi = "SELECT DISTINCT TO_CHAR(t.tanggal_transaksi, 'DD Month YYYY') AS tanggal_transaksi, m.nama_member, m.nomor_telepon, p.keterangan_fasilitas, p.keterangan_durasi, t.status_pembayaran, t.total_harga FROM member m JOIN transaksi t ON m.id_member = t.id_member JOIN paket_member p ON t.id_paket = p.id_paket WHERE m.nama_member LIKE '%$search%'";
 
         // Eksekusi query
         $resultTransaksi = $conn->query($queryTransaksi);
@@ -79,8 +78,8 @@ t.total_harga FROM member m JOIN transaksi t ON m.id_member = t.id_member JOIN p
     <!-- link css -->
     <link rel="stylesheet" href="css/admin.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="css/admin-transaksi.css?v=<?php echo time(); ?>">
-     <!-- link favicon -->
-     <link rel="shortcut icon" href="assets/logo-favicon.png" type="image/x-icon">
+    <!-- link favicon -->
+    <link rel="shortcut icon" href="assets/logo-favicon.png" type="image/x-icon">
     <!-- link google font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

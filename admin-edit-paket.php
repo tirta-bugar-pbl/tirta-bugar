@@ -1,63 +1,51 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-session_start();
-include 'koneksi.php';
+    error_reporting(E_ALL);
+    ini_set('display_errors', 1);
+    session_start();
+    include 'koneksi.php';
 
-if (!isset($_SESSION['email'])) {
-    die("Anda belum login.");
-}
-
-// Cek ID Paket
-if (!isset($_GET['id_paket']) || !is_numeric($_GET['id_paket']) || empty($_GET['id_paket'])) {
-    die("ID Paket tidak ditemukan atau tidak valid.");
-}
-
-$id_paket = (int)$_GET['id_paket'];
-
-// Ambil data paket
-$queryPaket = "SELECT * FROM paket_member WHERE id_paket = :id_paket";
-$stmt = $conn->prepare($queryPaket);
-$stmt->bindParam(':id_paket', $id_paket, PDO::PARAM_INT);
-
-if (!$stmt->execute()) {
-    die("Query gagal dijalankan: " . implode(", ", $stmt->errorInfo()));
-}
-
-$paket = $stmt->fetch(PDO::FETCH_ASSOC);
-if (!$paket) {
-    die("Data paket tidak ditemukan.");
-}
-
-// Proses update data
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nama_paket = $_POST['nama_paket'];
-    $keterangan_fasilitas = $_POST['keterangan_fasilitas'];
-    $keterangan_durasi = $_POST['keterangan_durasi'];
-    $harga = $_POST['harga'];
-
-    $queryUpdate = "
-        UPDATE paket_member 
-        SET nama_paket = :nama_paket, 
-            keterangan_fasilitas = :keterangan_fasilitas,
-            keterangan_durasi = :keterangan_durasi,
-            harga = :harga
-        WHERE id_paket = :id_paket
-    ";
-    $stmt = $conn->prepare($queryUpdate);
-    $stmt->bindParam(':nama_paket', $nama_paket);
-    $stmt->bindParam(':keterangan_fasilitas', $keterangan_fasilitas);
-    $stmt->bindParam(':keterangan_durasi', $keterangan_durasi);
-    $stmt->bindParam(':harga', $harga);
-    $stmt->bindParam(':id_paket', $id_paket, PDO::PARAM_INT);
-
-    if ($stmt->execute()) {
-        header('Location: admin-paket.php');
-        exit();
-    } else {
-        die("Gagal menyimpan perubahan: " . implode(", ", $stmt->errorInfo()));
+    if (!isset($_SESSION['email'])) {
+        die("Anda belum login.");
     }
-}
+
+    // Cek ID Paket
+    if (!isset($_GET['id_paket']) || !is_numeric($_GET['id_paket']) || empty($_GET['id_paket'])) {
+        die("ID Paket tidak ditemukan atau tidak valid.");
+    }
+
+    $id_paket = (int)$_GET['id_paket'];
+
+    // Ambil data paket
+    $queryPaket = "SELECT * FROM paket_member WHERE id_paket = $id_paket";
+    $paket = $conn->query($queryPaket);
+    $resultPaket = $paket->fetch(PDO::FETCH_ASSOC);
+
+    if (!$paket) {
+        die("Data paket tidak ditemukan.");
+    }
+
+    // Proses update data
+    if (isset($_POST['submit'])) {
+        $nama_paket = $_POST['nama_paket'];
+        $keterangan_fasilitas = $_POST['keterangan_fasilitas'];
+        $keterangan_durasi = $_POST['keterangan_durasi'];
+        $keterangan_private = $_POST['keterangan_private'];
+        $harga = (int)$_POST['harga'];
+
+
+        if (empty($keterangan_private)) {
+            $queryUpdate = "UPDATE paket_member SET nama_paket = '$nama_paket', keterangan_fasilitas = '$keterangan_fasilitas', keterangan_durasi = '$keterangan_durasi', harga = '$harga', keterangan_private = null WHERE id_paket = '$id_paket'";
+        } else {
+            $queryUpdate = "UPDATE paket_member SET nama_paket = '$nama_paket', keterangan_fasilitas = '$keterangan_fasilitas', keterangan_durasi = '$keterangan_durasi', harga = '$harga', keterangan_private = '$keterangan_private' WHERE id_paket = '$id_paket'";
+        }
+
+        if ($conn->query($queryUpdate)) {
+            header('Location: admin-paket.php');
+            exit();
+        } else {
+            die("Gagal menyimpan perubahan.");
+        }
+    }
 ?>
 
 <!DOCTYPE html>
@@ -68,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Edit Paket</title>
     <!-- Link CSS -->
     <link rel="stylesheet" href="css/admin.css?v=<?php echo time(); ?>">
-    <link rel="stylesheet" href="css/edit-paket.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="css/admin-edit-paket.css?v=<?php echo time(); ?>">
     <!-- Link favicon -->
     <link rel="shortcut icon" href="assets/logo-favicon.png" type="image/x-icon">
     <!-- Link Google Font -->
@@ -154,6 +142,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <img src="assets/notification.svg" alt="notifivation">
                         <div class="account-profile">
                             <img src="assets/profile.svg" alt="profile">
+                            <!-- <h3><?= $rowProfileName['username']?></h3> -->
                         </div>
                     </div>
                 </div>
@@ -162,26 +151,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <!-- form edit paket -->
                 <section class="edit-paket">
                     <form method="POST" class="form-edit container">
-                        <input type="hidden" name="id_paket" value="<?= $paket['id_paket'] ?>">
+                        <input type="hidden" name="id_paket" value="<?= $resultPaket['id_paket'] ?>">
 
                         <div class="form-group container">
                             <label for="nama_paket">Nama Paket</label>
-                            <input type="text" name="nama_paket" id="nama_paket" class="input-edit" value="<?= $paket['nama_paket'] ?>" required>
+                            <input type="text" name="nama_paket" id="nama_paket" class="input-edit" value="<?= $resultPaket['nama_paket'] ?>" required>
                         </div>
                         
                         <div class="form-group container">
                             <label for="keterangan_fasilitas">Keterangan Fasilitas</label>
-                            <input type="text" name="keterangan_fasilitas" id="keterangan_fasilitas" class="input-edit" value="<?= $paket['keterangan_fasilitas'] ?>" required>
+                            <input type="text" name="keterangan_fasilitas" id="keterangan_fasilitas" class="input-edit" value="<?= $resultPaket['keterangan_fasilitas'] ?>" required>
                         </div>
 
                         <div class="form-group container">
-                            <label for="keterangan_durasi">Keterangan Durasi</label>
-                            <input type="text" name="keterangan_durasi" id="keterangan_durasi" class="input-edit" value="<?= $paket['keterangan_durasi'] ?>" required>
+                            <label for="keterangan_durasi">Keterangan Durasi (berapa pertemuan)</label>
+                            <input type="text" name="keterangan_durasi" id="keterangan_durasi" class="input-edit" value="<?= $resultPaket['keterangan_durasi'] ?>" required>
+                        </div>
+
+                        
+                        <div class="form-group container">
+                            <label for="keterangan_private">Keterangan Private (berapa pertemuan)</label>
+                            <input type="text" name="keterangan_private" id="keterangan_private" class="input-edit" value="<?= $resultPaket['keterangan_private'] ?>">
                         </div>
 
                         <div class="form-group container">
                             <label for="harga">Harga</label>
-                            <input type="number" name="harga" id="harga" class="input-edit" value="<?= $paket['harga'] ?>" step="0.01" required>
+                            <input type="text" name="harga" id="harga" class="input-edit" value="<?= $resultPaket['harga'] ?>" required>
                         </div>
 
                         <div class="btn-group container">
