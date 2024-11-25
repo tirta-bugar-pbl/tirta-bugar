@@ -26,20 +26,17 @@
 
         if (strlen($password) < 8) {
             echo "<script>alert('Password harus lebih dari 8 characters');</script>";
-        }
-
-        if ($password !== $cfrPassword) {
+        } else if ($password !== $cfrPassword) {
             echo "<script>alert('Password tidak cocok dengan konfirmasi password');</script>";
-        }
-
-        $password_hash = password_hash($password, PASSWORD_DEFAULT);
-
-        $queryEditPassword = "UPDATE admin SET password = '$password_hash', reset_token_hash = NULL,reset_token_expires_at = NULL WHERE id_admin = $user[id_admin]";
-
-        $resultUpdatedPassword = $conn->query($queryEditPassword);
-
-        if($resultUpdatedPassword) {
-            echo "<script>alert('Password berhasil diubah'); setTimeout(function() {window.location.href = 'admin-login.php';}, 1000);</script>";
+        } else {
+            $password_hash = password_hash($password, PASSWORD_DEFAULT);
+            
+            $queryEditPassword = "UPDATE admin SET password = '$password_hash', reset_token_hash = NULL,reset_token_expires_at = NULL WHERE id_admin = $user[id_admin]";
+            $resultUpdatedPassword = $conn->query($queryEditPassword);
+    
+            if($resultUpdatedPassword) {
+                echo "<script>alert('Password berhasil diubah'); setTimeout(function() {window.location.href = 'admin-login.php';}, 1000);</script>";
+            }
         }
     }
 ?>
