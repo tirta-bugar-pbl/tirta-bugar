@@ -37,7 +37,7 @@ table td a {
 .form-tambah.container, .form-edit.container {
     display: flex;
     flex-direction: column;
-    row-gap: 20px; /* Spacing between form fields */
+    row-gap: 20px; /
 }
 
 .btn-group.container {

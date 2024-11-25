@@ -46,7 +46,7 @@ table td a:hover {
 
 .btn-group.container {
     display: flex;
-    justify-content: space-between;
+    width: 100%;
     gap: 10px;
     margin-top: 30px;
 }
@@ -55,6 +55,7 @@ table td a:hover {
     background-color: var(--acent-color);
     color: white;
     border: none;
+    width: 100%;
     padding: 10px 20px;
     border-radius: 5px;
     font-weight: bold;
@@ -65,6 +66,7 @@ table td a:hover {
     background-color: var(--acent2-color);
     color: white;
     border: none;
+    width: 100%;
     padding: 10px 20px;
     border-radius: 5px;
     font-weight: bold;
