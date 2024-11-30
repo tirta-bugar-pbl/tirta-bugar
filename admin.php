@@ -5,6 +5,7 @@
     if (!isset($_SESSION['email'])) {
         header('Location: admin-login.php');
         exit();
+
     }
 
     // variabel pagination
@@ -98,6 +99,35 @@
     $queryAmountMemberNonactive = "SELECT COUNT(id_member) As total_member_nonaktif FROM member WHERE status ILIKE 'tidak aktif'";
     $resultAmountMemberNonactive = $conn->query($queryAmountMemberNonactive);
     $rowAmountMemberNonActive = $resultAmountMemberNonactive->fetch(PDO::FETCH_ASSOC);
+
+    // Query untuk mengambil data seluruh member tanpa pagination untuk notifikasi
+$notificationQuery = "SELECT 
+m.nama_member, 
+(m.tanggal_berakhir - m.tanggal_awal) AS selisih 
+FROM member m";
+
+$notificationStmt = $conn->query($notificationQuery);
+$allMembers = $notificationStmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Siapkan notifikasi
+$notifications = array();
+
+foreach ($allMembers as $member) {
+if ($member['selisih'] == 0) {
+    $notifications[] = array(
+        'message' => "Member {$member['nama_member']} paketnya sudah habis",
+        'type' => 'danger'
+    );
+} elseif ($member['selisih'] == 7) {
+    $notifications[] = array(
+        'message' => "Member {$member['nama_member']} paketnya tersisa 7 hari",
+        'type' => 'warning'
+    );
+}
+}
+
+// Convert notifikasi ke JSON untuk JavaScript
+$notificationsJson = json_encode($notifications);
 ?>
 
 
@@ -194,17 +224,31 @@
                     <div class="title-page">
                         <h2>Beranda</h2>
                     </div>
-                    <div class="account">
-                        <!-- notif account -->
-                        <img src="assets/notification.svg" alt="notifivation">
-                        <div class="account-profile">
-                            <!-- icon account -->
-                            <img src="assets/profile.svg" alt="profile">
-                            <h3><?= $rowProfileName['username']?></h3>
-                        </div>
-                    </div>
-                </div>
+ <div class="account">
+    <!-- notif account -->
+    <div id="notification-container" class="notification-container">
+        <div class="notification-icon-wrapper">
+            <img src="assets/notification.svg" alt="notification" id="notificationIcon">
+            <span class="notification-badge hidden"></span>
+        </div>
+    </div>
+    <div class="account-profile">
+        <!-- icon account -->
+        <img src="assets/profile.svg" alt="profile">
+        <h3><?= $rowProfileName['username']?></h3>
+    </div>
+</div>
+</div>
             </header>
+        
+            <!-- Pop-Up Notification -->
+        <div id="notification-popup" class="popup hidden">
+            <div class="popup-content">
+                <span id="close-popup" class="close">&times;</span>
+                <ul id="notification-list"></ul>
+            </div>
+        </div>
+
             <main>
                 <!-- amount member -->
                 <section class="amount-member">
@@ -353,10 +397,77 @@
         });
 
         document.getElementById('sort_by_date').addEventListener('change', function() {
-            // Reset combined_filter saat memilih sort by date
-            document.getElementById('combined_filter').value = '';  // Reset combined_filter
-            this.form.submit();  // Submit form setelah mereset combined_filter
+            document.getElementById('combined_filter').value = '';  
+            this.form.submit();  
         });
+
+    // notifikasi
+    document.addEventListener('DOMContentLoaded', function () {
+    const notificationIcon = document.getElementById('notificationIcon');
+    const popup = document.getElementById('notification-popup');
+    const closeBtn = document.getElementById('close-popup');
+    const notificationList = document.getElementById('notification-list');
+
+    // Ambil notifikasi dari PHP
+    const notifications = <?php echo $notificationsJson; ?>;
+
+    // Tambahkan badge notifikasi jika ada notifikasi
+    const badge = document.querySelector('.notification-badge');
+    if (notifications.length > 0) {
+        badge.textContent = notifications.length;
+        badge.classList.remove('hidden');
+    } else {
+        badge.classList.add('hidden');
+    }
+    // Fungsi untuk mengisi daftar notifikasi
+    function populateNotifications() {
+        notificationList.innerHTML = ''; // Kosongkan daftar notifikasi
+
+        if (notifications.length === 0) {
+            // Jika tidak ada notifikasi
+            const li = document.createElement('li');
+            li.textContent = 'Tidak ada notifikasi';
+            notificationList.appendChild(li);
+            return;
+        }
+
+        // Tambahkan setiap notifikasi ke daftar
+        notifications.forEach(notif => {
+            const li = document.createElement('li');
+            li.className = notif.type; // Tambahkan kelas berdasarkan tipe notifikasi
+            li.innerHTML = `
+                <div class="notification-icon">
+                    <img src="assets/notification.svg" alt="notification">
+                </div>
+                <div class="notification-message">${notif.message}</div>
+            `;
+            notificationList.appendChild(li);
+        });
+    }
+
+    // Tampilkan atau sembunyikan popup saat ikon notifikasi diklik
+    notificationIcon.addEventListener('click', function (e) {
+        e.stopPropagation(); // Hentikan propagasi event klik
+        popup.classList.toggle('show'); // Toggle kelas 'show' untuk menampilkan/sembunyikan popup
+
+        if (popup.classList.contains('show')) {
+            populateNotifications(); // Isi notifikasi saat popup dibuka
+        }
+    });
+
+    // Tutup popup saat tombol "tutup" diklik
+    closeBtn.addEventListener('click', function () {
+        popup.classList.remove('show');
+    });
+
+    // Tutup popup saat mengklik area di luar popup
+    document.addEventListener('click', function (e) {
+        if (!popup.contains(e.target) && e.target !== notificationIcon) {
+            popup.classList.remove('show');
+        }
+    });
+});
+    
     </script>
 </body>
 </html>
