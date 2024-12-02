@@ -20,21 +20,19 @@
         $durasi = $_POST['durasi'];
         $tanggalAwal = $_POST['tanggal-awal'];
         $tanggalAkhir = $_POST['tanggal-akhir'];
-        $noKwitansi = $_POST['no-kwitansi'];
         
         $characters = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        $passwod = '';
+        $password = '';
         for ($i = 0; $i < 8; $i++) {
-            $passwod .= $characters[rand(0, strlen($characters) - 1)];
+            $password .= $characters[rand(0, strlen($characters) - 1)];
         }
+
         $pwHash = base64_encode($password); 
 
         if (!preg_match("/^[0-9]+$/", $telepon)) {
             echo "<script>alert('Nomor telepon harus berupa angka !');</script>";
-        } else if (!is_numeric($noKwitansi)) {
-            echo "<script>alert('Nomor kwitansi harus berupa angka !');</script>";
         } else {
-            $query = "INSERT INTO member(nama_member, email, password, nomor_telepon, no_kwitansi, status, tanggal_awal, tanggal_berakhir, id_paket) VALUES ('$nama', '$email', '$pwHash', '$telepon', '$noKwitansi', 'aktif', '$tanggalAwal', '$tanggalAkhir', '$durasi')";
+            $query = "INSERT INTO member(nama_member, email, password, nomor_telepon, tanggal_awal, tanggal_berakhir, id_paket, id_admin) VALUES ('$nama', '$email', '$pwHash', '$telepon', '$tanggalAwal', '$tanggalAkhir', '$durasi', '$adminId')";
 
             if ($conn->query($query)) {
                 header("Location: admin.php");
@@ -52,8 +50,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin</title>
     <!-- link css -->
-    <link rel="stylesheet" href="css/admin.css?v=<?php echo time(); ?>"">
-    <link rel="stylesheet" href="css/admin-tambah.css?v=<?php echo time(); ?>"">
+    <link rel="stylesheet" href="css/admin.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="css/admin-tambah.css?v=<?php echo time(); ?>">
     <!-- link favicon -->
     <link rel="shortcut icon" href="assets/logo-favicon.png" type="image/x-icon">
     <!-- link google font -->
@@ -181,10 +179,6 @@
                         <div class="form-group container">
                             <label for="tanggal-akhir">Tanggal Akhir</label>
                             <input type="date" name="tanggal-akhir" id="tanggal-akhir" class="input-tambah" required>
-                        </div>
-                        <div class="form-group container">
-                            <label for="no-kwitansi">No Kwitansi</label>
-                            <input type="text" name="no-kwitansi" id="no-kwitansi" class="input-tambah" required>
                         </div>
                         <div class="btn-group container">
                             <button type="submit" name="submit" class="btn-tambah">Tambah Member</button>

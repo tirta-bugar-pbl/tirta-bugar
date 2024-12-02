@@ -15,7 +15,7 @@
 
     // mengambil data detail member
     $id = $_GET['id'];
-    $queryDetailMember = "SELECT m.nama_member, m.email, m.password, m.nomor_telepon,  COALESCE(m.no_kwitansi, 'belum diupdate') as no_kwitansi , m.status, TO_CHAR(m.tanggal_awal, 'DD Month YYYY') as tanggal_awal, TO_CHAR(m.tanggal_berakhir, 'DD Month YYYY') as tanggal_berakhir, p.nama_paket, p.keterangan_fasilitas, p.keterangan_durasi, COALESCE(p.keterangan_private, '-') as keterangan_private FROM member m LEFT OUTER JOIN paket_member p ON m.id_paket = p.id_paket WHERE m.id_member = $id";
+    $queryDetailMember = "SELECT m.nama_member, m.email, m.password, m.nomor_telepon, TO_CHAR(m.tanggal_awal, 'DD Month YYYY') as tanggal_awal, TO_CHAR(m.tanggal_berakhir, 'DD Month YYYY') as tanggal_berakhir, p.nama_paket, p.keterangan_fasilitas, p.keterangan_durasi, COALESCE(p.keterangan_private, '-') as keterangan_private FROM member m LEFT OUTER JOIN paket_member p ON m.id_paket = p.id_paket WHERE m.id_member = $id";
     $resultDetailMember = $conn->query($queryDetailMember);
     $rowDetailMember = $resultDetailMember->fetch(PDO::FETCH_ASSOC);
 ?>
@@ -29,8 +29,8 @@
     <!-- link css -->
     <link rel="stylesheet" href="css/admin.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="css/admin-detail.css?v=<?php echo time(); ?>">
-     <!-- link favicon -->
-     <link rel="shortcut icon" href="assets/logo-favicon.png" type="image/x-icon">
+    <!-- link favicon -->
+    <link rel="shortcut icon" href="assets/logo-favicon.png" type="image/x-icon">
     <!-- link google font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -178,16 +178,6 @@
                             <p class="label-keterangan">Private Fitness</p>
                             <p>:</p>
                             <p><?= $rowDetailMember['keterangan_private'] ?></p>
-                        </div>
-                        <div class="detail-member-group container">
-                            <p class="label-status">Status Keanggotaan</p>
-                            <p>:</p>
-                            <p><?= $rowDetailMember['status'] ?></p>
-                        </div>
-                        <div class="detail-member-group container">
-                            <p class="label-kwitansi">Nomor Kwitansi</p>
-                            <p>:</p>
-                            <p><?= $rowDetailMember['no_kwitansi'] ?></p>
                         </div>
                     </div>
                     <div class="btn-group container">

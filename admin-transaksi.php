@@ -25,7 +25,7 @@
     $filter = isset($_GET['filter']) ? $_GET['filter'] : '';
     $search = isset($_GET['search']) ? $_GET['search'] : '';
 
-    $queryTransaksi = "SELECT DISTINCT TO_CHAR(t.tanggal_transaksi, 'DD Month YYYY') AS tanggal_transaksi, m.nama_member, m.nomor_telepon, p.keterangan_fasilitas, p.keterangan_durasi, t.status_pembayaran, t.total_harga FROM member m JOIN transaksi t ON m.id_member = t.id_member JOIN paket_member p ON t.id_paket = p.id_paket WHERE 1=1";
+    $queryTransaksi = "SELECT DISTINCT TO_CHAR(t.tanggal_transaksi, 'DD Month YYYY') AS tanggal_transaksi, t.invoice, m.nama_member, m.nomor_telepon, p.keterangan_fasilitas, p.keterangan_durasi, t.status_pembayaran, t.total_harga FROM member m JOIN transaksi t ON m.id_member = t.id_member JOIN paket_member p ON t.id_paket = p.id_paket WHERE 1=1";
 
     
     // Hitung total transaksi untuk pagination
@@ -190,11 +190,12 @@
                         <thead>
                             <tr>
                                 <td style="text-align: center;width: 15%;">Tanggal Transaksi</td>
+                                <td style="text-align: center;width: 10%;">Invoice</td>
                                 <td style="text-align: center;width: 15%;">Nama</td>
                                 <td style="text-align: center; width: 15%;">Nomor Telepon</td>
                                 <td style="text-align: center; width: 10%;">Durasi</td>
                                 <td style="text-align: center; width: 15%;">Keterangan</td>
-                                <td style="text-align: center; width: 15%;">Status Pembayaran</td>
+                                <td style="text-align: center; width: 10%;">Status Pembayaran</td>
                                 <td style="text-align: center; width: 15%;">Total Bayar</td>
 
                             </tr>
@@ -203,6 +204,7 @@
                             <?php foreach ($resultTransaksi as $result) : ?>
                                 <tr>
                                 <td style="text-align: center;"><?= $result['tanggal_transaksi']?></td>
+                                <td style="text-align: center;"><?= $result['invoice']?></td>
                                 <td><?= $result['nama_member']?></td>
                                 <td style="text-align: center;"><?= $result['nomor_telepon']?></td>
                                 <td style="text-align: center;"><?= $result['keterangan_durasi']?></td>
