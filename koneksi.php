@@ -2,7 +2,7 @@
     $host = 'localhost';
     $name = 'nurwahid';
     $pwd = '123';
-    $db = 'tirta_bugar';
+    $db = 'tb_update';
     $port = '5432';
     
     $conn = new PDO("pgsql:host=$host;port=$port;dbname=$db;user=$name;password=$pwd");
