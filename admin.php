@@ -18,17 +18,13 @@
     $resultProfileName = $conn->query($queryProfileName);
     $rowProfileName = $resultProfileName->fetch(PDO::FETCH_ASSOC);
 
-    // Update otomatis status keanggotaan jika tanggal_berakhir sudah jatuh tempo
-    $updateStatusQuery = "UPDATE member SET status = 'tidak aktif' WHERE tanggal_berakhir < CURRENT_DATE AND status = 'aktif'";
-    $conn->query($updateStatusQuery);
-
     // Mengambil nilai filter dari URL
     $combinedFilter = isset($_GET['combined_filter']) ? $_GET['combined_filter'] : '';
     $search = isset($_GET['search']) ? $_GET['search'] : '';
     $sortByDate = isset($_GET['sort_by_date']) ? $_GET['sort_by_date'] : '';
 
     // Query dasar
-    $baseQuery = "SELECT m.id_member, m.nama_member, m.nomor_telepon, p.keterangan_durasi, p.keterangan_fasilitas, m.tanggal_berakhir as tanggal_berakhir_raw, TO_CHAR(m.tanggal_berakhir, 'DD Month YYYY') as tanggal_berakhir, COALESCE(m.status, 'tidak ada') as status, (m.tanggal_berakhir - m.tanggal_awal) AS selisih FROM member m LEFT JOIN paket_member p ON p.id_paket = m.id_paket WHERE 1=1";
+    $baseQuery = "SELECT m.id_member, m.nama_member, m.nomor_telepon, p.keterangan_durasi, p.keterangan_fasilitas, m.tanggal_berakhir, TO_CHAR(m.tanggal_berakhir, 'DD Month YYYY') as tanggal_berakhir, (m.tanggal_berakhir - m.tanggal_awal) AS selisih FROM member m LEFT JOIN paket_member p ON p.id_paket = m.id_paket WHERE 1=1";
 
     // Tambahkan kondisi pencarian
     if (!empty($search)) {
@@ -39,29 +35,31 @@
     // Array untuk ORDER BY clauses
     $orderClauses = array();
 
+
     // Tambahkan kondisi filter gabungan
     if ($combinedFilter) {
-        list($status, $sort) = explode('-', $combinedFilter);
-        
+        list($status) = explode('-', $combinedFilter);
+
         if ($status !== 'all') {
             if ($status === 'aktif') {
-                $baseQuery .= " AND m.status = 'aktif'";
+                $baseQuery .= " AND m.tanggal_berakhir > CURRENT_DATE";
             } else if ($status === 'tidak_aktif') {
-                $baseQuery .= " AND (m.status != 'aktif' OR m.status IS NULL)";
+                $baseQuery .= " AND m.tanggal_berakhir <= CURRENT_DATE";
             }
         }
-        
-        if ($sort === 'asc') {
+
+        // Menggunakan `$combinedFilter` untuk menentukan sort
+        if ($combinedFilter === 'all-asc') {
             $orderClauses[] = "m.nama_member ASC";
-        } else if ($sort === 'desc') {
+        } else if ($combinedFilter === 'all-desc') {
             $orderClauses[] = "m.nama_member DESC";
         }
     }
 
-    // Tambahkan sort by date
-    if ($sortByDate) {
-        $orderClauses[] = "m.tanggal_berakhir " . ($sortByDate === 'asc' ? 'ASC' : 'DESC') . " NULLS LAST";
-    }
+// Tambahkan sort by date
+if ($sortByDate) {
+    $orderClauses[] = "m.tanggal_berakhir " . ($sortByDate === 'asc' ? 'ASC' : 'DESC') . " NULLS LAST";
+}
 
     // Tambahkan ORDER BY ke query jika ada
     if (!empty($orderClauses)) {
@@ -89,15 +87,15 @@
     $resultAmountMember = $conn->query($queryAmountMember);
     $rowAmountMember = $resultAmountMember->fetch(PDO::FETCH_ASSOC);
 
-    // jumlah data member aktif
-    $queryAmountMemberActive = "SELECT COUNT(id_member) As total_member_aktif FROM member WHERE status ILIKE 'aktif'";
+    // Menghitung jumlah member aktif
+    $queryAmountMemberActive = "SELECT COUNT(id_member) AS total_member_aktif FROM member WHERE tanggal_berakhir > CURRENT_DATE";
     $resultAmountMemberActive = $conn->query($queryAmountMemberActive);
     $rowAmountMemberActive = $resultAmountMemberActive->fetch(PDO::FETCH_ASSOC);
 
-    // jumlah data member nonaktif
-    $queryAmountMemberNonactive = "SELECT COUNT(id_member) As total_member_nonaktif FROM member WHERE status ILIKE 'tidak aktif'";
+    // Menghitung jumlah member tidak aktif
+    $queryAmountMemberNonactive = "SELECT COUNT(id_member) AS total_member_nonaktif FROM member WHERE tanggal_berakhir <= CURRENT_DATE";
     $resultAmountMemberNonactive = $conn->query($queryAmountMemberNonactive);
-    $rowAmountMemberNonActive = $resultAmountMemberNonactive->fetch(PDO::FETCH_ASSOC);
+    $rowAmountMemberNonactive = $resultAmountMemberNonactive->fetch(PDO::FETCH_ASSOC);
 ?>
 
 
@@ -230,7 +228,7 @@
                             <!-- title amount -->
                             <div class="title-amount-group">
                                 <h3>Masih Aktif</h3>
-                                <h4><?= $rowAmountMemberActive['total_member_aktif']?></h4>
+                                <h4><?= $rowAmountMemberActive['total_member_aktif'] ?></h4>
                             </div>
                         </div>
                         <div class="card-member-amount container">
@@ -241,7 +239,7 @@
                             <!-- title amount -->
                             <div class="title-amount-group">
                                 <h3>Tidak Aktif</h3>
-                                <h4><?= $rowAmountMemberNonActive['total_member_nonaktif'] ?></h4>
+                                <h4><?= $rowAmountMemberNonactive['total_member_nonaktif']?></h4>
                             </div>
                         </div>
                     </div>
@@ -257,12 +255,10 @@
                                     <div class="filter-member">
                                         <select name="combined_filter" id="combined_filter">
                                             <option value="">Filter & Sort</option>
-                                            <option value="all-asc" <?= $combinedFilter === 'all-asc' ? 'selected' : '' ?>>All Members (A-Z)</option>
-                                            <option value="all-desc" <?= $combinedFilter === 'all-desc' ? 'selected' : '' ?>>All Members (Z-A)</option>
-                                            <option value="aktif-asc" <?= $combinedFilter === 'aktif-asc' ? 'selected' : '' ?>>Members Aktif (A-Z)</option>
-                                            <option value="aktif-desc" <?= $combinedFilter === 'aktif-desc' ? 'selected' : '' ?>>Member Aktif (Z-A)</option>
-                                            <option value="tidak_aktif-asc" <?= $combinedFilter === 'tidak_aktif-asc' ? 'selected' : '' ?>>Member Tidak Aktif (A-Z)</option>
-                                            <option value="tidak_aktif-desc" <?= $combinedFilter === 'tidak_aktif-desc' ? 'selected' : '' ?>>Member Tidak Aktif (Z-A)</option>
+                                            <option value="all-asc" <?= $combinedFilter === 'all-asc' ? 'selected' : '' ?>>A - Z</option>
+                                            <option value="all-desc" <?= $combinedFilter === 'all-desc' ? 'selected' : '' ?>>Z - A</option>
+                                            <option value="aktif" <?= $combinedFilter === 'aktif' ? 'selected' : '' ?>>Members Aktif</option>
+                                            <option value="tidak_aktif" <?= $combinedFilter === 'tidak_aktif' ? 'selected' : '' ?>>Member Tidak Aktif</option>
                                         </select>
                                     </div>
                                 </div>
@@ -296,7 +292,6 @@
                                 <td style="text-align: center; width: 10%;">Durasi</td>
                                 <td style="text-align: center; width: 15%;">Keterangan</td>
                                 <td style="text-align: center; width: 15%;">Tanggal Berlaku</td>
-                                <td style="text-align: center; width: 10%;">Status</td>
                                 <td style="text-align: center; width: 15%;">Aksi</td>
                             </tr>
                         </thead>
@@ -318,11 +313,10 @@
                                 <td style="text-align: center;"><?= $result['keterangan_durasi']?></td>
                                 <td style="text-align: center;"><?= $result['keterangan_fasilitas']?></td>
                                 <td style="text-align: center;"><?= $result['tanggal_berakhir']?></td>
-                                <td style="text-align: center;"><?= $result['status']?></td>
                                 <td>
                                     <div class="action container">
                                         <a href="admin-detail.php?id=<?=$result['id_member']; ?>" class="detail">Detail</a>
-                                        <a href="delete-member.php?id=<?=$result['id_member']; ?>" class="hapus"  onclick="return confirmDelete();">Hapus</a>
+                                        <a href="delete-member.php?id=<?=$result['id_member']; ?>" class="hapus"  onclick="return confirm('Apakah Anda yakin ingin menghapus member ini?')">Hapus</a>
                                     </div>
                                 </td>
                             </tr>
@@ -353,9 +347,7 @@
         });
 
         document.getElementById('sort_by_date').addEventListener('change', function() {
-            // Reset combined_filter saat memilih sort by date
-            document.getElementById('combined_filter').value = '';  // Reset combined_filter
-            this.form.submit();  // Submit form setelah mereset combined_filter
+            this.form.submit();
         });
     </script>
 </body>
