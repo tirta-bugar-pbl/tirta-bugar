@@ -16,6 +16,7 @@
     $id_paket = (int)$_GET['id_paket'];
 
     // Ambil data paket
+    $adminId = $_SESSION['id_admin'];
     $queryPaket = "SELECT * FROM paket_member WHERE id_paket = $id_paket";
     $paket = $conn->query($queryPaket);
     $resultPaket = $paket->fetch(PDO::FETCH_ASSOC);
@@ -34,9 +35,9 @@
 
 
         if (empty($keterangan_private)) {
-            $queryUpdate = "UPDATE paket_member SET nama_paket = '$nama_paket', keterangan_fasilitas = '$keterangan_fasilitas', keterangan_durasi = '$keterangan_durasi', harga = '$harga', keterangan_private = null WHERE id_paket = '$id_paket'";
+            $queryUpdate = "UPDATE paket_member SET nama_paket = '$nama_paket', keterangan_fasilitas = '$keterangan_fasilitas', keterangan_durasi = '$keterangan_durasi', harga = '$harga', keterangan_private = null, id_admin = '$adminId' WHERE id_paket = '$id_paket'";
         } else {
-            $queryUpdate = "UPDATE paket_member SET nama_paket = '$nama_paket', keterangan_fasilitas = '$keterangan_fasilitas', keterangan_durasi = '$keterangan_durasi', harga = '$harga', keterangan_private = '$keterangan_private' WHERE id_paket = '$id_paket'";
+            $queryUpdate = "UPDATE paket_member SET nama_paket = '$nama_paket', keterangan_fasilitas = '$keterangan_fasilitas', keterangan_durasi = '$keterangan_durasi', harga = '$harga', keterangan_private = '$keterangan_private', id_admin = '$adminId' WHERE id_paket = '$id_paket'";
         }
 
         if ($conn->query($queryUpdate)) {

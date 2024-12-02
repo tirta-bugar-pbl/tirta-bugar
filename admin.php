@@ -35,10 +35,11 @@
     // Array untuk ORDER BY clauses
     $orderClauses = array();
 
+
     // Tambahkan kondisi filter gabungan
     if ($combinedFilter) {
         list($status) = explode('-', $combinedFilter);
-        
+
         if ($status !== 'all') {
             if ($status === 'aktif') {
                 $baseQuery .= " AND m.tanggal_berakhir > CURRENT_DATE";
@@ -46,18 +47,19 @@
                 $baseQuery .= " AND m.tanggal_berakhir <= CURRENT_DATE";
             }
         }
-        
-        // if ($sort === 'asc') {
-        //     $orderClauses[] = "m.nama_member ASC";
-        // } else if ($sort === 'desc') {
-        //     $orderClauses[] = "m.nama_member DESC";
-        // }
+
+        // Menggunakan `$combinedFilter` untuk menentukan sort
+        if ($combinedFilter === 'all-asc') {
+            $orderClauses[] = "m.nama_member ASC";
+        } else if ($combinedFilter === 'all-desc') {
+            $orderClauses[] = "m.nama_member DESC";
+        }
     }
 
-    // Tambahkan sort by date
-    if ($sortByDate) {
-        $orderClauses[] = "m.tanggal_berakhir " . ($sortByDate === 'asc' ? 'ASC' : 'DESC') . " NULLS LAST";
-    }
+// Tambahkan sort by date
+if ($sortByDate) {
+    $orderClauses[] = "m.tanggal_berakhir " . ($sortByDate === 'asc' ? 'ASC' : 'DESC') . " NULLS LAST";
+}
 
     // Tambahkan ORDER BY ke query jika ada
     if (!empty($orderClauses)) {
@@ -345,9 +347,7 @@
         });
 
         document.getElementById('sort_by_date').addEventListener('change', function() {
-            // Reset combined_filter saat memilih sort by date
-            document.getElementById('combined_filter').value = '';  // Reset combined_filter
-            this.form.submit();  // Submit form setelah mereset combined_filter
+            this.form.submit();
         });
     </script>
 </body>

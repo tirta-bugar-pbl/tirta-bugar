@@ -165,7 +165,7 @@
                         </div>
                         <div class="form-group container">
                             <label for="durasi">Pilih Paket</label>
-                            <select name="durasi" id="durasi" class="input-tambah">
+                            <select name="durasi" id="durasi" class="input-tambah" onchange="updateEndDate()">
                                 <option value="1">Regullar - 1 Bulan 8x Fitness</option>
                                 <option value="2">Regullar - 1 Bulan Fitness Sepuasnya</option>
                                 <option value="3">Regullar - 3 Bulan Fitness Sepuasnya</option>
@@ -174,11 +174,11 @@
                         </div>
                         <div class="form-group container">
                             <label for="tanggal-awal">Tanggal Awal</label>
-                            <input type="date" name="tanggal-awal" id="tanggal-awal" class="input-tambah" value="<?= date('Y-m-d') ?>">
+                            <input type="date" name="tanggal-awal" id="tanggal-awal" class="input-tambah" value="<?= date('Y-m-d') ?>" onchange="updateEndDate()">
                         </div>
                         <div class="form-group container">
                             <label for="tanggal-akhir">Tanggal Akhir</label>
-                            <input type="date" name="tanggal-akhir" id="tanggal-akhir" class="input-tambah" required>
+                            <input type="date" name="tanggal-akhir" id="tanggal-akhir" class="input-tambah" onchange="updateEndDate()" required>
                         </div>
                         <div class="btn-group container">
                             <button type="submit" name="submit" class="btn-tambah">Tambah Member</button>
@@ -189,5 +189,48 @@
             </main>
         </div>
     </div>
+    <!-- link javascript -->
+    <script>
+        function updateEndDate() {
+            const paketSelect = document.getElementById('durasi');
+            const startDateInput = document.getElementById('tanggal-awal');
+            const endDateInput = document.getElementById('tanggal-akhir');
+
+            console.log(paketSelect.value);
+
+            const startDate = new Date(startDateInput.value);
+            let duration = 0;
+
+            switch (paketSelect.value) {
+                case '1':
+                    duration = 1; // 1 bulan
+                    break;
+                case '2':
+                    duration = 1; // 1 bulan
+                    break;
+                case '3':
+                    duration = 3; // 3 bulan
+                    break;
+                case '4':
+                    duration = 1; // 1 bulan
+                    break;
+                default:
+                    duration = 0; // default atau paket lainnya
+            }
+
+            if (duration > 0) {
+                const endDate = new Date(startDate);
+                endDate.setMonth(endDate.getMonth() + duration);
+                
+                // Format tanggal menjadi yyyy-mm-dd
+                const month = String(endDate.getMonth() + 1).padStart(2, '0'); 
+                const day = String(endDate.getDate()).padStart(2, '0');
+                const year = endDate.getFullYear();
+
+                endDateInput.value = `${year}-${month}-${day}`;
+            }
+        }
+
+    </script>
 </body>
 </html>

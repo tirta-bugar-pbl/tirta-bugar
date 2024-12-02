@@ -6,12 +6,12 @@
     $id = $_GET['id'];
 
     // query untuk menghapus data absen
-    // $queryDeleteAbsen = "DELETE FROM absen_harian WHERE id_member = $id";
-    // $resultAbsen = $conn->query($queryDeleteAbsen);
+    $queryDeleteAbsen = "DELETE FROM absen_harian WHERE id_member = $id";
+    $resultAbsen = $conn->query($queryDeleteAbsen);
 
     // query untuk menghapus data transaksi
-    // $queryDeleteTransaksi = "DELETE FROM transaksi WHERE id_member = $id";
-    // $resultTransaksi = $conn->query($queryDeleteTransaksi);
+    $queryDeleteTransaksi = "DELETE FROM transaksi WHERE id_member = $id";
+    $resultTransaksi = $conn->query($queryDeleteTransaksi);
 
     // query untuk menghapus data member
     $queryDeleteMember = "DELETE FROM member WHERE id_member = $id";
