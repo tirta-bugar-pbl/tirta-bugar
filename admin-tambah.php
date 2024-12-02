@@ -20,21 +20,19 @@
         $durasi = $_POST['durasi'];
         $tanggalAwal = $_POST['tanggal-awal'];
         $tanggalAkhir = $_POST['tanggal-akhir'];
-        $noKwitansi = $_POST['no-kwitansi'];
         
         $characters = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        $passwod = '';
+        $password = '';
         for ($i = 0; $i < 8; $i++) {
-            $passwod .= $characters[rand(0, strlen($characters) - 1)];
+            $password .= $characters[rand(0, strlen($characters) - 1)];
         }
+
         $pwHash = base64_encode($password); 
 
         if (!preg_match("/^[0-9]+$/", $telepon)) {
             echo "<script>alert('Nomor telepon harus berupa angka !');</script>";
-        } else if (!is_numeric($noKwitansi)) {
-            echo "<script>alert('Nomor kwitansi harus berupa angka !');</script>";
         } else {
-            $query = "INSERT INTO member(nama_member, email, password, nomor_telepon, no_kwitansi, status, tanggal_awal, tanggal_berakhir, id_paket) VALUES ('$nama', '$email', '$pwHash', '$telepon', '$noKwitansi', 'aktif', '$tanggalAwal', '$tanggalAkhir', '$durasi')";
+            $query = "INSERT INTO member(nama_member, email, password, nomor_telepon, tanggal_awal, tanggal_berakhir, id_paket, id_admin) VALUES ('$nama', '$email', '$pwHash', '$telepon', '$tanggalAwal', '$tanggalAkhir', '$durasi', '$adminId')";
 
             if ($conn->query($query)) {
                 header("Location: admin.php");
@@ -54,8 +52,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin</title>
     <!-- link css -->
-    <link rel="stylesheet" href="css/admin.css?v=<?php echo time(); ?>"">
-    <link rel="stylesheet" href="css/admin-tambah.css?v=<?php echo time(); ?>"">
+    <link rel="stylesheet" href="css/admin.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="css/admin-tambah.css?v=<?php echo time(); ?>">
     <!-- link favicon -->
     <link rel="shortcut icon" href="assets/logo-favicon.png" type="image/x-icon">
     <!-- link google font -->
@@ -174,7 +172,7 @@
                         </div>
                         <div class="form-group container">
                             <label for="durasi">Pilih Paket</label>
-                            <select name="durasi" id="durasi" class="input-tambah">
+                            <select name="durasi" id="durasi" class="input-tambah" onchange="updateEndDate()">
                                 <option value="1">Regullar - 1 Bulan 8x Fitness</option>
                                 <option value="2">Regullar - 1 Bulan Fitness Sepuasnya</option>
                                 <option value="3">Regullar - 3 Bulan Fitness Sepuasnya</option>
@@ -183,15 +181,11 @@
                         </div>
                         <div class="form-group container">
                             <label for="tanggal-awal">Tanggal Awal</label>
-                            <input type="date" name="tanggal-awal" id="tanggal-awal" class="input-tambah" value="<?= date('Y-m-d') ?>">
+                            <input type="date" name="tanggal-awal" id="tanggal-awal" class="input-tambah" value="<?= date('Y-m-d') ?>" onchange="updateEndDate()">
                         </div>
                         <div class="form-group container">
                             <label for="tanggal-akhir">Tanggal Akhir</label>
-                            <input type="date" name="tanggal-akhir" id="tanggal-akhir" class="input-tambah" required>
-                        </div>
-                        <div class="form-group container">
-                            <label for="no-kwitansi">No Kwitansi</label>
-                            <input type="text" name="no-kwitansi" id="no-kwitansi" class="input-tambah" required>
+                            <input type="date" name="tanggal-akhir" id="tanggal-akhir" class="input-tambah" onchange="updateEndDate()" required>
                         </div>
                         <div class="btn-group container">
                             <button type="submit" name="submit" class="btn-tambah">Tambah Member</button>
@@ -202,6 +196,48 @@
             </main>
         </div>
     </div>
- 
+    <!-- link javascript -->
+    <script>
+        function updateEndDate() {
+            const paketSelect = document.getElementById('durasi');
+            const startDateInput = document.getElementById('tanggal-awal');
+            const endDateInput = document.getElementById('tanggal-akhir');
+
+            console.log(paketSelect.value);
+
+            const startDate = new Date(startDateInput.value);
+            let duration = 0;
+
+            switch (paketSelect.value) {
+                case '1':
+                    duration = 1; // 1 bulan
+                    break;
+                case '2':
+                    duration = 1; // 1 bulan
+                    break;
+                case '3':
+                    duration = 3; // 3 bulan
+                    break;
+                case '4':
+                    duration = 1; // 1 bulan
+                    break;
+                default:
+                    duration = 0; // default atau paket lainnya
+            }
+
+            if (duration > 0) {
+                const endDate = new Date(startDate);
+                endDate.setMonth(endDate.getMonth() + duration);
+                
+                // Format tanggal menjadi yyyy-mm-dd
+                const month = String(endDate.getMonth() + 1).padStart(2, '0'); 
+                const day = String(endDate.getDate()).padStart(2, '0');
+                const year = endDate.getFullYear();
+
+                endDateInput.value = `${year}-${month}-${day}`;
+            }
+        }
+
+    </script>
 </body>
 </html>

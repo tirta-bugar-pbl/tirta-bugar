@@ -363,6 +363,7 @@ if ($sortByDate) {
 
         document.getElementById('sort_by_date').addEventListener('change', function() {
             this.form.submit();
-        }); </script>
+        });
+    </script>
 </body>
 </html>

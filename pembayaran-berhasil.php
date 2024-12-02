@@ -109,11 +109,11 @@
             if($result) {
             if($durasi == '1' || $durasi == '2' || $durasi == '4') {
                     // query menambahkan data member
-                    $queryTambahMember = "INSERT INTO member(nama_member, email, password, nomor_telepon, no_kwitansi, status, tanggal_awal, tanggal_berakhir, id_paket) VALUES ('$nama', '$email', '$pwHash', '$nomor_telepon', null, 'aktif', CURRENT_DATE, CURRENT_DATE + INTERVAL '1 month', '$durasi')";
+                    $queryTambahMember = "INSERT INTO member(nama_member, email, password, nomor_telepon, tanggal_awal, tanggal_berakhir, id_paket, id_admin) VALUES ('$nama', '$email', '$pwHash', '$nomor_telepon', CURRENT_DATE, CURRENT_DATE + INTERVAL '1 month', '$durasi', null)";
                     $resultMember = $conn->query($queryTambahMember);
                 } else {
                     // query menambahkan data member
-                    $queryTambahMember = "INSERT INTO member(nama_member, email, password, nomor_telepon, no_kwitansi, status, tanggal_awal, tanggal_berakhir, id_paket) VALUES ('$nama', '$email', '$pwHash', '$nomor_telepon', null, 'aktif', CURRENT_DATE, CURRENT_DATE + INTERVAL '3 month', '$durasi')";
+                    $queryTambahMember = "INSERT INTO member(nama_member, email, password, nomor_telepon, tanggal_awal, tanggal_berakhir, id_paket, id_admin) VALUES ('$nama', '$email', '$pwHash', '$nomor_telepon', CURRENT_DATE, CURRENT_DATE + INTERVAL '3 month', '$durasi', null)";
                     $resultMember = $conn->query($queryTambahMember);
                 }
 
@@ -143,8 +143,8 @@
     <!-- link css -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/pembayaran-berhasil.css">
-     <!-- link favicon -->
-     <link rel="shortcut icon" href="assets/logo-favicon.png" type="image/x-icon">
+    <!-- link favicon -->
+    <link rel="shortcut icon" href="assets/logo-favicon.png" type="image/x-icon">
     <!-- link google font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

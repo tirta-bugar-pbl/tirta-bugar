@@ -17,6 +17,13 @@
     $queryDeleteMember = "DELETE FROM member WHERE id_member = $id";
     $resultMember = $conn->query($queryDeleteMember);
 
+    // Jika ada data terkait, tampilkan alert dan hentikan proses
+    if($resultMember) {
+        echo "<script>
+            alert('Tidak dapat menghapus member karena masih ada data terkait di tabel transaksi atau absen.');
+            window.location.href = 'admin.php';
+        </script>";
+    }
     // Redirect ke halaman admin setelah penghapusan berhasil
     header("Location: admin.php");
     exit();

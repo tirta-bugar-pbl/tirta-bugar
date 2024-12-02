@@ -15,7 +15,7 @@
 
     // mengambil data detail member
     $id = $_GET['id'];
-    $queryDetailMember = "SELECT nama_member, email, nomor_telepon, COALESCE(no_kwitansi, 'belum diupdate') as no_kwitansi, status, tanggal_berakhir, id_paket FROM member WHERE id_member = $id";
+    $queryDetailMember = "SELECT nama_member, email, nomor_telepon, tanggal_berakhir, id_paket FROM member WHERE id_member = $id";
     $resultDetailMember = $conn->query($queryDetailMember);
     $rowDetailMember = $resultDetailMember->fetch(PDO::FETCH_ASSOC);
 
@@ -24,15 +24,12 @@
         $email = $_POST['email'];
         $durasi = $_POST['durasi'];
         $nomor_telepon = $_POST['nomor-telepon'];
-        $no_kwitansi = $_POST['no-kwitansi'];
         $tanggal_berakhir = $_POST['tanggal-akhir'];
 
         if (!preg_match("/^[0-9]+$/", $nomor_telepon)) {
             echo "<script>alert('Nomor telepon harus berupa angka !');</script>";
-        } else if (!is_numeric($no_kwitansi)) {
-            echo "<script>alert('Nomor kwitansi harus berupa angka !');</script>";
         } else {
-            $queryEdit = "UPDATE member SET nama_member = '$nama_member', email = '$email', no_kwitansi = '$no_kwitansi', nomor_telepon = '$nomor_telepon', tanggal_berakhir = '$tanggal_berakhir', id_paket = '$durasi', status = 'aktif' WHERE id_member = $id";
+            $queryEdit = "UPDATE member SET nama_member = '$nama_member', email = '$email', nomor_telepon = '$nomor_telepon', tanggal_berakhir = '$tanggal_berakhir', id_paket = '$durasi', id_admin = '$adminId' WHERE id_member = $id";
 
             if ($conn->query($queryEdit)) {
                 header("Location: admin.php");
@@ -178,11 +175,7 @@
                         </div>
                         <div class="form-group container">
                             <label for="tanggal-akhir">Tanggal Akhir</label>
-                            <input type="date" name="tanggal-akhir" id="tanggal-akhir" value="<?= $rowDetailMember['tanggal_berakhir'] ?>" class="input-tambah">
-                        </div>
-                        <div class="form-group container">
-                            <label for="no-kwitansi">No Kwitansi</label>
-                            <input type="text" name="no-kwitansi" id="no-kwitansi" value="<?= $rowDetailMember['no_kwitansi'] ?>" class="input-tambah">
+                            <input type="date" name="tanggal-akhir" id="tanggal-akhir" value="<?= $rowDetailMember['tanggal_berakhir'] ?>" class="input-tambah" onchange="updateEndDate()">
                         </div>
                         <div class="btn-group container">
                             <button type="submit" name="submit" class="btn-tambah">Edit Member</button>
@@ -193,5 +186,48 @@
             </main>
         </div>
     </div>
+        <!-- link javascript -->
+        <script>
+        function updateEndDate() {
+            const paketSelect = document.getElementById('durasi');
+            const startDateInput = document.getElementById('tanggal-awal');
+            const endDateInput = document.getElementById('tanggal-akhir');
+
+            console.log(paketSelect.value);
+
+            const startDate = new Date(startDateInput.value);
+            let duration = 0;
+
+            switch (paketSelect.value) {
+                case '1':
+                    duration = 1; // 1 bulan
+                    break;
+                case '2':
+                    duration = 1; // 1 bulan
+                    break;
+                case '3':
+                    duration = 3; // 3 bulan
+                    break;
+                case '4':
+                    duration = 1; // 1 bulan
+                    break;
+                default:
+                    duration = 0; // default atau paket lainnya
+            }
+
+            if (duration > 0) {
+                const endDate = new Date(startDate);
+                endDate.setMonth(endDate.getMonth() + duration);
+                
+                // Format tanggal menjadi yyyy-mm-dd
+                const month = String(endDate.getMonth() + 1).padStart(2, '0'); 
+                const day = String(endDate.getDate()).padStart(2, '0');
+                const year = endDate.getFullYear();
+
+                endDateInput.value = `${year}-${month}-${day}`;
+            }
+        }
+
+    </script>
 </body>
 </html>

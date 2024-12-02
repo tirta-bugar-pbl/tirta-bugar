@@ -1,47 +1,46 @@
 <?php 
-        include 'koneksi.php';
-        session_start();
+    include 'koneksi.php';
+    session_start();
 
-        $id_paket = isset($_GET['id_paket']) ? $_GET['id_paket'] : '';
+    $id_paket = isset($_GET['id_paket']) ? $_GET['id_paket'] : '';
 
-        if (isset($_POST['submit'])) {
-            $nama = $_POST['nama'];
-            $email = $_POST['email'];
-            $telepon = $_POST['nomor-telepon'];
-            $durasi = $_POST['durasi'];
-            $order_id = rand();
+    if (isset($_POST['submit'])) {
+        $nama = $_POST['nama'];
+        $email = $_POST['email'];
+        $telepon = $_POST['nomor-telepon'];
+        $durasi = $_POST['durasi'];
+        $order_id = rand();
 
-            // Validasi nomor telepon harus angka
-            if (!preg_match("/^[0-9]+$/", $telepon)) {
-                echo "<script>alert('Nomor telepon harus berupa angka!');</script>";
+        // Validasi nomor telepon harus angka
+        if (!preg_match("/^[0-9]+$/", $telepon)) {
+            echo "<script>alert('Nomor telepon harus berupa angka!');</script>";
+        } else {
+            // Query untuk mendapatkan data member
+            $queryMember = "SELECT email, nomor_telepon FROM member WHERE email = '$email' OR nomor_telepon = '$telepon'";
+            $resultMember = $conn->query($queryMember);
+
+            if($resultMember->num_rows > 0) {
+                echo "<script>
+                    alert('Email atau nomor telepon sudah terdaftar!');
+                    window.history.back();
+                </script>";
             } else {
+                // Simpan data ke session jika valid
+                $_SESSION['form_data'] = [
+                    'nama' => $nama,
+                    'email' => $email,
+                    'nomor_telepon' => $telepon,
+                    'durasi' => $durasi
+                ];
 
-                // query untuk mendapatkan data member
-                $queryMember = "SELECT email, nomor_telepon FROM member WHERE email = '$email'  nomor_telepon = '$telepon'";
-                $resultMember = $conn->query($queryMember);
-                $rowMember = $resultMember->fetch(PDO::FETCH_ASSOC);
-
-                if($rowMember) {
-                    echo "<script>
-                        alert('Email atau nomor telepon sudah terdaftar !');
-                    </script>";
-                } else {
-                    // Simpan data ke session jika valid
-                    $_SESSION['form_data'] = [
-                        'nama' => $nama,
-                        'email' => $email,
-                        'nomor_telepon' => $telepon,
-                        'durasi' => $durasi
-                    ];
-
-                    // Redirect ke konfirmasi-pembayaran.php
-                    // header("Location: konfirmasi-pembayaran.php");
-                    header("Location: ./midtrans/examples/snap/checkout-process-simple-version.php?order_id=$order_id");
-                    exit;
-                }
+                // Redirect ke konfirmasi-pembayaran.php
+                header("Location: ./midtrans/examples/snap/checkout-process-simple-version.php?order_id=$order_id");
+                exit;
             }
         }
+    }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">

@@ -14,12 +14,13 @@
         $keterangan_fasilitas = $_POST['keterangan_fasilitas'];
         $keterangan_durasi = $_POST['keterangan_durasi'];
         $keterangan_private = $_POST['keterangan-private'];
+        $adminId = $_SESSION['id_admin'];
         $harga =  (int)$_POST['harga'];
 
         if (empty($keterangan_private)) {
-            $query = "INSERT INTO paket_member (nama_paket, keterangan_fasilitas, keterangan_durasi, harga, keterangan_private)  VALUES ('$nama_paket', '$keterangan_fasilitas', '$keterangan_durasi', '$harga', null)";
+            $query = "INSERT INTO paket_member (nama_paket, keterangan_fasilitas, keterangan_durasi, harga, keterangan_private, id_admin)  VALUES ('$nama_paket', '$keterangan_fasilitas', '$keterangan_durasi', '$harga', null, '$adminId')";
         } else {
-            $query = "INSERT INTO paket_member (nama_paket, keterangan_fasilitas, keterangan_durasi, harga, keterangan_private)  VALUES ('$nama_paket', '$keterangan_fasilitas', '$keterangan_durasi', '$harga', '$keterangan_private')";
+            $query = "INSERT INTO paket_member (nama_paket, keterangan_fasilitas, keterangan_durasi, harga, keterangan_private, id_admin)  VALUES ('$nama_paket', '$keterangan_fasilitas', '$keterangan_durasi', '$harga', '$keterangan_private', '$adminId')";
         }
 
         if ($conn->query($query)) {

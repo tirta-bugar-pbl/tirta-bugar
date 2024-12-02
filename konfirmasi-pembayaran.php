@@ -28,19 +28,28 @@ $invoice = rand();
 $harga_paket = 0;
 $keterangan = '';
 $keteranganDurasi = '';
+$keteranganPrivate = '';
 
 if ($durasi == '1') {
     $harga_paket = 100000;
     $keterangan = '8x Pertemuan';
     $keteranganDurasi = '1 Bulan';
+    $keteranganPrivate = '-';
 } elseif ($durasi == '2') {
     $harga_paket = 185000;
     $keterangan = 'Bebas Datang';
     $keteranganDurasi = '1 Bulan';
-} else {
+    $keteranganPrivate = '-';
+} elseif ($durasi == '3') {
     $harga_paket = 500000;
     $keterangan = 'Bebas Datang';
     $keteranganDurasi = '3 Bulan';
+    $keteranganPrivate = '-';
+} else {
+    $harga_paket = 550000;
+    $keterangan = 'Bebas Datang';
+    $keteranganDurasi = '1 Bulan';
+    $keteranganPrivate = '4x Pertemuan';
 }
 
 $biaya_pendaftaran = 50000;
@@ -53,16 +62,36 @@ function rupiah($angka) {
 // Proses ketika tombol Bayar diklik
 if (isset($_POST['submit'])) {
     try {
-        $queryTambahMember = "INSERT INTO member(nama_member, email, password, nomor_telepon, no_kwitansi, status, tanggal_awal, tanggal_berakhir, id_paket) VALUES ('$nama', '$email', '$pwHash', '$nomor_telepon', null, 'aktif', CURRENT_DATE, CURRENT_DATE + INTERVAL '$durasi month', '$durasi')";
-        $resultMember = $conn->query($queryTambahMember);
+        if($durasi == '1' || $durasi == '2' || $durasi == '4') {
+            $queryTambahMember = "INSERT INTO member(nama_member, email, password, nomor_telepon, no_kwitansi, status, tanggal_awal, tanggal_berakhir, id_paket) VALUES ('$nama', '$email', '$pwHash', '$nomor_telepon', null, 'aktif', CURRENT_DATE, CURRENT_DATE + INTERVAL '1 month', '$durasi')";
 
-        $queryTransaksi = "INSERT INTO transaksi(id_paket, invoice, total_harga, tanggal_transaksi, id_member) VALUES ('$durasi', '$invoice', $total , CURRENT_DATE, (SELECT id_member FROM member WHERE nomor_telepon = '$nomor_telepon'))";
-        $resultTransaksi = $conn->query($queryTransaksi);
+            $resultMember = $conn->query($queryTambahMember);   
 
-        if ($resultMember && $resultTransaksi) {
-            unset($_SESSION['form_data']);
-            unset($_SESSION['invoice']);
-            echo "<script>alert('Pembayaran berhasil diproses!'); window.location.href = 'index.php';</script>";
+            $queryTransaksi = "INSERT INTO transaksi(id_paket, invoice, total_harga, tanggal_transaksi, id_member) VALUES ('$durasi', '$invoice', $total , CURRENT_DATE, (SELECT id_member FROM member WHERE nomor_telepon = '$nomor_telepon'))";
+
+            $resultTransaksi = $conn->query($queryTransaksi);
+
+            
+            if ($resultMember && $resultTransaksi) {
+                unset($_SESSION['form_data']);
+                unset($_SESSION['invoice']);
+                echo "<script>alert('Pembayaran berhasil diproses!'); window.location.href = 'index.php';</script>";
+            }
+        } else {
+            $queryTambahMember = "INSERT INTO member(nama_member, email, password, nomor_telepon, no_kwitansi, status, tanggal_awal, tanggal_berakhir, id_paket) VALUES ('$nama', '$email', '$pwHash', '$nomor_telepon', null, 'aktif', CURRENT_DATE, CURRENT_DATE + INTERVAL '3 month', '$durasi')";
+
+            $resultMember = $conn->query($queryTambahMember);   
+
+            $queryTransaksi = "INSERT INTO transaksi(id_paket, invoice, total_harga, tanggal_transaksi, id_member) VALUES ('$durasi', '$invoice', $total , CURRENT_DATE, (SELECT id_member FROM member WHERE nomor_telepon = '$nomor_telepon'))";
+
+            $resultTransaksi = $conn->query($queryTransaksi);
+
+            
+            if ($resultMember && $resultTransaksi) {
+                unset($_SESSION['form_data']);
+                unset($_SESSION['invoice']);
+                echo "<script>alert('Pembayaran berhasil diproses!'); window.location.href = 'index.php';</script>";
+            }
         }
     } catch (Exception $e) {
         echo "<script>alert('Terjadi kesalahan: " . $e->getMessage() . "');</script>";
@@ -78,8 +107,8 @@ if (isset($_POST['submit'])) {
     <title>Pembayaran - Tirta Bugar Fitness</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/pembayaran.css">
-     <!-- link favicon -->
-     <link rel="shortcut icon" href="assets/logo-favicon.png" type="image/x-icon">
+    <!-- link favicon -->
+    <link rel="shortcut icon" href="assets/logo-favicon.png" type="image/x-icon">
 </head>
 <body>
     <?php if(isset($_SESSION['form_data'])): ?>
