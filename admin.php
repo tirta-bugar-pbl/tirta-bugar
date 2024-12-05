@@ -96,6 +96,11 @@ if ($sortByDate) {
     $queryAmountMemberNonactive = "SELECT COUNT(id_member) AS total_member_nonaktif FROM member WHERE tanggal_berakhir <= CURRENT_DATE";
     $resultAmountMemberNonactive = $conn->query($queryAmountMemberNonactive);
     $rowAmountMemberNonactive = $resultAmountMemberNonactive->fetch(PDO::FETCH_ASSOC);
+
+    
+$queryNonActiveMembers = "SELECT nama_member FROM member WHERE tanggal_berakhir <= CURRENT_DATE";
+$resultNonActiveMembers = $conn->query($queryNonActiveMembers);
+$nonActiveMembers = $resultNonActiveMembers->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 
@@ -364,6 +369,56 @@ if ($sortByDate) {
         document.getElementById('sort_by_date').addEventListener('change', function() {
             this.form.submit();
         });
-    </script>
+        // Get DOM elements
+const notificationIcon = document.getElementById('notificationIcon');
+const notificationPopup = document.getElementById('notification-popup');
+const notificationList = document.getElementById('notification-list');
+const closePopup = document.getElementById('close-popup');
+const notificationBadge = document.querySelector('.notification-badge');
+
+// Store non-active members data from PHP
+const nonActiveMembers = <?php echo json_encode($nonActiveMembers); ?>;
+
+// Function to populate notifications
+function populateNotifications() {
+    notificationList.innerHTML = ''; // Clear existing notifications
+    
+    if (nonActiveMembers.length === 0) {
+        notificationList.innerHTML = '<li>No notifications at this time</li>';
+        notificationBadge.classList.add('hidden');
+    } else {
+        nonActiveMembers.forEach(member => {
+            const li = document.createElement('li');
+            li.textContent = `${member.nama_member}'s membership has expired`;
+            notificationList.appendChild(li);
+        });
+        notificationBadge.classList.remove('hidden');
+        notificationBadge.textContent = nonActiveMembers.length;
+    }
+}
+
+// Initialize notifications
+populateNotifications();
+
+// Toggle popup when clicking notification icon
+notificationIcon.addEventListener('click', (e) => {
+    e.stopPropagation();
+    notificationPopup.classList.toggle('hidden');
+});
+
+// Close popup when clicking the close button
+closePopup.addEventListener('click', () => {
+    notificationPopup.classList.add('hidden');
+});
+
+// Close popup when clicking outside
+document.addEventListener('click', (e) => {
+    if (!notificationPopup.contains(e.target) && e.target !== notificationIcon) {
+        notificationPopup.classList.add('hidden');
+    }
+});
+
+</script>
+
 </body>
 </html>
