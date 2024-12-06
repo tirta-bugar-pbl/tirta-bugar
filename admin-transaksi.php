@@ -17,6 +17,8 @@
     $resultProfileName = $conn->query($queryProfileName);
     $rowProfileName = $resultProfileName->fetch(PDO::FETCH_ASSOC);
 
+    
+
     // logika pagination
     $limit = 10; // Example limit per page
     $page = isset($_GET['page']) ? $_GET['page'] : 1; // Current page, default to 1
@@ -76,6 +78,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+    <script src="notifications.js"></script>
+
 </head>
 <body>
     <div class="container">
@@ -155,16 +159,29 @@
                         <h2>Transaksi</h2>
                     </div>
                     <div class="account">
-                        <!-- notif account -->
-                        <img src="assets/notification.svg" alt="notifivation">
-                        <div class="account-profile">
-                            <!-- icon account -->
-                            <img src="assets/profile.svg" alt="profile">
-                            <h3><?= $rowProfileName['username']?></h3>
-                        </div>
-                    </div>
+            <!-- notif account -->
+            <div id="notification-container" class="notification-container">
+                <div class="notification-icon-wrapper">
+                    <img src="assets/notification.svg" alt="notification" id="notificationIcon">
+                    <span class="notification-badge hidden"></span>
                 </div>
-            </header>
+            </div>
+            <div class="account-profile">
+                <!-- icon account -->
+                <img src="assets/profile.svg" alt="profile">
+                <h3><?= $rowProfileName['username']?></h3>
+            </div>
+        </div>
+            </div>
+                </header>
+        
+            <!-- Pop-Up Notification -->
+        <div id="notification-popup" class="popup hidden">
+            <div class="popup-content">
+                <span id="close-popup" class="close">&times;</span>
+                <ul id="notification-list"></ul>
+            </div>
+        </div>
             <main>
                 <!-- filtering transaksi -->
                 <section class="filtering-transaksi">
@@ -236,6 +253,7 @@
             url.searchParams.set('filter', filter);
             window.location.href = url.toString();
         }
+     
     </script>
 </body>
 </html>
