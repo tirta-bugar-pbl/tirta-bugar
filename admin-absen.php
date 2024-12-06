@@ -23,22 +23,22 @@
 
     // mengambil data absen
     if($search) {
-        $queryAbsen = "SELECT TO_CHAR(a.tanggal_datang, 'DD Month YYYY') as tanggal_datang, m.nama_member, p.keterangan_fasilitas, TO_CHAR(m.tanggal_berakhir, 'DD Month YYYY') as tanggal_berakhir, p.keterangan_durasi, COALESCE(a.keterangan, '-') as keterangan_absen  FROM absen_harian a LEFT OUTER JOIN member m ON a.id_member = m.id_member LEFT OUTER JOIN paket_member p ON m.id_paket = p.id_paket WHERE LOWER(m.nama_member) LIKE '%$search%'";
+        $queryAbsen = "SELECT * FROM view_member_absen_list WHERE LOWER(nama_member) LIKE '%' || LOWER('$search') || '%'";
 
         $resultAbsen = $conn->query($queryAbsen);
 
         // Hitung total absen untuk pagination
-        $queryCount = "SELECT COUNT(DISTINCT a.id_pertemuan) AS total FROM absen_harian a JOIN member m ON m.id_member = a.id_member";
+        $queryCount = "SELECT COUNT(DISTINCT id_pertemuan) AS total FROM view_member_absen_list";
         $resultCount = $conn->query($queryCount);
         $totalCount = $resultCount->fetch(PDO::FETCH_ASSOC)['total'];
         $totalPages = ceil($totalCount / $limit);
     }else {
-        $queryAbsen = "SELECT TO_CHAR(a.tanggal_datang, 'DD Month YYYY') as tanggal_datang, m.nama_member, p.keterangan_fasilitas, TO_CHAR(m.tanggal_berakhir, 'DD Month YYYY') as tanggal_berakhir, p.keterangan_durasi, COALESCE(a.keterangan, '-') as keterangan_absen  FROM absen_harian a LEFT OUTER JOIN member m ON a.id_member = m.id_member LEFT OUTER JOIN paket_member p ON m.id_paket = p.id_paket LIMIT $limit OFFSET $offset";
+        $queryAbsen = "SELECT * FROM view_member_absen_list LIMIT $limit OFFSET $offset";
 
         $resultAbsen = $conn->query($queryAbsen);
 
         // Hitung total absen untuk pagination
-        $queryCount = "SELECT COUNT(DISTINCT a.id_pertemuan) AS total FROM absen_harian a JOIN member m ON a.id_member = m.id_member ";
+        $queryCount = "SELECT COUNT(DISTINCT id_pertemuan) AS total FROM view_member_absen_list";
         $resultCount = $conn->query($queryCount);
         $totalCount = $resultCount->fetch(PDO::FETCH_ASSOC)['total'];
         $totalPages = ceil($totalCount / $limit);
@@ -54,8 +54,8 @@
     <!-- link css -->
     <link rel="stylesheet" href="css/admin.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="css/admin-absen.css?v=<?php echo time(); ?>">
-     <!-- link favicon -->
-     <link rel="shortcut icon" href="assets/logo-favicon.png" type="image/x-icon">
+    <!-- link favicon -->
+    <link rel="shortcut icon" href="assets/logo-favicon.png" type="image/x-icon">
     <!-- link google font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

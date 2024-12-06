@@ -25,27 +25,27 @@
     $filter = isset($_GET['filter']) ? $_GET['filter'] : '';
     $search = isset($_GET['search']) ? $_GET['search'] : '';
 
-    $queryTransaksi = "SELECT DISTINCT TO_CHAR(t.tanggal_transaksi, 'DD Month YYYY') AS tanggal_transaksi, t.invoice, m.nama_member, m.nomor_telepon, p.keterangan_fasilitas, p.keterangan_durasi, t.status_pembayaran, t.total_harga FROM member m JOIN transaksi t ON m.id_member = t.id_member JOIN paket_member p ON t.id_paket = p.id_paket WHERE 1=1";
+    $queryTransaksi = "SELECT * FROM view_member_transaction_list WHERE 1=1";
 
     
     // Hitung total transaksi untuk pagination
-    $queryCount = "SELECT COUNT(DISTINCT t.id_transaksi) AS total FROM transaksi t JOIN member m ON m.id_member = t.id_member";
+    $queryCount = "SELECT COUNT(DISTINCT id_transaksi) AS total FROM view_member_transaction_list";
     $resultCount = $conn->query($queryCount);
     $totalCount = $resultCount->fetch(PDO::FETCH_ASSOC)['total'];
     $totalPages = ceil($totalCount / $limit);
 
     // kondisi searching 
     if (!empty($search)) {
-        $queryTransaksi .= " AND LOWER(m.nama_member) LIKE '%$search%'";
+        $queryTransaksi .= " AND LOWER(nama_member) LIKE '%' || LOWER('$search') || '%'";
     } 
 
     // Tambahkan filter waktu
     if ($filter == 'today') {
-        $queryTransaksi .= " AND DATE(t.tanggal_transaksi) = CURRENT_DATE";
+        $queryTransaksi .= " AND DATE(tanggal_transaksi) = CURRENT_DATE";
     } else if ($filter == 'week') {
-        $queryTransaksi .= " AND DATE(t.tanggal_transaksi) >= (CURRENT_DATE - INTERVAL '7 days')";
+        $queryTransaksi .= " AND DATE(tanggal_transaksi) >= (CURRENT_DATE - INTERVAL '7 days')";
     } else if ($filter == 'month') {
-        $queryTransaksi .= " AND DATE_PART('month', t.tanggal_transaksi) = DATE_PART('month', CURRENT_DATE) AND DATE_PART('year', t.tanggal_transaksi) = DATE_PART('year', CURRENT_DATE)";
+        $queryTransaksi .= " AND DATE_PART('month', tanggal_transaksi) = DATE_PART('month', CURRENT_DATE) AND DATE_PART('year', tanggal_transaksi) = DATE_PART('year', CURRENT_DATE)";
     }
 
     // Tambahkan LIMIT dan OFFSET untuk pagination
@@ -55,7 +55,7 @@
     $resultTransaksi = $conn->query($queryTransaksi);
 
     // Hitung total transaksi untuk pagination
-    $queryCount = "SELECT COUNT(DISTINCT t.id_transaksi) AS total FROM transaksi t JOIN member m ON m.id_member = t.id_member";
+    $queryCount = "SELECT COUNT(DISTINCT id_transaksi) AS total FROM view_member_transaction_list";
     $resultCount = $conn->query($queryCount);
     $totalCount = $resultCount->fetch(PDO::FETCH_ASSOC)['total'];
     $totalPages = ceil($totalCount / $limit);
@@ -203,7 +203,7 @@
                         <tbody>
                             <?php foreach ($resultTransaksi as $result) : ?>
                                 <tr>
-                                <td style="text-align: center;"><?= $result['tanggal_transaksi']?></td>
+                                <td style="text-align: center;"><?= $result['tanggal_transaksi_formated']?></td>
                                 <td style="text-align: center;"><?= $result['invoice']?></td>
                                 <td><?= $result['nama_member']?></td>
                                 <td style="text-align: center;"><?= $result['nomor_telepon']?></td>

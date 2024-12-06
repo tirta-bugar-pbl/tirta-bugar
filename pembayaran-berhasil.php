@@ -36,6 +36,7 @@
             // Hash password sebelum disimpan ke database
             $pwHash = base64_encode($password); 
 
+            // password hanya ditampilkan
             $pwDecode = base64_decode($pwHash);
 
             // Menentukan harga berdasarkan durasi

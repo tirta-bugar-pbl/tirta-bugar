@@ -11,12 +11,19 @@
         $durasi = $_POST['durasi'];
         $order_id = rand();
 
+        // mengecek akun yang sudah terdaftar
+        $sql = "SELECT nomor_telepon FROM view_member_list WHERE nomor_telepon = '$telepon'";
+        $result = $conn->query($sql);
+        $rowDuplicateTelepon = $result->fetch(PDO::FETCH_ASSOC);
+
         // Validasi nomor telepon harus angka
         if (!preg_match("/^[0-9]+$/", $telepon)) {
             echo "<script>alert('Nomor telepon harus berupa angka!');</script>";
-        } else {
+        } elseif($rowDuplicateTelepon ) {
+            echo "<script>alert('Nomor telepon sudah terdaftar');</script>";
+        }else {
             // Query untuk mendapatkan data member
-            $queryMember = "SELECT email, nomor_telepon FROM member WHERE email = '$email' OR nomor_telepon = '$telepon'";
+            $queryMember = "SELECT * FROM view_check_double_customer WHERE email = '$email' OR nomor_telepon = '$telepon'";
             $resultMember = $conn->query($queryMember);
 
             if($resultMember->num_rows > 0) {

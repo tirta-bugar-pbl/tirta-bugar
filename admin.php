@@ -24,12 +24,12 @@
     $sortByDate = isset($_GET['sort_by_date']) ? $_GET['sort_by_date'] : '';
 
     // Query dasar
-    $baseQuery = "SELECT m.id_member, m.nama_member, m.nomor_telepon, p.keterangan_durasi, p.keterangan_fasilitas, m.tanggal_berakhir, TO_CHAR(m.tanggal_berakhir, 'DD Month YYYY') as tanggal_berakhir, (m.tanggal_berakhir - m.tanggal_awal) AS selisih FROM member m LEFT JOIN paket_member p ON p.id_paket = m.id_paket WHERE 1=1";
+    // $baseQuery = "SELECT m.id_member, m.nama_member, m.nomor_telepon, p.keterangan_durasi, p.keterangan_fasilitas, m.tanggal_berakhir, TO_CHAR(m.tanggal_berakhir, 'DD Month YYYY') as tanggal_berakhir, (m.tanggal_berakhir - m.tanggal_awal) AS selisih, COALESCE(p.keterangan_private, '-') as keterangan FROM member m LEFT JOIN paket_member p ON p.id_paket = m.id_paket WHERE 1=1";
+    $baseQuery = "SELECT * FROM view_member_list WHERE 1=1";
 
     // Tambahkan kondisi pencarian
     if (!empty($search)) {
-        $searchTerm = '%' . strtolower($search) . '%';
-        $baseQuery .= " AND LOWER(m.nama_member) LIKE '$searchTerm'";
+        $baseQuery .= " AND LOWER(nama_member) LIKE '%' || LOWER('$search') || '%'";
     }
 
     // Array untuk ORDER BY clauses
@@ -42,23 +42,23 @@
 
         if ($status !== 'all') {
             if ($status === 'aktif') {
-                $baseQuery .= " AND m.tanggal_berakhir > CURRENT_DATE";
+                $baseQuery .= " AND tanggal_berakhir > CURRENT_DATE";
             } else if ($status === 'tidak_aktif') {
-                $baseQuery .= " AND m.tanggal_berakhir <= CURRENT_DATE";
+                $baseQuery .= " AND tanggal_berakhir <= CURRENT_DATE";
             }
         }
 
         // Menggunakan `$combinedFilter` untuk menentukan sort
         if ($combinedFilter === 'all-asc') {
-            $orderClauses[] = "m.nama_member ASC";
+            $orderClauses[] = "nama_member ASC";
         } else if ($combinedFilter === 'all-desc') {
-            $orderClauses[] = "m.nama_member DESC";
+            $orderClauses[] = "nama_member DESC";
         }
     }
 
 // Tambahkan sort by date
 if ($sortByDate) {
-    $orderClauses[] = "m.tanggal_berakhir " . ($sortByDate === 'asc' ? 'ASC' : 'DESC') . " NULLS LAST";
+    $orderClauses[] = "tanggal_berakhir " . ($sortByDate === 'asc' ? 'ASC' : 'DESC') . " NULLS LAST";
 }
 
     // Tambahkan ORDER BY ke query jika ada
@@ -88,12 +88,12 @@ if ($sortByDate) {
     $rowAmountMember = $resultAmountMember->fetch(PDO::FETCH_ASSOC);
 
     // Menghitung jumlah member aktif
-    $queryAmountMemberActive = "SELECT COUNT(id_member) AS total_member_aktif FROM member WHERE tanggal_berakhir > CURRENT_DATE";
+    $queryAmountMemberActive = "SELECT COUNT(id_member) AS total_member_aktif FROM view_member_list WHERE tanggal_berakhir > CURRENT_DATE";
     $resultAmountMemberActive = $conn->query($queryAmountMemberActive);
     $rowAmountMemberActive = $resultAmountMemberActive->fetch(PDO::FETCH_ASSOC);
 
     // Menghitung jumlah member tidak aktif
-    $queryAmountMemberNonactive = "SELECT COUNT(id_member) AS total_member_nonaktif FROM member WHERE tanggal_berakhir <= CURRENT_DATE";
+    $queryAmountMemberNonactive = "SELECT COUNT(id_member) AS total_member_nonaktif FROM view_member_list WHERE tanggal_berakhir <= CURRENT_DATE";
     $resultAmountMemberNonactive = $conn->query($queryAmountMemberNonactive);
     $rowAmountMemberNonactive = $resultAmountMemberNonactive->fetch(PDO::FETCH_ASSOC);
 ?>
@@ -287,10 +287,11 @@ if ($sortByDate) {
                         <!-- head table -->
                         <thead>
                             <tr>
-                                <td style="text-align: center;width: 20%;">Nama</td>
+                                <td style="text-align: center;width: 16%;">Nama</td>
                                 <td style="text-align: center; width: 15%;">Nomor Telepon</td>
                                 <td style="text-align: center; width: 10%;">Durasi</td>
                                 <td style="text-align: center; width: 15%;">Keterangan</td>
+                                <td style="text-align: center; width: 15%;">Private Fitness</td>
                                 <td style="text-align: center; width: 15%;">Tanggal Berlaku</td>
                                 <td style="text-align: center; width: 15%;">Aksi</td>
                             </tr>
@@ -312,7 +313,8 @@ if ($sortByDate) {
                                 <td style="text-align: center;"><?= $result['nomor_telepon']?></td>
                                 <td style="text-align: center;"><?= $result['keterangan_durasi']?></td>
                                 <td style="text-align: center;"><?= $result['keterangan_fasilitas']?></td>
-                                <td style="text-align: center;"><?= $result['tanggal_berakhir']?></td>
+                                <td style="text-align: center;"><?= $result['keterangan']?></td>
+                                <td style="text-align: center;"><?= $result['tanggal_berakhir_format']?></td>
                                 <td>
                                     <div class="action container">
                                         <a href="admin-detail.php?id=<?=$result['id_member']; ?>" class="detail">Detail</a>
