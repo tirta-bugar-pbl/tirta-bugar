@@ -12,37 +12,6 @@
     $queryProfileName = "SELECT username FROM admin WHERE id_admin = $adminId";
     $resultProfileName = $conn->query($queryProfileName);
     $rowProfileName = $resultProfileName->fetch(PDO::FETCH_ASSOC);
-
-    // variabel pagination
-    $limit = 10; 
-    $page = isset($_GET['page']) ? $_GET['page'] : 1; 
-    $offset = ($page - 1) * $limit; 
-
-    // Mengambil search
-    $search = isset($_GET['search']) ? $_GET['search'] : '';
-
-    // mengambil data absen
-    if($search) {
-        $queryAbsen = "SELECT * FROM view_member_absen_list WHERE LOWER(nama_member) LIKE '%' || LOWER('$search') || '%'";
-
-        $resultAbsen = $conn->query($queryAbsen);
-
-        // Hitung total absen untuk pagination
-        $queryCount = "SELECT COUNT(DISTINCT id_pertemuan) AS total FROM view_member_absen_list";
-        $resultCount = $conn->query($queryCount);
-        $totalCount = $resultCount->fetch(PDO::FETCH_ASSOC)['total'];
-        $totalPages = ceil($totalCount / $limit);
-    }else {
-        $queryAbsen = "SELECT * FROM view_member_absen_list LIMIT $limit OFFSET $offset";
-
-        $resultAbsen = $conn->query($queryAbsen);
-
-        // Hitung total absen untuk pagination
-        $queryCount = "SELECT COUNT(DISTINCT id_pertemuan) AS total FROM absen_harian";
-        $resultCount = $conn->query($queryCount);
-        $totalCount = $resultCount->fetch(PDO::FETCH_ASSOC)['total'];
-        $totalPages = ceil($totalCount / $limit);
-    }
 ?>
 
 <!DOCTYPE html>
@@ -140,29 +109,28 @@
                         <h2>Absensi Harian</h2>
                     </div>
                     <div class="account">
-            <!-- notif account -->
-            <div id="notification-container" class="notification-container">
-                <div class="notification-icon-wrapper">
-                    <img src="assets/notification.svg" alt="notification" id="notificationIcon">
-                    <span class="notification-badge hidden"></span>
+                        <!-- notif account -->
+                        <div id="notification-container" class="notification-container">
+                            <div class="notification-icon-wrapper">
+                                <img src="assets/notification.svg" alt="notification" id="notificationIcon">
+                                <span class="notification-badge hidden"></span>
+                            </div>
+                        </div>
+                        <div class="account-profile">
+                            <!-- icon account -->
+                            <img src="assets/profile.svg" alt="profile">
+                            <h3><?= $rowProfileName['username']?></h3>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            <!-- Pop-Up Notification -->
+            <div id="notification-popup" class="popup hidden">
+                <div class="popup-content">
+                    <span id="close-popup" class="close">&times;</span>
+                    <ul id="notification-list"></ul>
                 </div>
             </div>
-            <div class="account-profile">
-                <!-- icon account -->
-                <img src="assets/profile.svg" alt="profile">
-                <h3><?= $rowProfileName['username']?></h3>
-            </div>
-        </div>
-            </div>
-                </header>
-        
-            <!-- Pop-Up Notification -->
-        <div id="notification-popup" class="popup hidden">
-            <div class="popup-content">
-                <span id="close-popup" class="close">&times;</span>
-                <ul id="notification-list"></ul>
-            </div>
-        </div>
             <main>
                 <!-- filtering absen -->
                 <section class="filtering-absen">
@@ -190,17 +158,6 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- data table -->
-                            <?php foreach ($resultAbsen as $result) : ?>
-                                <tr>
-                                <td style="text-align: center;"><?= $result['tanggal_datang'] ?></td>
-                                <td><?= $result['nama_member'] ?></td>
-                                <td style="text-align: center;"><?= $result['keterangan_durasi'] ?></td>
-                                <td style="text-align: center;"><?= $result['tanggal_berakhir'] ?></td>
-                                <td style="text-align: center;"><?= $result['keterangan_fasilitas'] ?></td>          
-                                <td style="text-align: center;"><?= $result['keterangan_absen'] ?></td>
-                                </tr>
-                            <?php endforeach; ?>
                         </tbody>
                     </table>
                 </section>
@@ -208,14 +165,77 @@
                 <section class="pagination">
                     <div class="container">
                         <ul>
-                            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                                <li><a href="?page=<?= $i ?>&search=<?= $search ?>" class="<?= ($i == $page) ? 'active' : '' ?>"><?= $i ?></a></li>
-                            <?php endfor; ?>
                         </ul>
                     </div>
                 </section>
             </main>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('search');
+            const searchForm = document.querySelector('form');
+
+            function fetchData(page = 1) {
+                const params = new URLSearchParams({
+                    page: page,
+                    search: searchInput.value
+                });
+
+                fetch('./json/tampil-data-absen.php?' + params.toString())
+                    .then(response => response.json())
+                    .then(data => {
+                        renderTable(data.absens);
+                        renderPagination(data.totalPages, data.currentPage);
+                    })
+                    .catch(error => console.error('Error fetching data:', error));
+            }
+
+            function renderTable(absens) {
+                const tbody = document.querySelector('tbody');
+                tbody.innerHTML = '';
+
+                absens.forEach(absen => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${absen.tanggal_datang}</td>
+                        <td style="text-align: center;">${absen.nama_member}</td>
+                        <td style="text-align: center;">${absen.keterangan_durasi}</td>
+                        <td style="text-align: center;">${absen.tanggal_berakhir}</td>
+                        <td style="text-align: center;">${absen.keterangan_fasilitas}</td>
+                        <td style="text-align: center;">${absen.keterangan_absen}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            // fungsi render pagination
+            function renderPagination(totalPages, currentPage) {
+                const pagination = document.querySelector('.pagination ul');
+                pagination.innerHTML = '';
+
+                for (let i = 1; i <= totalPages; i++) {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<a href="#" class="${i === currentPage ? 'active' : ''}" data-page="${i}">${i}</a>`;
+                    pagination.appendChild(li);
+                }
+
+                document.querySelectorAll('.pagination a').forEach(link => {
+                    link.addEventListener('click', function(event) {
+                        event.preventDefault();
+                        const page = parseInt(this.getAttribute('data-page'));
+                        fetchData(page);
+                    });
+                });
+            }
+
+            searchForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+                fetchData(1);
+            });
+
+            fetchData();
+        });
+    </script>
 </body>
 </html>

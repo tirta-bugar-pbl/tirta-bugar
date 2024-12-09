@@ -12,11 +12,6 @@
     $queryProfileName = "SELECT username FROM admin WHERE id_admin = $adminId";
     $resultProfileName = $conn->query($queryProfileName);
     $rowProfileName = $resultProfileName->fetch(PDO::FETCH_ASSOC);
-
-    // mengambil data paket
-    $queryTampilPaket = "SELECT id_paket, nama_paket, keterangan_fasilitas, keterangan_durasi, 'Rp ' || TO_CHAR(harga, 'FM999,999,999') as harga, COALESCE(keterangan_private, '-') as keterangan_private FROM paket_member";
-    $resultTampilPaket = $conn->query($queryTampilPaket);
-    $rowTampilPaket = $resultTampilPaket->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -157,32 +152,52 @@
                             </tr>
                         </thead>
                         <tbody>
-                        <?php foreach ($rowTampilPaket as $result) : ?>
-                            <tr>
-                                <td><?= $result['nama_paket']?></td>
-                                <td><?= $result['harga']?></td>
-                                <td><?= $result['keterangan_durasi']?></td>
-                                <td><?= $result['keterangan_fasilitas']?></td>
-                                <td><?= $result['keterangan_private']?></td>
-                                <td>
-                                    <!-- Tombol Edit -->
-                                    <form action="admin-edit-paket.php" method="GET" style="display: inline;">
-                                        <input type="hidden" name="id_paket" value="<?= $result['id_paket'] ?>">
-                                        <button type="submit" class="btn-edit">Edit</button>
-                                    </form>
-                                    <!-- Tombol Hapus -->
-                                    <form action="hapus-paket.php" method="POST" style="display: inline;">
-                                        <input type="hidden" name="id_paket" value="<?= $result['id_paket'] ?>">
-                                        <button type="submit" class="btn-hapus" onclick="return confirm('Apakah Anda yakin ingin menghapus paket ini?')">Hapus</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
                         </tbody>
                     </table>
                 </section>
             </main>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            function fetchData() {
+                fetch('./json/tampil-data-paket-member.php')
+                    .then(response => response.json())
+                    .then(data => {
+                        renderTable(data);
+                    })
+                    .catch(error => console.error('Error fetching data:', error));
+            }
+
+            function renderTable(pakets) {
+                const tbody = document.querySelector('tbody');
+                tbody.innerHTML = '';
+
+                pakets.forEach(paket => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${paket.nama_paket}</td>
+                        <td>${paket.harga}</td>
+                        <td>${paket.keterangan_durasi}</td>
+                        <td>${paket.keterangan_fasilitas}</td>
+                        <td>${paket.keterangan_private}</td>
+                        <td>
+                            <form action="admin-edit-paket.php" method="GET" style="display: inline;">
+                                <input type="hidden" name="id_paket" value="${paket.id_paket}">
+                                <button type="submit" class="btn-edit">Edit</button>
+                            </form>
+                            <form action="hapus-paket.php" method="POST" style="display: inline;">
+                                <input type="hidden" name="id_paket" value="${paket.id_paket}">
+                                <button type="submit" class="btn-hapus" onclick="return confirm('Apakah Anda yakin ingin menghapus paket ini?')">Hapus</button>
+                            </form>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            fetchData();
+        });
+    </script>
 </body>
 </html>

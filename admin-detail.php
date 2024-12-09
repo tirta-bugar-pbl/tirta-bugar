@@ -15,7 +15,8 @@
 
     // mengambil data detail member
     $id = $_GET['id'];
-    $queryDetailMember = "SELECT m.nama_member, m.email, m.password, m.nomor_telepon, TO_CHAR(m.tanggal_awal, 'DD Month YYYY') as tanggal_awal, TO_CHAR(m.tanggal_berakhir, 'DD Month YYYY') as tanggal_berakhir, p.nama_paket, p.keterangan_fasilitas, p.keterangan_durasi, COALESCE(p.keterangan_private, '-') as keterangan_private FROM member m LEFT OUTER JOIN paket_member p ON m.id_paket = p.id_paket WHERE m.id_member = $id";
+    // $queryDetailMember = "SELECT m.nama_member, m.email, m.password, m.nomor_telepon, TO_CHAR(m.tanggal_awal, 'DD Month YYYY') as tanggal_awal, TO_CHAR(m.tanggal_berakhir, 'DD Month YYYY') as tanggal_berakhir, p.nama_paket, p.keterangan_fasilitas, p.keterangan_durasi, COALESCE(p.keterangan_private, '-') as keterangan_private FROM member m LEFT OUTER JOIN paket_member p ON m.id_paket = p.id_paket WHERE m.id_member = $id";
+    $queryDetailMember = "SELECT * FROM view_detail_member WHERE id_member = $id";
     $resultDetailMember = $conn->query($queryDetailMember);
     $rowDetailMember = $resultDetailMember->fetch(PDO::FETCH_ASSOC);
 ?>
@@ -146,52 +147,52 @@
                         <div class="detail-member-group container">
                             <p class="label-nama">Nama</p>
                             <p>:</p>
-                            <p><?= $rowDetailMember['nama_member']?></p>
+                            <p id="nama-member"><?= $rowDetailMember['nama_member']?></p>
                         </div>
                         <div class="detail-member-group container">
                             <p class="label-phone">Nomor Telepon</p>
                             <p>:</p>
-                            <p><?= $rowDetailMember['nomor_telepon']?></p>
+                            <p id="nomor-telepon"><?= $rowDetailMember['nomor_telepon']?></p>
                         </div>
                         <div class="detail-member-group container">
                             <p class="label-email">Email</p>
                             <p>:</p>
-                            <p><?= $rowDetailMember['email']?></p>
+                            <p id="email"><?= $rowDetailMember['email']?></p>
                         </div>
                         <div class="detail-member-group container">
                             <p class="label-password">Password</p>
                             <p>:</p>
-                            <p><?= $rowDetailMember['password']?></p>
+                            <p id="password"><?= $rowDetailMember['password']?></p>
                         </div>
                         <div class="detail-member-group container">
                             <p class="label-paket">Jenis Paket</p>
                             <p>:</p>
-                            <p><?= $rowDetailMember['nama_paket']?></p>
+                            <p id="paket"><?= $rowDetailMember['nama_paket']?></p>
                         </div>
                         <div class="detail-member-group container">
                             <p class="label-durasi">Durasi</p>
                             <p>:</p>
-                            <p><?= $rowDetailMember['keterangan_durasi'] ?></p>
+                            <p id="durasi"><?= $rowDetailMember['keterangan_durasi'] ?></p>
                         </div>
                         <div class="detail-member-group container">
                             <p class="label-date-start">Tanggal Awal</p>
                             <p>:</p>
-                            <p><?= $rowDetailMember['tanggal_awal'] ?></p>
+                            <p id="date-start"><?= $rowDetailMember['tanggal_awal'] ?></p>
                         </div>
                         <div class="detail-member-group container">
                             <p class="label-date-end">Tanggal Akhir</p>
                             <p>:</p>
-                            <p><?= $rowDetailMember['tanggal_berakhir'] ?></p>
+                            <p id="date-end"><?= $rowDetailMember['tanggal_berakhir'] ?></p>
                         </div>
                         <div class="detail-member-group container">
                             <p class="label-keterangan">Keterangan</p>
                             <p>:</p>
-                            <p><?= $rowDetailMember['keterangan_fasilitas'] ?></p>
+                            <p id="keterangan"><?= $rowDetailMember['keterangan_fasilitas'] ?></p>
                         </div>
                         <div class="detail-member-group container">
                             <p class="label-keterangan">Private Fitness</p>
                             <p>:</p>
-                            <p><?= $rowDetailMember['keterangan_private'] ?></p>
+                            <p id="private"><?= $rowDetailMember['keterangan_private'] ?></p>
                         </div>
                     </div>
                     <div class="btn-group container">
@@ -202,5 +203,34 @@
             </main>
         </div>
     </div>
+    <!-- <script>
+        const memberId = <?= json_decode($id) ?>;
+        function fetchDetailData(id) {
+            fetch('./json/tampil-detail-member.php?id=' + id)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        console.error(data.error);
+                    } else {
+                        // Tampilkan data di halaman
+                        console.log(data);
+                        document.getElementById('nama-member').textContent = data.nama_member;
+                        document.getElementById('nomor-telepon').textContent = data.nomor_telepon;
+                        document.getElementById('email').textContent = data.email;
+                        document.getElementById('password').textContent = data.password;
+                        document.getElementById('paket').textContent = data.nama_paket;
+                        document.getElementById('durasi').textContent = data.keterangan_durasi;
+                        document.getElementById('date-start').textContent = data.tanggal_awal;
+                        document.getElementById('date-end').textContent = data.tanggal_berakhir;
+                        document.getElementById('keterangan').textContent = data.keterangan_fasilitas;
+                        document.getElementById('private').textContent = data.keterangan_private;
+                    }
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
+
+        // Contoh penggunaan: mengambil detail data dengan ID 1
+        fetchDetailData(memberId);
+    </script> -->
 </body>
 </html>

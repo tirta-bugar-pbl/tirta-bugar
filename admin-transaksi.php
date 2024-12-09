@@ -17,50 +17,6 @@
     $resultProfileName = $conn->query($queryProfileName);
     $rowProfileName = $resultProfileName->fetch(PDO::FETCH_ASSOC);
 
-    
-
-    // logika pagination
-    $limit = 10; // Example limit per page
-    $page = isset($_GET['page']) ? $_GET['page'] : 1; // Current page, default to 1
-    $offset = ($page - 1) * $limit; // Offset for SQL query 
-
-    $filter = isset($_GET['filter']) ? $_GET['filter'] : '';
-    $search = isset($_GET['search']) ? $_GET['search'] : '';
-
-    $queryTransaksi = "SELECT * FROM view_member_transaction_list WHERE 1=1";
-
-    
-    // Hitung total transaksi untuk pagination
-    $queryCount = "SELECT COUNT(DISTINCT id_transaksi) AS total FROM view_member_transaction_list";
-    $resultCount = $conn->query($queryCount);
-    $totalCount = $resultCount->fetch(PDO::FETCH_ASSOC)['total'];
-    $totalPages = ceil($totalCount / $limit);
-
-    // kondisi searching 
-    if (!empty($search)) {
-        $queryTransaksi .= " AND LOWER(nama_member) LIKE '%' || LOWER('$search') || '%'";
-    } 
-
-    // Tambahkan filter waktu
-    if ($filter == 'today') {
-        $queryTransaksi .= " AND DATE(tanggal_transaksi) = CURRENT_DATE";
-    } else if ($filter == 'week') {
-        $queryTransaksi .= " AND DATE(tanggal_transaksi) >= (CURRENT_DATE - INTERVAL '7 days')";
-    } else if ($filter == 'month') {
-        $queryTransaksi .= " AND DATE_PART('month', tanggal_transaksi) = DATE_PART('month', CURRENT_DATE) AND DATE_PART('year', tanggal_transaksi) = DATE_PART('year', CURRENT_DATE)";
-    }
-
-    // Tambahkan LIMIT dan OFFSET untuk pagination
-    $queryTransaksi .= " LIMIT $limit OFFSET $offset";
-
-    // Eksekusi query
-    $resultTransaksi = $conn->query($queryTransaksi);
-
-    // Hitung total transaksi untuk pagination
-    $queryCount = "SELECT COUNT(DISTINCT id_transaksi) AS total FROM view_member_transaction_list";
-    $resultCount = $conn->query($queryCount);
-    $totalCount = $resultCount->fetch(PDO::FETCH_ASSOC)['total'];
-    $totalPages = ceil($totalCount / $limit);
 ?>
 
 <!DOCTYPE html>
@@ -190,16 +146,16 @@
                         <div class="filter-transaksi">
                             <select name="filter" id=filter onchange="applyFilter()">
                                 <option value="">Filter</option>
-                                <option value="today" <?= isset($_GET['filter']) && $_GET['filter'] === 'today' ? 'selected' : '' ?>>Hari Ini</option>
-                                <option value="week" <?= isset($_GET['filter']) && $_GET['filter'] === 'week' ? 'selected' : '' ?>>Minggu Ini</option>
-                                <option value="month" <?= isset($_GET['filter']) && $_GET['filter'] === 'month' ? 'selected' : '' ?>>Bulan ini</option>
+                                <option value="today">Hari Ini</option>
+                                <option value="week">Minggu Ini</option>
+                                <option value="month">Bulan ini</option>
                             </select>
                         </div>
                         <!-- search member -->
                         <div class="search-transaksi container">
-        <input type="text" name="search" id="search" placeholder="Search" value="<?= htmlspecialchars($search) ?>">
-        <img src="assets/search.svg" alt="search">
-    </div>
+                            <input type="text" name="search" id="search" placeholder="Search">
+                            <img src="assets/search.svg" alt="search">
+                        </div>
                 </section>
                 <section class="member-table">
                     <table>
@@ -218,18 +174,6 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($resultTransaksi as $result) : ?>
-                                <tr>
-                                <td style="text-align: center;"><?= $result['tanggal_transaksi_formated']?></td>
-                                <td style="text-align: center;"><?= $result['invoice']?></td>
-                                <td><?= $result['nama_member']?></td>
-                                <td style="text-align: center;"><?= $result['nomor_telepon']?></td>
-                                <td style="text-align: center;"><?= $result['keterangan_durasi']?></td>
-                                <td style="text-align: center;"><?= $result['keterangan_fasilitas']?></td>
-                                <td style="text-align: center;"><b><?= $result['status_pembayaran']?></b></td>
-                                <td style="text-align: center;"><?= rupiah($result['total_harga'])?></td>
-                            </tr>
-                            <?php endforeach; ?>
                         </tbody>
                     </table>
                 </section>
@@ -237,9 +181,6 @@
                 <section class="pagination">
                     <div class="container">
                         <ul>
-                            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                                <li><a href="?page=<?= $i ?>&search=<?= $search ?>" class="<?= ($i == $page) ? 'active' : '' ?>"><?= $i ?></a></li>
-                            <?php endfor; ?>
                         </ul>
                     </div>
                 </section>
@@ -247,13 +188,83 @@
         </div>
     </div>
     <script>
-        function applyFilter() {
-            const filter = document.getElementById('filter').value;
-            const url = new URL(window.location.href);
-            url.searchParams.set('filter', filter);
-            window.location.href = url.toString();
-        }
-     
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterSelect = document.getElementById('filter');
+            const searchInput = document.getElementById('search');
+            const searchForm = document.querySelector('form');
+
+            // konversi ke mata uang rupiah
+            function formatRupiah(angka) {
+                return 'Rp ' + angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+            }
+
+            // pengambilan data
+            function fetchData(page = 1) {
+                const params = new URLSearchParams({
+                    page: page,
+                    filter: filterSelect.value,
+                    search: searchInput.value,
+                });
+
+                fetch('./json/tampil-data-transkasi.php?' + params.toString())
+                    .then(response => response.json())
+                    .then(data => {
+                        renderTable(data.transactions);
+                        renderPagination(data.totalPages, data.currentPage);
+                    })
+                    .catch(error => console.error('Error fetching data:', error));
+            }
+
+            // render table
+            function renderTable(transactions) {
+                const tbody = document.querySelector('tbody');
+                tbody.innerHTML = '';
+
+                transactions.forEach(transaction => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td style="text-align: center;">${transaction.tanggal_transaksi_formated}</td>
+                        <td style="text-align: center;">${transaction.invoice}</td>
+                        <td>${transaction.nama_member}</td>
+                        <td style="text-align: center;">${transaction.nomor_telepon}</td>
+                        <td style="text-align: center;">${transaction.keterangan_durasi}</td>
+                        <td style="text-align: center;">${transaction.keterangan_fasilitas}</td>
+                        <td style="text-align: center;"><b>${transaction.status_pembayaran}</b></td>
+                        <td style="text-align: center;">${transaction.total_harga}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            // render pagination
+            function renderPagination(totalPages, currentPage) {
+                const pagination = document.querySelector('.pagination ul');
+                pagination.innerHTML = '';
+
+                for (let i = 1; i <= totalPages; i++) {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<a href="#" class="${i === currentPage ? 'active' : ''}" data-page="${i}">${i}</a>`;
+                    pagination.appendChild(li);
+                }
+
+                document.querySelectorAll('.pagination a').forEach(link => {
+                    link.addEventListener('click', function(event) {
+                        event.preventDefault();
+                        const page = parseInt(this.getAttribute('data-page'));
+                        fetchData(page);
+                    });
+                });
+            }
+
+            filterSelect.addEventListener('change', () => fetchData(1));
+            searchForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+                fetchData(1);
+            });
+
+            fetchData();
+        });
     </script>
+
 </body>
 </html>
