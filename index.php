@@ -46,7 +46,7 @@
                     </button>
                 </a>
             </nav>
-            <!-- Sidebar for Mobile -->
+            <!-- Sidebar for Mobile -->xx
             <div id="sidebar" class="sidebar hideOnDesktop">
                 <ul>
                     <li><a href="#home" onclick="toggleSidebar()">Home</a></li>
