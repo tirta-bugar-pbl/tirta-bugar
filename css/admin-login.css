@@ -89,6 +89,11 @@ input[type="password"], input[type="text"] {
     margin-top: 40px;
 }
 
+.btn-group.container {
+    justify0content: center;
+    flex-direction: column;
+}
+
 .btn-group p {
     font-weight: 500;
     margin-top: 12px;

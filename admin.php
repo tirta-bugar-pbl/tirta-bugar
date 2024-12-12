@@ -7,97 +7,12 @@
         exit();
     }
 
-    // variabel pagination
-    $limit = 10;
-    $page = isset($_GET['page']) ? (int)$_GET['page'] : 1; 
-    $offset = ($page - 1) * $limit; 
-
-    // mengambil data profile
+    // mengambil data profile di php
     $adminId = $_SESSION['id_admin'];
     $queryProfileName = "SELECT username FROM admin WHERE id_admin = $adminId";
     $resultProfileName = $conn->query($queryProfileName);
     $rowProfileName = $resultProfileName->fetch(PDO::FETCH_ASSOC);
-
-    // Mengambil nilai filter dari URL
-    $combinedFilter = isset($_GET['combined_filter']) ? $_GET['combined_filter'] : '';
-    $search = isset($_GET['search']) ? $_GET['search'] : '';
-    $sortByDate = isset($_GET['sort_by_date']) ? $_GET['sort_by_date'] : '';
-
-    // Query dasar
-    $baseQuery = "SELECT m.id_member, m.nama_member, m.nomor_telepon, p.keterangan_durasi, p.keterangan_fasilitas, m.tanggal_berakhir, TO_CHAR(m.tanggal_berakhir, 'DD Month YYYY') as tanggal_berakhir, (m.tanggal_berakhir - m.tanggal_awal) AS selisih FROM member m LEFT JOIN paket_member p ON p.id_paket = m.id_paket WHERE 1=1";
-
-    // Tambahkan kondisi pencarian
-    if (!empty($search)) {
-        $searchTerm = '%' . strtolower($search) . '%';
-        $baseQuery .= " AND LOWER(m.nama_member) LIKE '$searchTerm'";
-    }
-
-    // Array untuk ORDER BY clauses
-    $orderClauses = array();
-
-
-    // Tambahkan kondisi filter gabungan
-    if ($combinedFilter) {
-        list($status) = explode('-', $combinedFilter);
-
-        if ($status !== 'all') {
-            if ($status === 'aktif') {
-                $baseQuery .= " AND m.tanggal_berakhir > CURRENT_DATE";
-            } else if ($status === 'tidak_aktif') {
-                $baseQuery .= " AND m.tanggal_berakhir <= CURRENT_DATE";
-            }
-        }
-
-        // Menggunakan `$combinedFilter` untuk menentukan sort
-        if ($combinedFilter === 'all-asc') {
-            $orderClauses[] = "m.nama_member ASC";
-        } else if ($combinedFilter === 'all-desc') {
-            $orderClauses[] = "m.nama_member DESC";
-        }
-    }
-
-// Tambahkan sort by date
-if ($sortByDate) {
-    $orderClauses[] = "m.tanggal_berakhir " . ($sortByDate === 'asc' ? 'ASC' : 'DESC') . " NULLS LAST";
-}
-
-    // Tambahkan ORDER BY ke query jika ada
-    if (!empty($orderClauses)) {
-        $baseQuery .= " ORDER BY " . implode(", ", $orderClauses);
-    }
-
-    // Query untuk menghitung total records
-    $countQuery = preg_replace('/SELECT.*?FROM/s', 'SELECT COUNT(*) as total FROM', $baseQuery);
-    $countQuery = preg_replace('/ORDER BY.*$/', '', $countQuery);
-
-    // Eksekusi query untuk menghitung total records
-    $stmt = $conn->query($countQuery);
-    $rowCount = $stmt->fetch(PDO::FETCH_ASSOC);
-    $totalPages = ceil($rowCount['total'] / $limit);
-
-    // Tambahkan LIMIT dan OFFSET
-    $baseQuery .= " LIMIT $limit OFFSET $offset";
-
-    // Eksekusi query final
-    $stmt = $conn->query($baseQuery);
-    $resultMember = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    // Statistik tetap sama seperti sebelumnya
-    $queryAmountMember = "SELECT COUNT(id_member) As total_member FROM member";
-    $resultAmountMember = $conn->query($queryAmountMember);
-    $rowAmountMember = $resultAmountMember->fetch(PDO::FETCH_ASSOC);
-
-    // Menghitung jumlah member aktif
-    $queryAmountMemberActive = "SELECT COUNT(id_member) AS total_member_aktif FROM member WHERE tanggal_berakhir > CURRENT_DATE";
-    $resultAmountMemberActive = $conn->query($queryAmountMemberActive);
-    $rowAmountMemberActive = $resultAmountMemberActive->fetch(PDO::FETCH_ASSOC);
-
-    // Menghitung jumlah member tidak aktif
-    $queryAmountMemberNonactive = "SELECT COUNT(id_member) AS total_member_nonaktif FROM member WHERE tanggal_berakhir <= CURRENT_DATE";
-    $resultAmountMemberNonactive = $conn->query($queryAmountMemberNonactive);
-    $rowAmountMemberNonactive = $resultAmountMemberNonactive->fetch(PDO::FETCH_ASSOC);
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -113,6 +28,7 @@ if ($sortByDate) {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+    <script src= notifications.js></script>
 </head>
 
 <body>
@@ -187,22 +103,37 @@ if ($sortByDate) {
             </a>
         </div>
         <div class="content">
-            <header>
-                <div class="container">
-                    <div class="title-page">
-                        <h2>Beranda</h2>
-                    </div>
-                    <div class="account">
-                        <!-- notif account -->
-                        <img src="assets/notification.svg" alt="notifivation">
-                        <div class="account-profile">
-                            <!-- icon account -->
-                            <img src="assets/profile.svg" alt="profile">
-                            <h3><?= $rowProfileName['username']?></h3>
+        <header>
+            <div class="container">
+                <div class="title-page">
+                    <h2>Beranda</h2>
+                </div>
+
+                <div class="account">
+                <!-- notif account -->
+                    <div id="notification-container" class="notification-container">
+                        <div class="notification-icon-wrapper">
+                            <img src="assets/notification.svg" alt="notification" id="notificationIcon">
+                            <span class="notification-badge hidden"></span>
                         </div>
                     </div>
+                    <div class="account-profile">
+                        <!-- icon account -->
+                        <img src="assets/profile.svg" alt="profile">
+                        <h3><?= $rowProfileName['username']?></h3>
+                    </div>
                 </div>
-            </header>
+            </div>
+        </header>
+        
+            <!-- Pop-Up Notification -->
+        <div id="notification-popup" class="popup hidden">
+            <div class="popup-content">
+                <span id="close-popup" class="close">&times;</span>
+                <ul id="notification-list"></ul>
+            </div>
+        </div>
+
             <main>
                 <!-- amount member -->
                 <section class="amount-member">
@@ -217,7 +148,7 @@ if ($sortByDate) {
                             <!-- title amount -->
                             <div class="title-amount-group">
                                 <h3>Jumlah Member</h3>
-                                <h4><?= $rowAmountMember['total_member']?></h4>
+                                <h4 id="total-member">0</h4>
                             </div>
                         </div>
                         <div class="card-member-amount container">
@@ -228,7 +159,7 @@ if ($sortByDate) {
                             <!-- title amount -->
                             <div class="title-amount-group">
                                 <h3>Masih Aktif</h3>
-                                <h4><?= $rowAmountMemberActive['total_member_aktif'] ?></h4>
+                                <h4 id="total-member-active">0</h4>
                             </div>
                         </div>
                         <div class="card-member-amount container">
@@ -239,7 +170,7 @@ if ($sortByDate) {
                             <!-- title amount -->
                             <div class="title-amount-group">
                                 <h3>Tidak Aktif</h3>
-                                <h4><?= $rowAmountMemberNonactive['total_member_nonaktif']?></h4>
+                                <h4 id="total-member-nonactive">0</h4>
                             </div>
                         </div>
                     </div>
@@ -255,10 +186,10 @@ if ($sortByDate) {
                                     <div class="filter-member">
                                         <select name="combined_filter" id="combined_filter">
                                             <option value="">Filter & Sort</option>
-                                            <option value="all-asc" <?= $combinedFilter === 'all-asc' ? 'selected' : '' ?>>A - Z</option>
-                                            <option value="all-desc" <?= $combinedFilter === 'all-desc' ? 'selected' : '' ?>>Z - A</option>
-                                            <option value="aktif" <?= $combinedFilter === 'aktif' ? 'selected' : '' ?>>Members Aktif</option>
-                                            <option value="tidak_aktif" <?= $combinedFilter === 'tidak_aktif' ? 'selected' : '' ?>>Member Tidak Aktif</option>
+                                            <option value="all-asc">A - Z</option>
+                                            <option value="all-desc">Z - A</option>
+                                            <option value="aktif">Members Aktif</option>
+                                            <option value="tidak_aktif">Member Tidak Aktif</option>
                                         </select>
                                     </div>
                                 </div>
@@ -267,15 +198,15 @@ if ($sortByDate) {
                                     <div class="filter-member">
                                         <select name="sort_by_date" id="sort_by_date">
                                             <option value="">Sort by Date</option>
-                                            <option value="asc" <?= $sortByDate === 'asc' ? 'selected' : '' ?>>Lama ke Baru</option>
-                                            <option value="desc" <?= $sortByDate === 'desc' ? 'selected' : '' ?>>Baru ke Lama</option>
+                                            <option value="asc">Lama ke Baru</option>
+                                            <option value="desc">Baru ke Lama</option>
                                         </select>
                                     </div>
                                 </div>
                             </div>
                             <!-- search member -->
                             <div class="search-member container">
-                                <input type="text" name="search" id="search" placeholder="Search" value="<?= htmlspecialchars($search) ?>">
+                                <input type="text" name="search" id="search" placeholder="Search">
                                 <img src="assets/search.svg" alt="search">
                             </div>    
                         </div>
@@ -287,40 +218,16 @@ if ($sortByDate) {
                         <!-- head table -->
                         <thead>
                             <tr>
-                                <td style="text-align: center;width: 20%;">Nama</td>
+                                <td style="text-align: center;width: 16%;">Nama</td>
                                 <td style="text-align: center; width: 15%;">Nomor Telepon</td>
                                 <td style="text-align: center; width: 10%;">Durasi</td>
                                 <td style="text-align: center; width: 15%;">Keterangan</td>
+                                <td style="text-align: center; width: 15%;">Private Fitness</td>
                                 <td style="text-align: center; width: 15%;">Tanggal Berlaku</td>
                                 <td style="text-align: center; width: 15%;">Aksi</td>
                             </tr>
                         </thead>
                         <tbody>
-                        <?php foreach ($resultMember as $result) : ?>
-                            <?php 
-                                $style = '';
-
-                                // kondisi menentukan 
-                                if($result['selisih'] == 7) {
-                                    $style = "style='background-color: yellow';";
-                                } elseif ($result['selisih'] == 0) {
-                                    $style = "style='background-color: red';";
-                                } 
-                            ?>
-                            <tr <?= $style ?>>
-                                <td><?= $result['nama_member']?></td>
-                                <td style="text-align: center;"><?= $result['nomor_telepon']?></td>
-                                <td style="text-align: center;"><?= $result['keterangan_durasi']?></td>
-                                <td style="text-align: center;"><?= $result['keterangan_fasilitas']?></td>
-                                <td style="text-align: center;"><?= $result['tanggal_berakhir']?></td>
-                                <td>
-                                    <div class="action container">
-                                        <a href="admin-detail.php?id=<?=$result['id_member']; ?>" class="detail">Detail</a>
-                                        <a href="delete-member.php?id=<?=$result['id_member']; ?>" class="hapus"  onclick="return confirm('Apakah Anda yakin ingin menghapus member ini?')">Hapus</a>
-                                    </div>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
                         </tbody>
                     </table>
                 </section>
@@ -328,13 +235,6 @@ if ($sortByDate) {
                 <section class="pagination">
                     <div class="container">
                         <ul>
-                            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                                <li>
-                                    <a href="?page=<?= $i ?>&combined_filter=<?= urlencode($combinedFilter) ?>&search=<?= urlencode($search) ?>&sort_by_date=<?= urlencode($sortByDate) ?>"  class="<?= ($i == $page) ? 'active' : '' ?>">
-                                        <?= $i ?>
-                                    </a>
-                                </li>
-                            <?php endfor; ?>
                         </ul>
                     </div>
                 </section>
@@ -349,6 +249,117 @@ if ($sortByDate) {
         document.getElementById('sort_by_date').addEventListener('change', function() {
             this.form.submit();
         });
-    </script>
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const combinedFilter = document.getElementById('combined_filter');
+            const sortByDate = document.getElementById('sort_by_date');
+            const searchInput = document.getElementById('search');
+            const searchForm = document.querySelector('form');
+
+            // Fungsi untuk mengatur pilihan yang sudah dipilih sebelumnya
+            function setInitialSelections() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const combinedFilterValue = urlParams.get('combined_filter');
+                const sortByDateValue = urlParams.get('sort_by_date');
+
+                if (combinedFilterValue) {
+                    combinedFilter.value = combinedFilterValue;
+                }
+                if (sortByDateValue) {
+                    sortByDate.value = sortByDateValue;
+                }
+            }
+
+            // Fungsi untuk memuat data member
+            function fetchData(page = 1) {
+                const params = new URLSearchParams({
+                    page: page,
+                    combined_filter: combinedFilter.value,
+                    search: searchInput.value,
+                    sort_by_date: sortByDate.value
+                });
+
+                fetch('./json/tampil-data-member.php?' + params.toString())
+                    .then(response => response.json())
+                    .then(data => {
+                        renderTable(data.members);
+                        renderPagination(data.totalPages, page);
+                        renderAmount(data.total_member, data.total_member_aktif, data.total_member_nonaktif);
+                    })
+                    .catch(error => console.error('Error fetching data:', error));
+            }
+
+            // Fungsi untuk menampilkan data member
+            function renderTable(members) {
+                const tbody = document.querySelector('tbody');
+                tbody.innerHTML = '';
+
+                members.forEach(member => {
+                    const tr = document.createElement('tr');
+                    if(member.selisih == 0) {
+                        tr.classList.add('habis');
+                    }
+                    tr.innerHTML = `
+                        <td>${member.nama_member}</td>
+                        <td style="text-align: center;">${member.nomor_telepon}</td>
+                        <td style="text-align: center;">${member.keterangan_durasi}</td>
+                        <td style="text-align: center;">${member.keterangan_fasilitas}</td>
+                        <td style="text-align: center;">${member.keterangan}</td>
+                        <td style="text-align: center;">${member.format_tanggal_berakhir}</td>
+                        <td>
+                            <div class="action container">
+                                <a href="admin-detail.php?id=${member.id_member}" class="detail">Detail</a>
+                                <a href="delete-member.php?id=${member.id_member}" class="hapus" onclick="return confirm('Apakah Anda yakin ingin menghapus member ini?')">Hapus</a>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            // fungsi render pagination
+            function renderPagination(totalPages, currentPage) {
+                const pagination = document.querySelector('.pagination ul');
+                pagination.innerHTML = '';
+
+                for (let i = 1; i <= totalPages; i++) {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<a href="#" class="${i === currentPage ? 'active' : ''}" data-page="${i}">${i}</a>`;
+                    pagination.appendChild(li);
+                }
+
+                document.querySelectorAll('.pagination a').forEach(link => {
+                    link.addEventListener('click', function(event) {
+                        event.preventDefault();
+                        const page = parseInt(this.getAttribute('data-page'));
+                        fetchData(page);
+                    });
+                });
+            }
+
+            // fungsi render jumlah
+            function renderAmount(totalMember, totalMemberAktif, totalMemberNonaktif) {
+                const totalMemberElement = document.getElementById('total-member');
+                const totalMemberAktifElement = document.getElementById('total-member-active');
+                const totalMemberNonaktifElement = document.getElementById('total-member-nonactive');
+
+                totalMemberElement.textContent = totalMember;
+                totalMemberAktifElement.textContent = totalMemberAktif;
+                totalMemberNonaktifElement.textContent = totalMemberNonaktif;
+            }
+
+            combinedFilter.addEventListener('change', () => fetchData(1));
+            sortByDate.addEventListener('change', () => fetchData(1));
+
+            searchForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+                fetchData(1);
+            });
+
+            setInitialSelections();
+            fetchData();
+        });
+
+</script>
 </body>
 </html>

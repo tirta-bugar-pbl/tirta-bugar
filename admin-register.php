@@ -23,7 +23,8 @@
                 alert('Email sudah terdaftar, silahkan gunakan email yang lain!');
             </script>";
         } else {
-            $sql = "INSERT INTO admin (username, email, password,token_verify,status_verify) VALUES ('$username', '$email', '$hash_pass', '$verify_token', 0)";
+            // $sql = "INSERT INTO admin (username, email, password,token_verify,status_verify) VALUES ('$username', '$email', '$hash_pass', '$verify_token', 0)";
+            $sql = "CALL register_admin('$username', '$email', '$hash_pass', '$verify_token')";
 
             if ($conn->query($sql)) {
                  // variabel untuk mengirim email
@@ -52,8 +53,8 @@
     <title>Admin</title>
     <link rel="stylesheet" href="css/admin.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="css/admin-register.css?v=<?php echo time(); ?>">
-     <!-- link favicon -->
-     <link rel="shortcut icon" href="assets/logo-favicon.png" type="image/x-icon">
+    <!-- link favicon -->
+    <link rel="shortcut icon" href="assets/logo-favicon.png" type="image/x-icon">
         <!-- link google font -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
