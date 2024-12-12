@@ -53,7 +53,12 @@
             $paket = $resultPaket->fetch(PDO::FETCH_ASSOC);
 
             if($paket) {
-                $queryTambahMember = "INSERT INTO member(nama_member, email, password, nomor_telepon, no_kwitansi, status, tanggal_awal, tanggal_berakhir, id_paket) VALUES ('$nama', '$email', '$pwHash', '$nomor_telepon', null, 'aktif', CURRENT_DATE, CURRENT_DATE + INTERVAL '$durasi month', '$durasi')";
+                $queryTransaksi = "CALL tambah_member_transaksi('$nama','$email','$pwHash', '$nomor_telepon','$durasi','$invoice','$harga_paket')";
+
+                $resultTransaksi = $conn->query($queryTransaksi);  
+
+                /*
+                $queryTambahMember = "INSERT INTO member(nama_member, email, password, nomor_telepon, tanggal_awal, tanggal_berakhir, id_paket) VALUES ('$nama', '$email', '$pwHash', '$nomor_telepon', null, 'aktif', CURRENT_DATE, CURRENT_DATE + INTERVAL '$durasi month', '$durasi')";
 
                 $resultMember = $conn->query($queryTambahMember);   
 
@@ -66,6 +71,13 @@
                     unset($_SESSION['form_data']);
                     unset($_SESSION['invoice']);
                     echo "<script>alert('Pembayaran berhasil diproses!'); window.location.href = 'index.php';</script>";
+                }
+                */
+
+                if ($resultTransaksi) {
+                    unset($_SESSION['form_data']);
+                    unset($_SESSION['invoice']);
+                    echo "<script>alert('Pembayaran berhasil diproses!'); window.location.href = 'pembarayan-berhasil.php';</script>";
                 }
             }
         } catch (Exception $e) {

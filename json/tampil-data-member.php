@@ -35,9 +35,9 @@
 
         if ($status !== 'all') {
             if ($status === 'aktif') {
-                $baseQuery .= " AND tanggal_berakhir > CURRENT_DATE";
+                $baseQuery .= " AND selisih > 0";
             } else if ($status === 'tidak_aktif') {
-                $baseQuery .= " AND tanggal_berakhir <= CURRENT_DATE";
+                $baseQuery .= " AND selisih = 0";
             }
         }
 
@@ -81,12 +81,12 @@
     $rowAmountMember = $resultAmountMember->fetch(PDO::FETCH_ASSOC);
 
     // Menghitung jumlah member aktif
-    $queryAmountMemberActive = "SELECT COUNT(id_member) AS total_member_aktif FROM view_member_list WHERE tanggal_berakhir > CURRENT_DATE";
+    $queryAmountMemberActive = "SELECT COUNT(id_member) AS total_member_aktif FROM view_member_list WHERE selisih > 0";
     $resultAmountMemberActive = $conn->query($queryAmountMemberActive);
     $rowAmountMemberActive = $resultAmountMemberActive->fetch(PDO::FETCH_ASSOC);
 
     // Menghitung jumlah member tidak aktif
-    $queryAmountMemberNonactive = "SELECT COUNT(id_member) AS total_member_nonaktif FROM view_member_list WHERE tanggal_berakhir <= CURRENT_DATE";
+    $queryAmountMemberNonactive = "SELECT COUNT(id_member) AS total_member_nonaktif FROM view_member_list WHERE selisih = 0";
     $resultAmountMemberNonactive = $conn->query($queryAmountMemberNonactive);
     $rowAmountMemberNonactive = $resultAmountMemberNonactive->fetch(PDO::FETCH_ASSOC);
 

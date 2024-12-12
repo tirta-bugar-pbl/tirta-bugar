@@ -32,7 +32,8 @@
         if (!preg_match("/^[0-9]+$/", $telepon)) {
             echo "<script>alert('Nomor telepon harus berupa angka !');</script>";
         } else {
-            $query = "INSERT INTO member(nama_member, email, password, nomor_telepon, tanggal_awal, tanggal_berakhir, id_paket, id_admin) VALUES ('$nama', '$email', '$pwHash', '$telepon', '$tanggalAwal', '$tanggalAkhir', '$durasi', '$adminId')";
+            // $query = "INSERT INTO member(nama_member, email, password, nomor_telepon, tanggal_awal, tanggal_berakhir, id_paket, id_admin) VALUES ('$nama', '$email', '$pwHash', '$telepon', '$tanggalAwal', '$tanggalAkhir', '$durasi', '$adminId')";
+            $query = "CALL tambah_member('$nama', '$email', '$pwHash', '$telepon', '$tanggalAwal', '$tanggalAkhir', '$durasi', '$adminId')";
 
             if ($conn->query($query)) {
                 header("Location: admin.php");
@@ -41,8 +42,6 @@
             }
         }
     }
-
-    
 ?>
 
 <!DOCTYPE html>

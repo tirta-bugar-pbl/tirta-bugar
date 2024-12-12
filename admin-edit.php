@@ -25,11 +25,13 @@
         $durasi = $_POST['durasi'];
         $nomor_telepon = $_POST['nomor-telepon'];
         $tanggal_berakhir = $_POST['tanggal-akhir'];
+        $tanggal_awal = $_POST['tanggal-awal'];
 
         if (!preg_match("/^[0-9]+$/", $nomor_telepon)) {
             echo "<script>alert('Nomor telepon harus berupa angka !');</script>";
         } else {
-            $queryEdit = "UPDATE member SET nama_member = '$nama_member', email = '$email', nomor_telepon = '$nomor_telepon', tanggal_berakhir = '$tanggal_berakhir', id_paket = '$durasi', id_admin = '$adminId' WHERE id_member = $id";
+            // $queryEdit = "UPDATE member SET nama_member = '$nama_member', email = '$email', nomor_telepon = '$nomor_telepon', tanggal_awal = '$tanggal_awal',tanggal_berakhir = '$tanggal_berakhir', id_paket = '$durasi', id_admin = '$adminId' WHERE id_member = $id";
+            $queryEdit = "CALL edit_member('$id','$nama_member','$email','$nomor_telepon','$tanggal_awal', '$tanggal_berakhir','$adminId','$durasi')";
 
             if ($conn->query($queryEdit)) {
                 header("Location: admin.php");

@@ -305,7 +305,7 @@
                         <td style="text-align: center;">${member.keterangan_durasi}</td>
                         <td style="text-align: center;">${member.keterangan_fasilitas}</td>
                         <td style="text-align: center;">${member.keterangan}</td>
-                        <td style="text-align: center;">${member.tanggal_berakhir_format}</td>
+                        <td style="text-align: center;">${member.format_tanggal_berakhir}</td>
                         <td>
                             <div class="action container">
                                 <a href="admin-detail.php?id=${member.id_member}" class="detail">Detail</a>
