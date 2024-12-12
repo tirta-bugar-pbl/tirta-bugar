@@ -36,7 +36,9 @@
         if ($status !== 'all') {
             if ($status === 'aktif') {
                 $baseQuery .= " AND selisih > 0";
-            } else if ($status === 'tidak_aktif') {
+            } else if($status === 'hampir_habis') {
+                $baseQuery .= " AND selisih <= 7 AND selisih > 0";
+            }else if ($status === 'tidak_aktif') {
                 $baseQuery .= " AND selisih = 0";
             }
         }

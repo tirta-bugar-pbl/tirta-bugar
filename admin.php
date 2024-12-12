@@ -188,8 +188,9 @@
                                             <option value="">Filter & Sort</option>
                                             <option value="all-asc">A - Z</option>
                                             <option value="all-desc">Z - A</option>
-                                            <option value="aktif">Members Aktif</option>
-                                            <option value="tidak_aktif">Member Tidak Aktif</option>
+                                            <option value="aktif">Aktif</option>
+                                            <option value="hampir_habis">Hampir Habis</option>
+                                            <option value="tidak_aktif">Tidak Aktif</option>
                                         </select>
                                     </div>
                                 </div>
@@ -298,6 +299,9 @@
                     const tr = document.createElement('tr');
                     if(member.selisih == 0) {
                         tr.classList.add('habis');
+                    } else if (member.selisih <= 7 && member.selisih > 0) {
+                        tr.classList.add('hampir-habis');
+
                     }
                     tr.innerHTML = `
                         <td>${member.nama_member}</td>
