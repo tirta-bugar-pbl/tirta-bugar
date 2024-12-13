@@ -163,88 +163,87 @@
             </div>
             <main>
                 <!-- form tambah member -->
-                <section class="tambah-member">
-                    <form class="form-tambah container" method="POST">
-                        <div class="form-group container">
-                            <label for="nama">Nama (Sesuai KTP)</label>
-                            <input type="text" name="nama" id="nama" value="<?= $rowDetailMember['nama_member'] ?>" class="input-tambah">
-                        </div>
-                        <div class="form-group container">
-                            <label for="email">Email</label>
-                            <input type="email" name="email" id="email" value="<?= $rowDetailMember['email'] ?>" class="input-tambah">
-                        </div>
-                        <div class="form-group container">
-                            <label for="nomor-telepon">Nomor Telepon</label>
-                            <input type="text" name="nomor-telepon" value="<?= $rowDetailMember['nomor_telepon'] ?>" id="nomor-telepon" class="input-tambah">
-                        </div>
-                        <div class="form-group container">
-                            <label for="durasi">Pilihan Paket</label>
-                            <select name="durasi" id="durasi" class="input-tambah">
-                                <option value="1" <?php if($rowDetailMember['id_paket'] == 1) echo "selected"?>>Regullar - 1 Bulan 8x Fitness</option>
-                                <option value="2" <?php if($rowDetailMember['id_paket'] == 2) echo "selected"?>>Regullar - 1 Bulan Fitness Sepuasnya</option>
-                                <option value="3" <?php if($rowDetailMember['id_paket'] == 3) echo "selected"?>>Regullar - 3 Bulan Fitness Sepuasnya</option>
-                                <option value="4" <?php if($rowDetailMember['id_paket'] == 3) echo "selected"?>>Regullar - 1 Bulan Sepuasnya + 4x Private Fitness</option>
-                            </select>
-                        </div>
-                        <div class="form-group container">
-                            <label for="tanggal-awal">Tanggal Perpanjangan</label>
-                            <input type="date" name="tanggal-awal" id="tanggal-awal" value="<?= date('Y-m-d') ?>" class="input-tambah">
-                        </div>
-                        <div class="form-group container">
-                            <label for="tanggal-akhir">Tanggal Akhir</label>
-                            <input type="date" name="tanggal-akhir" id="tanggal-akhir" value="<?= $rowDetailMember['tanggal_berakhir'] ?>" class="input-tambah" onchange="updateEndDate()">
-                        </div>
-                        <div class="btn-group container">
-                            <button type="submit" name="submit" class="btn-tambah">Edit Member</button>
-                            <a href="admin-detail.php?id=<?= $id ?>" class="btn-cancell">Batalkan</a>
-                        </div>
-                    </form>
-                </section>
+<section class="tambah-member">
+    <form class="form-tambah container" method="POST">
+        <div class="form-group container">
+            <label for="nama">Nama (Sesuai KTP)</label>
+            <input type="text" name="nama" id="nama" value="<?= $rowDetailMember['nama_member'] ?>" class="input-tambah">
+        </div>
+        <div class="form-group container">
+            <label for="email">Email</label>
+            <input type="email" name="email" id="email" value="<?= $rowDetailMember['email'] ?>" class="input-tambah">
+        </div>
+        <div class="form-group container">
+            <label for="nomor-telepon">Nomor Telepon</label>
+            <input type="text" name="nomor-telepon" value="<?= $rowDetailMember['nomor_telepon'] ?>" id="nomor-telepon" class="input-tambah">
+        </div>
+        <div class="form-group container">
+            <label for="durasi">Pilihan Paket</label>
+            <select name="durasi" id="durasi" class="input-tambah" onchange="updateEndDate()">
+                <option value="1" <?php if($rowDetailMember['id_paket'] == 1) echo "selected"?>>Regullar - 1 Bulan 8x Fitness</option>
+                <option value="2" <?php if($rowDetailMember['id_paket'] == 2) echo "selected"?>>Regullar - 1 Bulan Fitness Sepuasnya</option>
+                <option value="3" <?php if($rowDetailMember['id_paket'] == 3) echo "selected"?>>Regullar - 3 Bulan Fitness Sepuasnya</option>
+                <option value="4" <?php if($rowDetailMember['id_paket'] == 4) echo "selected"?>>Regullar - 1 Bulan Sepuasnya + 4x Private Fitness</option>
+            </select>
+        </div>
+        <div class="form-group container">
+            <label for="tanggal-awal">Tanggal Perpanjangan</label>
+            <input type="date" name="tanggal-awal" id="tanggal-awal" value="<?= date('Y-m-d') ?>" class="input-tambah" onchange="updateEndDate()">
+        </div>
+        <div class="form-group container">
+            <label for="tanggal-akhir">Tanggal Akhir</label>
+            <input type="date" name="tanggal-akhir" id="tanggal-akhir" value="<?= $rowDetailMember['tanggal_berakhir'] ?>" class="input-tambah" readonly>
+        </div>
+        <div class="btn-group container">
+            <button type="submit" name="submit" class="btn-tambah">Edit Member</button>
+            <a href="admin-detail.php?id=<?= $id ?>" class="btn-cancell">Batalkan</a>
+        </div>
+    </form>
+</section>
             </main>
         </div>
     </div>
-        <!-- link javascript -->
-        <script>
-        function updateEndDate() {
-            const paketSelect = document.getElementById('durasi');
-            const startDateInput = document.getElementById('tanggal-awal');
-            const endDateInput = document.getElementById('tanggal-akhir');
+    <script>
+    function updateEndDate() {
+        const paketSelect = document.getElementById('durasi');
+        const startDateInput = document.getElementById('tanggal-awal');
+        const endDateInput = document.getElementById('tanggal-akhir');
 
-            console.log(paketSelect.value);
+        const startDate = new Date(startDateInput.value);
+        let duration = 0;
 
-            const startDate = new Date(startDateInput.value);
-            let duration = 0;
-
-            switch (paketSelect.value) {
-                case '1':
-                    duration = 1; // 1 bulan
-                    break;
-                case '2':
-                    duration = 1; // 1 bulan
-                    break;
-                case '3':
-                    duration = 3; // 3 bulan
-                    break;
-                case '4':
-                    duration = 1; // 1 bulan
-                    break;
-                default:
-                    duration = 0; // default atau paket lainnya
-            }
-
-            if (duration > 0) {
-                const endDate = new Date(startDate);
-                endDate.setMonth(endDate.getMonth() + duration);
-                
-                // Format tanggal menjadi yyyy-mm-dd
-                const month = String(endDate.getMonth() + 1).padStart(2, '0'); 
-                const day = String(endDate.getDate()).padStart(2, '0');
-                const year = endDate.getFullYear();
-
-                endDateInput.value = `${year}-${month}-${day}`;
-            }
+        switch (paketSelect.value) {
+            case '1':
+                duration = 1; // 1 bulan
+                break;
+            case '2':
+                duration = 1; // 1 bulan
+                break;
+            case '3':
+                duration = 3; // 3 bulan
+                break;
+            case '4':
+                duration = 1; // 1 bulan
+                break;
+            default:
+                duration = 0; // default atau paket lainnya
         }
 
-    </script>
+        if (duration > 0) {
+            const endDate = new Date(startDate);
+            endDate.setMonth(endDate.getMonth() + duration);
+            
+            // Format tanggal menjadi yyyy-mm-dd
+            const month = String(endDate.getMonth() + 1).padStart(2, '0'); 
+            const day = String(endDate.getDate()).padStart(2, '0');
+            const year = endDate.getFullYear();
+
+            endDateInput.value = `${year}-${month}-${day}`;
+        }
+    }
+
+    // Call updateEndDate when the page loads to set initial end date
+    document.addEventListener('DOMContentLoaded', updateEndDate);
+</script>
 </body>
 </html>
