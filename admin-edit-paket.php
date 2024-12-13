@@ -39,9 +39,11 @@
 
 
         if (empty($keterangan_private)) {
-            $queryUpdate = "UPDATE paket_member SET nama_paket = '$nama_paket', keterangan_fasilitas = '$keterangan_fasilitas', keterangan_durasi = '$keterangan_durasi', harga = '$harga', keterangan_private = null, id_admin = '$adminId' WHERE id_paket = '$id_paket'";
+            // $queryUpdate = "UPDATE paket_member SET nama_paket = '$nama_paket', keterangan_fasilitas = '$keterangan_fasilitas', keterangan_durasi = '$keterangan_durasi', harga = '$harga', keterangan_private = null, id_admin = '$adminId' WHERE id_paket = '$id_paket'";
+            $queryUpdate = "CALL edit_paket_member('$id_paket', '$nama_paket', '$keterangan_fasilitas', '$keterangan_durasi', '$harga', null, '$adminId')";
         } else {
-            $queryUpdate = "UPDATE paket_member SET nama_paket = '$nama_paket', keterangan_fasilitas = '$keterangan_fasilitas', keterangan_durasi = '$keterangan_durasi', harga = '$harga', keterangan_private = '$keterangan_private', id_admin = '$adminId' WHERE id_paket = '$id_paket'";
+            // $queryUpdate = "UPDATE paket_member SET nama_paket = '$nama_paket', keterangan_fasilitas = '$keterangan_fasilitas', keterangan_durasi = '$keterangan_durasi', harga = '$harga', keterangan_private = '$keterangan_private', id_admin = '$adminId' WHERE id_paket = '$id_paket'";
+            $queryUpdate = "CALL edit_paket_member('$id_paket', '$nama_paket', '$keterangan_fasilitas', '$keterangan_durasi', '$harga', '$keterangan_private', '$adminId')";
         }
 
         if ($conn->query($queryUpdate)) {

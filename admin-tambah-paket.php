@@ -18,9 +18,11 @@
         $harga =  (int)$_POST['harga'];
 
         if (empty($keterangan_private)) {
-            $query = "INSERT INTO paket_member (nama_paket, keterangan_fasilitas, keterangan_durasi, harga, keterangan_private, id_admin)  VALUES ('$nama_paket', '$keterangan_fasilitas', '$keterangan_durasi', '$harga', null, '$adminId')";
+            // $query = "INSERT INTO paket_member (nama_paket, keterangan_fasilitas, keterangan_durasi, harga, keterangan_private, id_admin)  VALUES ('$nama_paket', '$keterangan_fasilitas', '$keterangan_durasi', '$harga', null, '$adminId')";
+            $query = "CALL tambah_paket('$nama_paket', '$keterangan_fasilitas', '$keterangan_durasi', '$harga', null, '$adminId')";
         } else {
-            $query = "INSERT INTO paket_member (nama_paket, keterangan_fasilitas, keterangan_durasi, harga, keterangan_private, id_admin)  VALUES ('$nama_paket', '$keterangan_fasilitas', '$keterangan_durasi', '$harga', '$keterangan_private', '$adminId')";
+            // $query = "INSERT INTO paket_member (nama_paket, keterangan_fasilitas, keterangan_durasi, harga, keterangan_private, id_admin)  VALUES ('$nama_paket', '$keterangan_fasilitas', '$keterangan_durasi', '$harga', '$keterangan_private', '$adminId')";
+            $query = "CALL tambah_paket('$nama_paket', '$keterangan_fasilitas', '$keterangan_durasi', '$harga', '$keterangan_private', '$adminId')";
         }
 
         if ($conn->query($query)) {

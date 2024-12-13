@@ -108,24 +108,34 @@
             $result = sendEmail($email, $nama, $subject, $body);
 
             if($result) {
-            if($durasi == '1' || $durasi == '2' || $durasi == '4') {
-                    // query menambahkan data member
-                    $queryTambahMember = "INSERT INTO member(nama_member, email, password, nomor_telepon, tanggal_awal, tanggal_berakhir, id_paket, id_admin) VALUES ('$nama', '$email', '$pwHash', '$nomor_telepon', CURRENT_DATE, CURRENT_DATE + INTERVAL '1 month', '$durasi', null)";
-                    $resultMember = $conn->query($queryTambahMember);
-                } else {
-                    // query menambahkan data member
-                    $queryTambahMember = "INSERT INTO member(nama_member, email, password, nomor_telepon, tanggal_awal, tanggal_berakhir, id_paket, id_admin) VALUES ('$nama', '$email', '$pwHash', '$nomor_telepon', CURRENT_DATE, CURRENT_DATE + INTERVAL '3 month', '$durasi', null)";
-                    $resultMember = $conn->query($queryTambahMember);
-                }
+                /* 
+                if($durasi == '1' || $durasi == '2' || $durasi == '4') {
+                        // query menambahkan data member
+                        $queryTambahMember = "INSERT INTO member(nama_member, email, password, nomor_telepon, tanggal_awal, tanggal_berakhir, id_paket, id_admin) VALUES ('$nama', '$email', '$pwHash', '$nomor_telepon', CURRENT_DATE, CURRENT_DATE + INTERVAL '1 month', '$durasi', null)";
+                        $resultMember = $conn->query($queryTambahMember);
+                    } else {
+                        // query menambahkan data member
+                        $queryTambahMember = "INSERT INTO member(nama_member, email, password, nomor_telepon, tanggal_awal, tanggal_berakhir, id_paket, id_admin) VALUES ('$nama', '$email', '$pwHash', '$nomor_telepon', CURRENT_DATE, CURRENT_DATE + INTERVAL '3 month', '$durasi', null)";
+                        $resultMember = $conn->query($queryTambahMember);
+                    }
 
-                // query menambahkan data transaksi
-                $queryTransaksi = "INSERT INTO transaksi(id_paket, invoice, total_harga, tanggal_transaksi,  status_pembayaran, id_member) VALUES ('$durasi', '$order_id', $total , CURRENT_DATE, 'successful', (SELECT id_member FROM member WHERE nomor_telepon = '$nomor_telepon'))";
-                $resultTransaksi = $conn->query($queryTransaksi);
+                    // query menambahkan data transaksi
+                    $queryTransaksi = "INSERT INTO transaksi(id_paket, invoice, total_harga, tanggal_transaksi,  status_pembayaran, id_member) VALUES ('$durasi', '$order_id', $total , CURRENT_DATE, 'successful', (SELECT id_member FROM member WHERE nomor_telepon = '$nomor_telepon'))";
+                    $resultTransaksi = $conn->query($queryTransaksi);
 
-                if($resultMember && $resultTransaksi) {
-                    // Hapus data session setelah berhasil
-                    unset($_SESSION['form_data']);
-                }
+                    if($resultMember && $resultTransaksi) {
+                        // Hapus data session setelah berhasil
+                        unset($_SESSION['form_data']);
+                    }   
+                        */
+
+                    $queryTransaksi = "CALL tambah_member_transaksi('$nama','$email','$pwHash', '$nomor_telepon','$durasi','$order_id','$harga_paket')";
+                    $resultTransaksi = $conn->query($queryTransaksi); 
+
+                    if($resultTransaksi) {
+                        // Hapus data session setelah berhasil
+                        unset($_SESSION['form_data']);
+                    }   
             }
         } else {
             echo "<script>alert('Pembayaran gagal diproses!'); window.location.href = 'index.php';</script>";

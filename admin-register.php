@@ -23,7 +23,8 @@
                 alert('Email sudah terdaftar, silahkan gunakan email yang lain!');
             </script>";
         } else {
-            $sql = "INSERT INTO admin (username, email, password,token_verify,status_verify) VALUES ('$username', '$email', '$hash_pass', '$verify_token', 0)";
+            // $sql = "INSERT INTO admin (username, email, password,token_verify,status_verify) VALUES ('$username', '$email', '$hash_pass', '$verify_token', 0)";
+            $sql = "CALL register_admin('$username', '$email', '$hash_pass', '$verify_token')";
 
             if ($conn->query($sql)) {
                  // variabel untuk mengirim email
