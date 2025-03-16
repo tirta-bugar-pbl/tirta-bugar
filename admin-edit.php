@@ -191,7 +191,7 @@
             <input type="date" name="tanggal-awal" id="tanggal-awal" value="<?= date('Y-m-d') ?>" class="input-tambah" onchange="updateEndDate()">
         </div>
         <div class="form-group container">
-            <label for="tanggal-akhir">Tanggal Akhir</label>
+            <label for="tanggal-akhir">Tanggal Berakhir</label>
             <input type="date" name="tanggal-akhir" id="tanggal-akhir" value="<?= $rowDetailMember['tanggal_berakhir'] ?>" class="input-tambah" readonly>
         </div>
         <div class="btn-group container">
