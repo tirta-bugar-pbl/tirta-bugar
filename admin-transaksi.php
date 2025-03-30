@@ -17,48 +17,6 @@
     $resultProfileName = $conn->query($queryProfileName);
     $rowProfileName = $resultProfileName->fetch(PDO::FETCH_ASSOC);
 
-    // logika pagination
-    $limit = 10; // Example limit per page
-    $page = isset($_GET['page']) ? $_GET['page'] : 1; // Current page, default to 1
-    $offset = ($page - 1) * $limit; // Offset for SQL query 
-
-    $filter = isset($_GET['filter']) ? $_GET['filter'] : '';
-    $search = isset($_GET['search']) ? $_GET['search'] : '';
-
-    $queryTransaksi = "SELECT DISTINCT TO_CHAR(t.tanggal_transaksi, 'DD Month YYYY') AS tanggal_transaksi, m.nama_member, m.nomor_telepon, p.keterangan_fasilitas, p.keterangan_durasi, t.status_pembayaran, t.total_harga FROM member m JOIN transaksi t ON m.id_member = t.id_member JOIN paket_member p ON t.id_paket = p.id_paket WHERE 1=1";
-
-    
-    // Hitung total transaksi untuk pagination
-    $queryCount = "SELECT COUNT(DISTINCT t.id_transaksi) AS total FROM transaksi t JOIN member m ON m.id_member = t.id_member";
-    $resultCount = $conn->query($queryCount);
-    $totalCount = $resultCount->fetch(PDO::FETCH_ASSOC)['total'];
-    $totalPages = ceil($totalCount / $limit);
-
-    // kondisi searching 
-    if (!empty($search)) {
-        $queryTransaksi .= " AND LOWER(m.nama_member) LIKE '%$search%'";
-    } 
-
-    // Tambahkan filter waktu
-    if ($filter == 'today') {
-        $queryTransaksi .= " AND DATE(t.tanggal_transaksi) = CURRENT_DATE";
-    } else if ($filter == 'week') {
-        $queryTransaksi .= " AND DATE(t.tanggal_transaksi) >= (CURRENT_DATE - INTERVAL '7 days')";
-    } else if ($filter == 'month') {
-        $queryTransaksi .= " AND DATE_PART('month', t.tanggal_transaksi) = DATE_PART('month', CURRENT_DATE) AND DATE_PART('year', t.tanggal_transaksi) = DATE_PART('year', CURRENT_DATE)";
-    }
-
-    // Tambahkan LIMIT dan OFFSET untuk pagination
-    $queryTransaksi .= " LIMIT $limit OFFSET $offset";
-
-    // Eksekusi query
-    $resultTransaksi = $conn->query($queryTransaksi);
-
-    // Hitung total transaksi untuk pagination
-    $queryCount = "SELECT COUNT(DISTINCT t.id_transaksi) AS total FROM transaksi t JOIN member m ON m.id_member = t.id_member";
-    $resultCount = $conn->query($queryCount);
-    $totalCount = $resultCount->fetch(PDO::FETCH_ASSOC)['total'];
-    $totalPages = ceil($totalCount / $limit);
 ?>
 
 <!DOCTYPE html>
@@ -76,6 +34,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+    <script src="notifications.js"></script>
+
 </head>
 <body>
     <div class="container">
@@ -155,16 +115,29 @@
                         <h2>Transaksi</h2>
                     </div>
                     <div class="account">
-                        <!-- notif account -->
-                        <img src="assets/notification.svg" alt="notifivation">
-                        <div class="account-profile">
-                            <!-- icon account -->
-                            <img src="assets/profile.svg" alt="profile">
-                            <h3><?= $rowProfileName['username']?></h3>
-                        </div>
-                    </div>
+            <!-- notif account -->
+            <div id="notification-container" class="notification-container">
+                <div class="notification-icon-wrapper">
+                    <img src="assets/notification.svg" alt="notification" id="notificationIcon">
+                    <span class="notification-badge hidden"></span>
                 </div>
-            </header>
+            </div>
+            <div class="account-profile">
+                <!-- icon account -->
+                <img src="assets/profile.svg" alt="profile">
+                <h3><?= $rowProfileName['username']?></h3>
+            </div>
+        </div>
+            </div>
+                </header>
+        
+            <!-- Pop-Up Notification -->
+        <div id="notification-popup" class="popup hidden">
+            <div class="popup-content">
+                <span id="close-popup" class="close">&times;</span>
+                <ul id="notification-list"></ul>
+            </div>
+        </div>
             <main>
                 <!-- filtering transaksi -->
                 <section class="filtering-transaksi">
@@ -173,16 +146,16 @@
                         <div class="filter-transaksi">
                             <select name="filter" id=filter onchange="applyFilter()">
                                 <option value="">Filter</option>
-                                <option value="today" <?= isset($_GET['filter']) && $_GET['filter'] === 'today' ? 'selected' : '' ?>>Hari Ini</option>
-                                <option value="week" <?= isset($_GET['filter']) && $_GET['filter'] === 'week' ? 'selected' : '' ?>>Minggu Ini</option>
-                                <option value="month" <?= isset($_GET['filter']) && $_GET['filter'] === 'month' ? 'selected' : '' ?>>Bulan ini</option>
+                                <option value="today">Hari Ini</option>
+                                <option value="week">Minggu Ini</option>
+                                <option value="month">Bulan ini</option>
                             </select>
                         </div>
                         <!-- search member -->
                         <div class="search-transaksi container">
-        <input type="text" name="search" id="search" placeholder="Search" value="<?= htmlspecialchars($search) ?>">
-        <img src="assets/search.svg" alt="search">
-    </div>
+                            <input type="text" name="search" id="search" placeholder="Search">
+                            <img src="assets/search.svg" alt="search">
+                        </div>
                 </section>
                 <section class="member-table">
                     <table>
@@ -190,27 +163,17 @@
                         <thead>
                             <tr>
                                 <td style="text-align: center;width: 15%;">Tanggal Transaksi</td>
+                                <td style="text-align: center;width: 10%;">Invoice</td>
                                 <td style="text-align: center;width: 15%;">Nama</td>
                                 <td style="text-align: center; width: 15%;">Nomor Telepon</td>
                                 <td style="text-align: center; width: 10%;">Durasi</td>
                                 <td style="text-align: center; width: 15%;">Keterangan</td>
-                                <td style="text-align: center; width: 15%;">Status Pembayaran</td>
+                                <td style="text-align: center; width: 10%;">Status Pembayaran</td>
                                 <td style="text-align: center; width: 15%;">Total Bayar</td>
 
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($resultTransaksi as $result) : ?>
-                                <tr>
-                                <td style="text-align: center;"><?= $result['tanggal_transaksi']?></td>
-                                <td><?= $result['nama_member']?></td>
-                                <td style="text-align: center;"><?= $result['nomor_telepon']?></td>
-                                <td style="text-align: center;"><?= $result['keterangan_durasi']?></td>
-                                <td style="text-align: center;"><?= $result['keterangan_fasilitas']?></td>
-                                <td style="text-align: center;"><b><?= $result['status_pembayaran']?></b></td>
-                                <td style="text-align: center;"><?= rupiah($result['total_harga'])?></td>
-                            </tr>
-                            <?php endforeach; ?>
                         </tbody>
                     </table>
                 </section>
@@ -218,9 +181,6 @@
                 <section class="pagination">
                     <div class="container">
                         <ul>
-                            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                                <li><a href="?page=<?= $i ?>&search=<?= $search ?>" class="<?= ($i == $page) ? 'active' : '' ?>"><?= $i ?></a></li>
-                            <?php endfor; ?>
                         </ul>
                     </div>
                 </section>
@@ -228,12 +188,83 @@
         </div>
     </div>
     <script>
-        function applyFilter() {
-            const filter = document.getElementById('filter').value;
-            const url = new URL(window.location.href);
-            url.searchParams.set('filter', filter);
-            window.location.href = url.toString();
-        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterSelect = document.getElementById('filter');
+            const searchInput = document.getElementById('search');
+            const searchForm = document.querySelector('form');
+
+            // konversi ke mata uang rupiah
+            function formatRupiah(angka) {
+                return 'Rp ' + angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+            }
+
+            // pengambilan data
+            function fetchData(page = 1) {
+                const params = new URLSearchParams({
+                    page: page,
+                    filter: filterSelect.value,
+                    search: searchInput.value,
+                });
+
+                fetch('./json/tampil-data-transkasi.php?' + params.toString())
+                    .then(response => response.json())
+                    .then(data => {
+                        renderTable(data.transactions);
+                        renderPagination(data.totalPages, data.currentPage);
+                    })
+                    .catch(error => console.error('Error fetching data:', error));
+            }
+
+            // render table
+            function renderTable(transactions) {
+                const tbody = document.querySelector('tbody');
+                tbody.innerHTML = '';
+
+                transactions.forEach(transaction => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td style="text-align: center;">${transaction.tanggal_transaksi_formated}</td>
+                        <td style="text-align: center;">${transaction.invoice}</td>
+                        <td>${transaction.nama_member}</td>
+                        <td style="text-align: center;">${transaction.nomor_telepon}</td>
+                        <td style="text-align: center;">${transaction.keterangan_durasi}</td>
+                        <td style="text-align: center;">${transaction.keterangan_fasilitas}</td>
+                        <td style="text-align: center;"><b>${transaction.status_pembayaran}</b></td>
+                        <td style="text-align: center;">${transaction.total_harga}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            // render pagination
+            function renderPagination(totalPages, currentPage) {
+                const pagination = document.querySelector('.pagination ul');
+                pagination.innerHTML = '';
+
+                for (let i = 1; i <= totalPages; i++) {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<a href="#" class="${i === currentPage ? 'active' : ''}" data-page="${i}">${i}</a>`;
+                    pagination.appendChild(li);
+                }
+
+                document.querySelectorAll('.pagination a').forEach(link => {
+                    link.addEventListener('click', function(event) {
+                        event.preventDefault();
+                        const page = parseInt(this.getAttribute('data-page'));
+                        fetchData(page);
+                    });
+                });
+            }
+
+            filterSelect.addEventListener('change', () => fetchData(1));
+            searchForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+                fetchData(1);
+            });
+
+            fetchData();
+        });
     </script>
+
 </body>
 </html>

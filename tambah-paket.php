@@ -1,58 +1,40 @@
 <?php
-    error_reporting(E_ALL);
-    ini_set('display_errors', 1);
-    session_start();
-    include 'koneksi.php';
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+session_start();
+include 'koneksi.php';
 
-    if (!isset($_SESSION['email'])) {
-        die("Anda belum login.");
-    }
+if (!isset($_SESSION['email'])) {
+    die("Anda belum login.");
+}
 
-    // Cek ID Paket
-    if (!isset($_GET['id_paket']) || !is_numeric($_GET['id_paket']) || empty($_GET['id_paket'])) {
-        die("ID Paket tidak ditemukan atau tidak valid.");
-    }
-
-    $id_paket = (int)$_GET['id_paket'];
-
-    // Ambil data paket
-    $adminId = $_SESSION['id_admin'];
-    $queryProfileName = "SELECT username FROM admin WHERE id_admin = $adminId";
-    $resultProfileName = $conn->query($queryProfileName);
-    $rowProfileName = $resultProfileName->fetch(PDO::FETCH_ASSOC);
-
-    $queryPaket = "SELECT * FROM paket_member WHERE id_paket = $id_paket";
-    $paket = $conn->query($queryPaket);
-    $resultPaket = $paket->fetch(PDO::FETCH_ASSOC);
-
-    if (!$paket) {
-        die("Data paket tidak ditemukan.");
-    }
-
-    // Proses update data
-    if (isset($_POST['submit'])) {
+// Proses tambah data
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    try {
         $nama_paket = $_POST['nama_paket'];
         $keterangan_fasilitas = $_POST['keterangan_fasilitas'];
         $keterangan_durasi = $_POST['keterangan_durasi'];
-        $keterangan_private = $_POST['keterangan_private'];
-        $harga = (int)$_POST['harga'];
+        $harga = $_POST['harga'];
 
+        $query = "INSERT INTO paket_member (nama_paket, keterangan_fasilitas, keterangan_durasi, harga) 
+                 VALUES (:nama_paket, :keterangan_fasilitas, :keterangan_durasi, :harga)";
+        
+        $stmt = $conn->prepare($query);
+        $stmt->bindParam(':nama_paket', $nama_paket);
+        $stmt->bindParam(':keterangan_fasilitas', $keterangan_fasilitas);
+        $stmt->bindParam(':keterangan_durasi', $keterangan_durasi);
+        $stmt->bindParam(':harga', $harga);
 
-        if (empty($keterangan_private)) {
-            // $queryUpdate = "UPDATE paket_member SET nama_paket = '$nama_paket', keterangan_fasilitas = '$keterangan_fasilitas', keterangan_durasi = '$keterangan_durasi', harga = '$harga', keterangan_private = null, id_admin = '$adminId' WHERE id_paket = '$id_paket'";
-            $queryUpdate = "CALL edit_paket_member('$id_paket', '$nama_paket', '$keterangan_fasilitas', '$keterangan_durasi', '$harga', null, '$adminId')";
-        } else {
-            // $queryUpdate = "UPDATE paket_member SET nama_paket = '$nama_paket', keterangan_fasilitas = '$keterangan_fasilitas', keterangan_durasi = '$keterangan_durasi', harga = '$harga', keterangan_private = '$keterangan_private', id_admin = '$adminId' WHERE id_paket = '$id_paket'";
-            $queryUpdate = "CALL edit_paket_member('$id_paket', '$nama_paket', '$keterangan_fasilitas', '$keterangan_durasi', '$harga', '$keterangan_private', '$adminId')";
-        }
-
-        if ($conn->query($queryUpdate)) {
+        if ($stmt->execute()) {
             header('Location: admin-paket.php');
             exit();
         } else {
-            die("Gagal menyimpan perubahan.");
+            throw new Exception("Gagal menambahkan paket");
         }
+    } catch (Exception $e) {
+        die("Error: " . $e->getMessage());
     }
+}
 ?>
 
 <!DOCTYPE html>
@@ -60,17 +42,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Paket</title>
+    <title>Tambah Paket</title>
     <!-- Link CSS -->
     <link rel="stylesheet" href="css/admin.css?v=<?php echo time(); ?>">
-    <link rel="stylesheet" href="css/admin-edit-paket.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="css/tambah-paket.css?v=<?php echo time(); ?>">
     <!-- Link favicon -->
     <link rel="shortcut icon" href="assets/logo-favicon.png" type="image/x-icon">
     <!-- Link Google Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
-    <script src= notifications.js></script>
 </head>
 <body>
     <div class="container">
@@ -144,63 +125,38 @@
             <header>
                 <div class="container">
                     <div class="title-page">
-                        <h2>Edit Paket</h2>
+                        <h2>Tambah Paket Baru</h2>
                     </div>
-
                     <div class="account">
-                    <!-- notif account -->
-                        <div id="notification-container" class="notification-container">
-                            <div class="notification-icon-wrapper">
-                                <img src="assets/notification.svg" alt="notification" id="notificationIcon">
-                                <span class="notification-badge hidden"></span>
-                            </div>
-                        </div>
+                        <img src="assets/notification.svg" alt="notifivation">
                         <div class="account-profile">
-                            <!-- icon account -->
                             <img src="assets/profile.svg" alt="profile">
-                            <h3><?= $rowProfileName['username']?></h3>
                         </div>
                     </div>
                 </div>
             </header>
-            
-            <!-- Pop-Up Notification -->
-            <div id="notification-popup" class="popup hidden">
-                <div class="popup-content">
-                    <span id="close-popup" class="close">&times;</span>
-                    <ul id="notification-list"></ul>
-                </div>
-            </div>
             <main>
-                <!-- form edit paket -->
+                <!-- form tambah paket -->
                 <section class="edit-paket">
                     <form method="POST" class="form-edit container">
-                        <input type="hidden" name="id_paket" value="<?= $resultPaket['id_paket'] ?>">
-
                         <div class="form-group container">
                             <label for="nama_paket">Nama Paket</label>
-                            <input type="text" name="nama_paket" id="nama_paket" class="input-edit" value="<?= $resultPaket['nama_paket'] ?>" required>
+                            <input type="text" name="nama_paket" id="nama_paket" class="input-edit" required>
                         </div>
                         
                         <div class="form-group container">
                             <label for="keterangan_fasilitas">Keterangan Fasilitas</label>
-                            <input type="text" name="keterangan_fasilitas" id="keterangan_fasilitas" class="input-edit" value="<?= $resultPaket['keterangan_fasilitas'] ?>" required>
+                            <input type="text" name="keterangan_fasilitas" id="keterangan_fasilitas" class="input-edit" required>
                         </div>
 
                         <div class="form-group container">
-                            <label for="keterangan_durasi">Keterangan Durasi (berapa pertemuan)</label>
-                            <input type="text" name="keterangan_durasi" id="keterangan_durasi" class="input-edit" value="<?= $resultPaket['keterangan_durasi'] ?>" required>
-                        </div>
-
-                        
-                        <div class="form-group container">
-                            <label for="keterangan_private">Keterangan Private (berapa pertemuan)</label>
-                            <input type="text" name="keterangan_private" id="keterangan_private" class="input-edit" value="<?= $resultPaket['keterangan_private'] ?>">
+                            <label for="keterangan_durasi">Keterangan Durasi</label>
+                            <input type="text" name="keterangan_durasi" id="keterangan_durasi" class="input-edit" required>
                         </div>
 
                         <div class="form-group container">
                             <label for="harga">Harga</label>
-                            <input type="text" name="harga" id="harga" class="input-edit" value="<?= $resultPaket['harga'] ?>" required>
+                            <input type="number" name="harga" id="harga" class="input-edit" step="0.01" required>
                         </div>
 
                         <div class="btn-group container">

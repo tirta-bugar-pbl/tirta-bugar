@@ -9,21 +9,35 @@
         if (empty($email) || empty($password)) {
             echo "<script>alert('Wajib isi Form !');</script>";
         } else {
-            $sql = "SELECT * FROM admin WHERE email = '$email'";
-            $result = $conn->query($sql);
-            $user = $result->fetch(PDO::FETCH_ASSOC);
 
-            if($result) {
-                if($user['status_verify'] == 0) {
-                    echo "<script>alert('Akun kamu belum di verifikasi !');</script>";
-                } else {
-                    if ($user && password_verify($password, $user['password'])) {
-                        $_SESSION['email'] = $user['email'];
-                        $_SESSION['id_admin'] = $user['id_admin'];
-                        header('Location: admin.php');
-                        exit();
+            $ch = curl_init('https://www.google.com/recaptcha/api/siteverify');
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, [
+                'secret' => '6LfEookqAAAAAIRwktMaonwH5dUsS-OBoC9dmzMv', 
+                'response' => $_POST['g-recaptcha-response'],
+            ]);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $response = curl_exec($ch);
+            $result = json_decode($response);
+            if (!$result->success) {
+                echo "<script>alert('Akun kamu ngisi capctha !');</script>";
+            } else {
+                $sql = "SELECT * FROM admin WHERE email = '$email'";
+                $resultLogin = $conn->query($sql);
+                $user = $resultLogin->fetch(PDO::FETCH_ASSOC);
+    
+                if($resultLogin) {
+                    if($user['status_verify'] == 0) {
+                        echo "<script>alert('Akun kamu belum di verifikasi !');</script>";
                     } else {
-                        echo "<script>alert('Email atau password salah!');</script>";
+                        if ($user && password_verify($password, $user['password'])) {
+                            $_SESSION['email'] = $user['email'];
+                            $_SESSION['id_admin'] = $user['id_admin'];
+                            header('Location: admin.php');
+                            exit();
+                        } else {
+                            echo "<script>alert('Email atau password salah!');</script>";
+                        }
                     }
                 }
             }
@@ -37,14 +51,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin</title>
+    <!-- link css -->
     <link rel="stylesheet" href="css/admin.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="css/admin-login.css?v=<?php echo time(); ?>">
-     <!-- link favicon -->
-     <link rel="shortcut icon" href="assets/logo-favicon.png" type="image/x-icon">
-        <!-- link google font -->
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+    <!-- link favicon -->
+    <link rel="shortcut icon" href="assets/logo-favicon.png" type="image/x-icon">
+    <!-- link captcha -->
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <!-- link google font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
@@ -63,7 +80,9 @@
                     </div>
                     <a class="auth-link" href="admin-forgot-password.php" target="_blank">Forgot Password</a>
                 </div>
-                <div class="btn-group">
+                <div class="btn-group container">
+                    <div class="g-recaptcha" data-sitekey="6LfEookqAAAAABXcqRQj72oB7pPTR4JC121z5DmZ"></div>
+                    <br/>
                     <button type="submit" name="submit" class="btn-login">Login</button>
                     <p>Don’t have account? <a class="auth-link" href="admin-register.php">Register</a></p>
                 </div>
